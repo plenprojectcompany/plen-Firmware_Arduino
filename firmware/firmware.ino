@@ -1,99 +1,4 @@
-/**
- * PLEN2 - Firmware for Arduino (Atmega32u4)
- * =============================================================================
- *
- * Code name "Cytisus" (version 1.00).
- *
- * Copyright (c) 2015.
- * ---
- * - Kazuyuki TAKASE - https://github.com/Guvalif
- * - PLEN Project Company Ltd. - http://plen.jp/
- * 
- * Build enviroment.
- * ---
- * - Windows 8.1 Professional edition
- * - Windows 7 Home Premium
- * - Arduino IDE ver.1.6.0
- * - Sublime Text 2 ver.2.0.2
- * - [Stino](https://github.com/Robot-Will/Stino)
- * - [Arduino Unit](https://github.com/mmurdoch/arduinounit)
- * 
- * License.
- * ---
- * This software is released under the MIT License.
- * (See also : http://opensource.org/licenses/mit-license.php)
- */
-
-
-// 標準Cライブラリ関連
-#include <string.h>
-
-// Arduinoライブラリ関連
-#include <EEPROM.h>
-#include <Wire.h>
-
-
-// #define _DEBUG           // デバッグプリントを行います。
-// #define _DEBUG_CODE      // コードインタプリタ回りのデバッグを行います。
-// #define _DEBUG_MOTION    // モーション再生回りのデバッグを行います。
-// #define _DEBUG_INSTALL   // モーションインストール回りのデバッグを行います。
-// #define _DEBUG_EXTEEPROM // EEPROMの読み書き回りのデバッグを行います。
-// #define _DEBUG_HARD      // 割り込み回りがシビアなメソッドについてもデバッグプリントを行います。
-
-
-/**
- * ピンマッピング
- * =============================================================================
- * NOTE:
- * ---
- * PLEN2の回路図も併せてご参照ください。
- * Arduino Microのピンマッピング → http://arduino.cc/en/Hacking/PinMapping32u4
- */
-namespace Pin
-{
-	inline static const int MULTIPLEXER_SELECT0() { return 5;  }
-	inline static const int MULTIPLEXER_SELECT1() { return 6;  }
-	inline static const int MULTIPLEXER_SELECT2() { return 12; }
-	inline static const int PWM_OUT_00_07()       { return 11; }
-	inline static const int PWM_OUT_08_15()       { return 10; }
-	inline static const int PWM_OUT_16_23()       { return 9;  }
-	inline static const int RS485_TXD()           { return 4;  }
-	inline static const int LED_OUT()             { return 13; }
-}
-
-
-/**
- * 前方参照・定数定義
- * =============================================================================
- * CAUTION!:
- * ---
- * コンパイルの都合上、配列の要素数はマクロで参照しないとエラーとなります。
- * C++11のconstexprを使用すれば、静的に決定可能な変数はinline展開され、
- * マクロと同様に扱ってもエラーとなりません。
- *
- * Arduino IDEでもソースコードをC++11とみなしてコンパイルを行うことが可能です。
- * 参考 → http://www.cloverfield.jp/2015/03/18/786
- */
-namespace System
-{
-	#define         _SYSTEM__USBSERIAL                       Serial
-	#define         _SYSTEM__BLESERIAL                       Serial1
-	#define         _SYSTEM__PWM_OUT_00_07_REGISTER          OCR1C
-	#define         _SYSTEM__PWM_OUT_08_15_REGISTER          OCR1B
-	#define         _SYSTEM__PWM_OUT_16_23_REGISTER          OCR1A
-	inline static const long USBSERIAL_BAUDRATE()   { return 2000000; }
-	inline static const long BLESERIAL_BAUDRATE()   { return 2000000; }
-	inline static const int  EEPROM_SIZE()          { return 1024;    }
-}
-
-namespace ExternalEEPROM
-{
-	inline static const long CLOCK()      { return 400000;  }
-	inline static const long SIZE()       { return 0x20000; }
-	inline static const int  BLOCK()      { return 32;      }
-	inline static const int  ADDRESS()    { return 0x50;    }
-	inline static const int  SELECT_BIT() { return 2;       }
-}
+#include "Main.h"
 
 namespace Purser
 {
@@ -114,30 +19,6 @@ namespace Multiplexer
 	inline static const int SELECTABLE_NUM() { return 8; } // 制御可能数
 }
 
-namespace Joint
-{
-	struct JointSetting
-	{
-		unsigned int MIN;  // 関節可動域最小値
-		unsigned int MAX;  // 関節可動域最大値
-		unsigned int HOME; // 関節初期位置
-	};
-
-	inline static const int SUM()                  { return 24;   } // 実装個数
-	#define         _JOINT__SUM                             24
-	inline static const int ANGLE_MIN()            { return 300;  }
-	inline static const int ANGLE_MAX()            { return 1500; }
-	inline static const int CONFIG_FLAG_ADDRESS()  { return 0;    }
-	inline static const int CONFIG_FLAG_VALUE()    { return 0;    }
-	inline static const int CONFIG_BEGIN_ADDRESS() { return 1;    }
-
-	namespace PWM
-	{
-		inline static const int NEUTRAL() { return 652; } // 機械的中間PWM
-		inline static const int MIN()     { return 493; } // 機械的可動最大PWM
-		inline static const int MAX()     { return 810; } // 機械的可動最小PWM
-	}
-}
 
 namespace Motion
 {
@@ -184,184 +65,6 @@ namespace Config
 }
 
 
-/**
- * システム管理メソッド・変数
- * =============================================================================
- */
-namespace System
-{
-	Stream* input_serial  = &_SYSTEM__BLESERIAL;
-	Stream* output_serial = &_SYSTEM__USBSERIAL;
-
-	// 入力シリアルの切り替えを行います。
-	void toggleInputSerial()
-	{
-		#ifdef _DEBUG
-			System::output_serial->println(F("in fuction : System::toggleInputSerial()"));
-		#endif
-
-		if (input_serial == &_SYSTEM__BLESERIAL)
-		{
-			input_serial = &_SYSTEM__USBSERIAL;
-		}
-		else
-		{
-			input_serial = &_SYSTEM__BLESERIAL;
-		}
-	}
-
-	// Timer1割り込みを許可します。
-	void timer1Start()
-	{
-		#ifdef _DEBUG
-			System::output_serial->println(F("in fuction : System::timer1Start()"));
-		#endif
-
-
-		TIMSK1 = _BV(TOIE1);
-	}
-
-	// Timer1割り込みを禁止します。
-	void timer1Stop()
-	{
-		#ifdef _DEBUG
-			System::output_serial->println(F("in fuction : System::timer1Stop()"));
-		#endif
-
-		TIMSK1 &= ~_BV(TOIE1);
-	}
-}
-
-
-/**
- * 外部EEPROM管理メソッド
- * =============================================================================
- * NOTE:
- * ---
- * 使用しているEEPROM，24FC1025は、一度にアクセス可能な領域サイズが
- * 128byteですが、ArduinoのWireライブラリのバッファサイズが32byteのため、
- * 性能を最大限に引き出すことはできません。
- *
- * また注意点として、書き込みの場合アドレス指定の2byteもこの32byteに含まれます。
- * つまり、1度に書き込み可能な正味の領域サイズは30byteとなります。
- *
- *
- * TASK:
- * ---
- * I2Cのバッファサイズ拡張。
- */
-namespace ExternalEEPROM
-{
-	// 領域境界を1つのスロットとして、1スロットごとに読み込みを行います。
-	int readBlock(unsigned int slot, char* data, unsigned int read_size = BLOCK())
-	{
-		#ifdef _DEBUG
-			System::output_serial->println(F("in fuction : ExternalEEPROM::readBlock()"));
-		#endif
-
-		if (read_size > BLOCK())
-		{
-			return -1;
-		}
-
-		int  slave_address = ADDRESS();
-		long data_address  = (long)slot * BLOCK();
-
-		if (data_address >= (SIZE() / 2))
-		{
-			slave_address |= _BV(SELECT_BIT()); // B0 = 1のメモリブロックを選択
-			data_address  -= (SIZE() / 2);
-		}
-
-		#ifdef _DEBUG_EXTEEPROM
-			System::output_serial->print("slave_address : ");
-			System::output_serial->println(slave_address, HEX);
-			System::output_serial->print("data_address : ");
-			System::output_serial->println(data_address, HEX);
-		#endif
-
-		Wire.beginTransmission(slave_address);
-		Wire.write((byte)(data_address >> 8));     // High側アドレスを指定する
-		Wire.write((byte)(data_address & 0x00ff)); // Low側アドレスを指定する
-		int ret = Wire.endTransmission();
-
-		if (ret == 0)
-		{
-			ret = Wire.requestFrom(slave_address, read_size);
-			if (ret == read_size)
-			{
-				for (int index = 0; index < read_size; index++)
-				{
-					data[index] = Wire.read();
-				}
-			}
-			else
-			{
-				ret = -1;
-			}
-		}
-
-		return ret;
-	}
-
-	// 領域境界を1つのスロットとして、1スロットごとに書き込みを行います。
-	// CAUTION!:
-	// ---
-	// EEPROMへの書き込みには時間がかかるので、このメソッドの使用後に
-	// delay()を5[msec]程度、ハードコーディングしてください。
-	int writeBlock(unsigned int slot, char* data, unsigned int write_size = BLOCK())
-	{
-		#ifdef _DEBUG
-			System::output_serial->println(F("in fuction : ExternalEEPROM::writeBlock()"));
-		#endif
-
-		if (write_size > BLOCK())
-		{
-			return -1;
-		}
-
-		int  slave_address = ADDRESS();
-		long data_address  = (long)slot * BLOCK();
-
-		if (data_address >= (SIZE() / 2))
-		{
-			slave_address |= _BV(SELECT_BIT()); // B0 = 1のメモリブロックを選択
-			data_address  -= (SIZE() / 2);
-		}
-
-		#ifdef _DEBUG_EXTEEPROM
-			System::output_serial->print("slave_address : ");
-			System::output_serial->println(slave_address, HEX);
-			System::output_serial->print("data_address : ");
-			System::output_serial->println(data_address, HEX);
-		#endif
-
-		Wire.beginTransmission(slave_address);
-		Wire.write((byte)(data_address >> 8));     // High側アドレスを指定する
-		Wire.write((byte)(data_address & 0x00ff)); // Low側アドレスを指定する
-
-		for (int index = 0; index < write_size; index++)
-		{
-			Wire.write(*data++);
-		}
-
-		return Wire.endTransmission();
-	}
-}
-
-
-/**
- * 関節管理メソッド・変数
- * =============================================================================
- * NOTE:
- * ---
- * PWM信号の出力ピンが3本なので、8出力のマルチプレクサと組み合わせることで
- * 計24個までのサーボモータを制御します。
- *
- * サーボモータの許容最小パルス幅は0.78[msec]，許容最大パルス幅は2.18[msec]と、
- * 実測値として確認されています。その際の可動範囲は130[deg]となります。
- * ただし、本ファームウェアでは個体差を考慮して少なめに見積もっています。
- */
 namespace Joint
 {
 	JointSetting SETTINGS[_JOINT__SUM] =
@@ -453,13 +156,13 @@ namespace Joint
 	// 指定したサーボモータの関節可動域最小値を、指定した値に設定します。
 	void setMinAngle(unsigned char joint_id, unsigned int angle)
 	{
-		#ifdef _DEBUG
+		#if _DEBUG
 			System::output_serial->println(F("in fuction : Joint::setMinAngle()"));
 		#endif
 
 		if (joint_id >= SUM())
 		{
-			#ifdef _DEBUG
+			#if _DEBUG
 				System::output_serial->print(F(">>> joint_id : bad argment (value : "));
 				System::output_serial->print((int)joint_id);
 				System::output_serial->println(F(")"));
@@ -479,7 +182,7 @@ namespace Joint
 			delay(5);
 		}
 
-		#ifdef _DEBUG
+		#if _DEBUG
 			System::output_serial->print(F(">>> address_offset : "));
 			System::output_serial->println(address_offset);
 		#endif
@@ -488,13 +191,13 @@ namespace Joint
 	// 指定したサーボモータの関節可動域最大値を、指定した値に設定します。
 	void setMaxAngle(unsigned char joint_id, unsigned int angle)
 	{
-		#ifdef _DEBUG
+		#if _DEBUG
 			System::output_serial->println(F("in fuction : Joint::setMaxAngle()"));
 		#endif
 
 		if (joint_id >= SUM())
 		{
-			#ifdef _DEBUG
+			#if _DEBUG
 				System::output_serial->print(F(">>> joint_id : bad argment (value : "));
 				System::output_serial->print((int)joint_id);
 				System::output_serial->println(F(")"));
@@ -514,7 +217,7 @@ namespace Joint
 			delay(5);
 		}
 
-		#ifdef _DEBUG
+		#if _DEBUG
 			System::output_serial->print(F(">>> address_offset : "));
 			System::output_serial->println(address_offset);
 		#endif
@@ -523,13 +226,13 @@ namespace Joint
 	// 指定したサーボモータの関節初期位置を、指定した値に設定します。
 	void setHomeAngle(unsigned char joint_id, unsigned int angle)
 	{
-		#ifdef _DEBUG
+		#if _DEBUG
 			System::output_serial->println(F("in fuction : Joint::setHomeAngle()"));
 		#endif
 
 		if (joint_id >= SUM())
 		{
-			#ifdef _DEBUG
+			#if _DEBUG
 				System::output_serial->print(F(">>> joint_id : bad argment (value : "));
 				System::output_serial->print((int)joint_id);
 				System::output_serial->println(F(")"));
@@ -549,7 +252,7 @@ namespace Joint
 			delay(5);
 		}
 
-		#ifdef _DEBUG
+		#if _DEBUG
 			System::output_serial->print(F(">>> address_offset : "));
 			System::output_serial->println(address_offset);
 		#endif
@@ -558,13 +261,13 @@ namespace Joint
 	// 指定したサーボモータの角度を、指定した値に設定します。
 	void setAngle(unsigned char joint_id, unsigned int angle)
 	{
-		#ifdef _DEBUG_HARD
+		#if _DEBUG_HARD
 			System::output_serial->println(F("in fuction : Joint::setAngle()"));
 		#endif
 
 		if (joint_id >= SUM())
 		{
-			#ifdef _DEBUG_HARD
+			#if _DEBUG_HARD
 				System::output_serial->print(F(">>> joint_id : bad argment (value : "));
 				System::output_serial->print((int)joint_id);
 				System::output_serial->println(F(")"));
@@ -600,7 +303,7 @@ namespace Config
 	// 保持している関節情報をダンプします。
 	void dumpJointSettings()
 	{
-		#ifdef _DEBUG
+		#if _DEBUG
 			System::output_serial->println(F("in fuction : Config::dumpJointSettings()"));
 		#endif
 
@@ -620,7 +323,7 @@ namespace Config
 	// 指定したスロットのモーション情報をダンプします。
 	void dumpMotion(unsigned char slot)
 	{
-		#ifdef _DEBUG
+		#if _DEBUG
 			System::output_serial->println(F("in fuction : Config::dumpMotion()"));
 		#endif
 
@@ -837,7 +540,7 @@ namespace Motion
 	// CAUTION: ヘッダーサイズの変化に弱い実装
 	void setHeader(HeaderDefinition* p_header)
 	{
-		#ifdef _DEBUG_EXTEEPROM
+		#if _DEBUG_EXTEEPROM
 			System::output_serial->println(F("in fuction : Motion::setHeader()"));
 		#endif
 
@@ -846,7 +549,7 @@ namespace Motion
 		int ret = ExternalEEPROM::writeBlock((int)p_header->slot * 41, filler, sizeof(*p_header) /* = 25byte */);
 		delay(10);
 
-		#ifdef _DEBUG_EXTEEPROM
+		#if _DEBUG_EXTEEPROM
 			System::output_serial->print(F("return : "));
 			System::output_serial->println(ret);
 		#endif
@@ -857,7 +560,7 @@ namespace Motion
 	// CAUTION: ヘッダーサイズの変化に弱い実装
 	void getHeader(unsigned char motion_slot, HeaderDefinition* p_header)
 	{
-		#ifdef _DEBUG_EXTEEPROM
+		#if _DEBUG_EXTEEPROM
 			System::output_serial->println(F("in fuction : Motion::getHeader()"));
 		#endif
 
@@ -865,7 +568,7 @@ namespace Motion
 
 		int ret = ExternalEEPROM::readBlock((int)motion_slot * 41, filler, sizeof(*p_header) /* = 25byte */);
 
-		#ifdef _DEBUG_EXTEEPROM
+		#if _DEBUG_EXTEEPROM
 			System::output_serial->print(F("return : "));
 			System::output_serial->println(ret);
 		#endif
@@ -883,21 +586,21 @@ namespace Motion
 	// CAUTION: フレームサイズの変化に弱い実装
 	void setFrame(unsigned char motion_slot, Frame::FrameDefinition* p_frame)
 	{
-		#ifdef _DEBUG_EXTEEPROM
+		#if _DEBUG_EXTEEPROM
 			System::output_serial->println(F("in fuction : Motion::setFrame()"));
 		#endif
 
 		char* filler = (char*)p_frame;
 
 		int ret = ExternalEEPROM::writeBlock((int)motion_slot * 41 + 1 + (int)p_frame->number * 2, filler, 30);
-		#ifdef _DEBUG_EXTEEPROM
+		#if _DEBUG_EXTEEPROM
 			System::output_serial->print(F("return [0] : "));
 			System::output_serial->println(ret);
 		#endif
 		delay(10);
 
 		ret = ExternalEEPROM::writeBlock((int)motion_slot * 41 + 1 + (int)p_frame->number * 2 + 1, filler + 30, 21);
-		#ifdef _DEBUG_EXTEEPROM
+		#if _DEBUG_EXTEEPROM
 			System::output_serial->print(F("return [1] : "));
 			System::output_serial->println(ret);
 		#endif
@@ -909,20 +612,20 @@ namespace Motion
 	// CAUTION: フレームサイズの変化に弱い実装
 	void getFrame(unsigned char motion_slot, unsigned char frame_num, Frame::FrameDefinition* p_frame)
 	{
-		#ifdef _DEBUG_EXTEEPROM
+		#if _DEBUG_EXTEEPROM
 			System::output_serial->println(F("in fuction : Motion::getFrame()"));
 		#endif
 
 		char* filler = (char*)p_frame;
 
 		int ret = ExternalEEPROM::readBlock((int)motion_slot * 41 + 1 + (int)frame_num * 2, filler, 30);
-		#ifdef _DEBUG_EXTEEPROM
+		#if _DEBUG_EXTEEPROM
 			System::output_serial->print(F("return [0] : "));
 			System::output_serial->println(ret);
 		#endif
 
 		ret = ExternalEEPROM::readBlock((int)motion_slot * 41 + 1 + (int)frame_num * 2 + 1, filler + 30, 21);
-		#ifdef _DEBUG_EXTEEPROM
+		#if _DEBUG_EXTEEPROM
 			System::output_serial->print(F("return [1] : "));
 			System::output_serial->println(ret);
 		#endif
@@ -1165,7 +868,7 @@ namespace Purser
 			PURSER_STATE_EOF
 		} PurserState;
 
-		#ifdef _DEBUG
+		#if _DEBUG
 			const char* STR[] =
 			{
 				"INIT",
@@ -1288,7 +991,7 @@ namespace Purser
 	// arduinoのsetup()内で呼ぶ必要はありません。
 	void init()
 	{
-		#ifdef _DEBUG
+		#if _DEBUG
 			System::output_serial->println(F("in fuction : Purser::init()"));
 		#endif
 
@@ -1315,7 +1018,7 @@ namespace Purser
 	// 内部のif文を削除してください。
 	void readByte(char byte)
 	{
-		#ifdef _DEBUG
+		#if _DEBUG
 			System::output_serial->println(F("in fuction : Purser::readByte()"));
 		#endif
 
@@ -1333,7 +1036,7 @@ namespace Purser
 	// ユーザが内部を編集する必要は基本的にありません。
 	bool lexAccept()
 	{
-		#ifdef _DEBUG
+		#if _DEBUG
 			System::output_serial->println(F("in fuction : Purser::lexAccept()"));
 		#endif
 
@@ -1370,7 +1073,7 @@ namespace Purser
 	// 先に到着したトークンに依存する処理を実現するために必要です。
 	void makeTokenLog()
 	{
-		#ifdef _DEBUG
+		#if _DEBUG
 			System::output_serial->println(F("in fuction : Purser::makeTokenLog()"));
 		#endif
 
@@ -1384,7 +1087,7 @@ namespace Purser
 	// パーサーのエラー時処理を委譲します。
 	void errorAbort()
 	{
-		#ifdef _DEBUG
+		#if _DEBUG
 			System::output_serial->println(F("in fuction : Purser::errorAbort()"));
 		#endif
 
@@ -1395,7 +1098,7 @@ namespace Purser
 	// 各状態に対応して処理をcase文内部に記述してください。
 	void execEventHandler()
 	{
-		#ifdef _DEBUG
+		#if _DEBUG
 			System::output_serial->println(F("in fuction : Purser::execEventHandle()"));
 		#endif
 
@@ -1504,7 +1207,7 @@ namespace Purser
 
 				if (slot > Motion::SLOT_MAX())
 				{
-					#ifdef _DEBUG_INSTALL
+					#if _DEBUG_INSTALL
 						System::output_serial->println(F(">>> slot : bad argment (value : "));
 						System::output_serial->print((int)slot);
 						System::output_serial->println(F(")"));
@@ -1541,7 +1244,7 @@ namespace Purser
 
 				if (frame_num > Motion::FLAMENUM_MAX())
 				{
-					#ifdef _DEBUG_INSTALL
+					#if _DEBUG_INSTALL
 						System::output_serial->println(F(">>> frame_num : bad argment (value : "));
 						System::output_serial->print((int)frame_num);
 						System::output_serial->println(F(")"));
@@ -1551,7 +1254,7 @@ namespace Purser
 				}
 				else if (frame_num < Motion::FLAMENUM_MIN())
 				{
-					#ifdef _DEBUG_INSTALL
+					#if _DEBUG_INSTALL
 						System::output_serial->println(F(">>> frame_num : bad argment (value : "));
 						System::output_serial->print((int)frame_num);
 						System::output_serial->println(F(")"));
@@ -1578,7 +1281,7 @@ namespace Purser
 
 				Motion::setHeader(&Config::header);
 
-				#ifdef _DEBUG_INSTALL
+				#if _DEBUG_INSTALL
 					char name[22];
 					name[20] = '|';
 					name[21] = '\0';
@@ -1627,7 +1330,7 @@ namespace Purser
 				{
 					Motion::setFrame(Config::header.slot, &Config::frame);
 
-					#ifdef _DEBUG_INSTALL
+					#if _DEBUG_INSTALL
 						System::output_serial->print(F("transition_delay_msec : "));
 						System::output_serial->println(Config::frame.transition_delay_msec);
 						for (int joint = 0; joint < Joint::SUM(); joint++)
@@ -1657,7 +1360,7 @@ namespace Purser
 					Config::joint_id = Joint::SUM();
 				}
 
-				#ifdef _DEBUG
+				#if _DEBUG
 					System::output_serial->print(F(">>> joint id : "));
 					System::output_serial->println((int)Config::joint_id);
 				#endif
@@ -1705,7 +1408,7 @@ namespace Purser
 					}
 				}
 
-				#ifdef _DEBUG
+				#if _DEBUG
 					System::output_serial->print(F(">>> angle : "));
 					System::output_serial->println(Config::angle);
 				#endif
@@ -1722,7 +1425,7 @@ namespace Purser
 					motion_slot = Motion::SLOT_MAX();
 				}
 
-				#ifdef _DEBUG
+				#if _DEBUG
 					System::output_serial->print(F(">>> motion num : "));
 					System::output_serial->println(motion_slot);
 				#endif
@@ -1801,7 +1504,7 @@ namespace Purser
 
 			default:
 			{
-				#ifdef _DEBUG
+				#if _DEBUG
 					System::output_serial->print(F(">>> token now : "));
 					System::output_serial->println(Token::STR[Token::now]);
 				#endif
@@ -1815,7 +1518,7 @@ namespace Purser
 	// 内部を編集する必要は基本的にありません。
 	void transition()
 	{
-		#ifdef _DEBUG
+		#if _DEBUG
 			System::output_serial->println(F("in fuction : Purser::transition()"));
 			System::output_serial->print(F(">>> state now : "));
 			System::output_serial->println(State::STR[State::now]);
@@ -1832,7 +1535,7 @@ namespace Purser
 
 		if (--Packet::DEFINITIONS[State::now].count != 0)
 		{
-			#ifdef _DEBUG
+			#if _DEBUG
 				System::output_serial->print(F(">>> packet count : "));
 				System::output_serial->println(Packet::DEFINITIONS[State::now].count);
 			#endif
@@ -1850,209 +1553,15 @@ namespace Purser
 }
 
 
-/**
- * 初期化メソッド
- * =============================================================================
- * NOTE:
- * ---
- * 必要な初期化処理はこちらに記述してください。
- *
- *
- * CAUTION!:
- * ---
- * デジタルピンの出力は初期レベルを与えない場合不定となります。
- * モード設定を行うようなピンの初期化は必ず行ってください。
- */
 void setup()
 {
-	_SYSTEM__USBSERIAL.begin(System::USBSERIAL_BAUDRATE());
-	_SYSTEM__BLESERIAL.begin(System::BLESERIAL_BAUDRATE());
-	Wire.begin();
-	Wire.setClock(ExternalEEPROM::CLOCK());
-
-	pinMode(Pin::MULTIPLEXER_SELECT0(), OUTPUT);
-	pinMode(Pin::MULTIPLEXER_SELECT1(), OUTPUT);
-	pinMode(Pin::MULTIPLEXER_SELECT2(), OUTPUT);
-	pinMode(Pin::PWM_OUT_00_07(),       OUTPUT);
-	pinMode(Pin::PWM_OUT_08_15(),       OUTPUT);
-	pinMode(Pin::PWM_OUT_16_23(),       OUTPUT);
-	pinMode(Pin::RS485_TXD(),           OUTPUT);
-	pinMode(Pin::LED_OUT(),             OUTPUT);
-
-	digitalWrite(Pin::RS485_TXD(), LOW);
-	digitalWrite(Pin::LED_OUT(),   LOW);
-
-	Joint::init();
-	Motion::init();
-	Code::init();
+	PLEN2::setup();
 }
 
 
-/**
- * メインポーリングループ
- * =============================================================================
- * NOTE:
- * ---
- * 繰り返し実行したい処理はこちらに記述してください。
- *
- *
- * CAUTION!:
- * ---
- * 動作を強制終了したい場合、exit()命令を使用する必要があります。
- * return命令では、再度ループが実行されてしまいます。
- */
 void loop()
 {
-	if (Config::disable() && Motion::playing() && !Code::running())
-	{
-		if (Motion::Frame::updatable())
-		{
-			Motion::Frame::update();
-		}
-
-		if (Motion::Frame::updateFinished())
-		{
-			if (Motion::Frame::nextFrameLoadable())
-			{
-				Motion::Frame::buffering();
-				Motion::Frame::transition_count = Motion::Frame::next->transition_delay_msec / Motion::Frame::UPDATE_MSEC();
-
-				for (int index = 0; index < Joint::SUM(); index++)
-				{
-					Motion::Frame::now_fixed_point[index]  = (long)(Motion::Frame::now->joint_angle[index]) << 16;
-					Motion::Frame::diff_fixed_point[index] = ((long)(Motion::Frame::next->joint_angle[index]) << 16) - Motion::Frame::now_fixed_point[index];
-					Motion::Frame::diff_fixed_point[index] /= Motion::Frame::transition_count;
-				}
-
-				if (   (Motion::header.extra[0] == 1)
-					&& (Motion::Frame::next->number == Motion::header.extra[2]))
-				{
-					Motion::getFrame(Motion::header.slot, Motion::header.extra[1], Motion::Frame::back);
-				}
-				else if (   (Motion::header.extra[0] == 2)
-					     && (Motion::Frame::next->number == (Motion::header.frame_num - 1)))
-				{
-					Motion::getFrame(Motion::header.extra[1], 0, Motion::Frame::back);
-				}
-				else
-				{
-					Motion::getFrame(Motion::header.slot, Motion::Frame::next->number + 1, Motion::Frame::back);
-				}
-
-				for (int index = 0; index < Joint::SUM(); index++)
-				{
-					Motion::Frame::back->joint_angle[index] += Joint::SETTINGS[index].HOME;
-				}
-			}
-			else
-			{
-				Motion::stop();
-			}
-		}
-	}
-
-	if (Config::disable() && Motion::playing() && Code::running())
-	{
-		if (Motion::Frame::updatable())
-		{
-			Motion::Frame::update();
-		}
-
-		if (Motion::Frame::updateFinished())
-		{
-			#ifdef _DEBUG_CODE
-				System::output_serial->println(F(">>> Motion::Frame::updateFinished() == true"));
-			#endif
-
-			if (Motion::Frame::nextFrameLoadable())
-			{
-				Motion::Frame::buffering();
-				Motion::Frame::transition_count = Motion::Frame::next->transition_delay_msec / Motion::Frame::UPDATE_MSEC();
-
-				for (int index = 0; index < Joint::SUM(); index++)
-				{
-					Motion::Frame::now_fixed_point[index]  = (long)(Motion::Frame::now->joint_angle[index]) << 16;
-					Motion::Frame::diff_fixed_point[index] = ((long)(Motion::Frame::next->joint_angle[index]) << 16) - Motion::Frame::now_fixed_point[index];
-					Motion::Frame::diff_fixed_point[index] /= Motion::Frame::transition_count;
-				}
-				
-				if (   (Motion::header.extra[0] == 1)
-					&& (Motion::Frame::next->number == Motion::header.extra[2])
-					&& (Code::_loop >= 1))
-				{
-					Code::_loop--;
-
-					if (Code::_loop == 0)
-					{
-						Motion::header.extra[0] = 0;
-					}
-
-					Motion::getFrame(Motion::header.slot, Motion::header.extra[1], Motion::Frame::back);
-				}
-				else
-				{
-					Motion::getFrame(Motion::header.slot, Motion::Frame::next->number + 1, Motion::Frame::back);
-				}
-
-				for (int index = 0; index < Joint::SUM(); index++)
-				{
-					Motion::Frame::back->joint_angle[index] += Joint::SETTINGS[index].HOME;
-				}
-			}
-			else
-			{
-				unsigned char slot;
-
-				if (Code::getCode(slot, Code::_loop))
-				{
-					#ifdef _DEBUG_CODE
-						System::output_serial->println(F(">>> next code."));
-					#endif
-
-					Motion::play(slot);
-					if (Motion::header.extra[0] != 1)
-					{
-						Motion::header.extra[0] = 1;
-						Motion::header.extra[1] = 0;
-						Motion::header.extra[2] = Motion::header.frame_num - 1;
-					}
-				}
-				else
-				{
-					#ifdef _DEBUG_CODE
-						System::output_serial->println(F(">>> code end."));
-					#endif
-
-					Motion::stop();
-					Code::_running = false;
-				}
-			}
-		}
-	}
-
-	if (_SYSTEM__USBSERIAL.available())
-	{
-		Purser::readByte(_SYSTEM__USBSERIAL.read());
-
-		if (Purser::lexAccept())
-		{
-			Purser::makeTokenLog();
-			Purser::execEventHandler();
-			Purser::transition();
-		}
-	}
-
-	if (_SYSTEM__BLESERIAL.available())
-	{
-		Purser::readByte(_SYSTEM__BLESERIAL.read());
-
-		if (Purser::lexAccept())
-		{
-			Purser::makeTokenLog();
-			Purser::execEventHandler();
-			Purser::transition();
-		}
-	}
+	PLEN2::loop();
 }
 
 
@@ -2088,12 +1597,12 @@ void loop()
  */
 ISR(TIMER1_OVF_vect)
 {
-	#ifdef _DEBUG_HARD
+	#if _DEBUG_HARD
 		System::output_serial->println(F("in vector : TIMER1_OVF_vect"));
 	#endif
 
 	volatile static unsigned char output_select = 0;
-	volatile static unsigned char joint_select  = 1; // ダブルバッファリングを考慮し1つ先読み
+	volatile static unsigned char joint_select  = 1; // IMPORTANT!: ダブルバッファリングを考慮し1つ先読み
 
 	if (output_select == Multiplexer::SELECTABLE_NUM())
 	{
@@ -2106,6 +1615,8 @@ ISR(TIMER1_OVF_vect)
 		Motion::Frame::_updatable = true;
 	}
 
+	// IMPORTANT!:
+	// ---
 	// PWM信号が出力される前に出力先を切り替える必要があるので、
 	// タイマー割り込みのなるべく早い段階で切り替え処理を行う。
 	digitalWrite(Pin::MULTIPLEXER_SELECT0(), bitRead(output_select, 0));
