@@ -375,6 +375,34 @@ namespace Joint
 		{ ANGLE_MIN(), ANGLE_MAX(), 900  }  // JOINT23 (未使用)
 	};
 
+	JointSetting SETTINGS_INITIAL[_JOINT__SUM] =
+	{
+		{ ANGLE_MIN(), ANGLE_MAX(), 900  }, // JOINT00 ([01] 左：肩ピッチ)
+		{ ANGLE_MIN(), ANGLE_MAX(), 1150 }, // JOINT01 ([02] 左：腿ヨー)
+		{ ANGLE_MIN(), ANGLE_MAX(), 1200 }, // JOINT02 ([03] 左：肩ロール)
+		{ ANGLE_MIN(), ANGLE_MAX(), 800  }, // JOINT03 ([04] 左：肘ロール)
+		{ ANGLE_MIN(), ANGLE_MAX(), 800  }, // JOINT04 ([05] 左：腿ロール)
+		{ ANGLE_MIN(), ANGLE_MAX(), 850  }, // JOINT05 ([06] 左：腿ピッチ)
+		{ ANGLE_MIN(), ANGLE_MAX(), 1400 }, // JOINT06 ([07] 左：膝ピッチ)
+		{ ANGLE_MIN(), ANGLE_MAX(), 1200 }, // JOINT07 ([08] 左：足首ピッチ)
+		{ ANGLE_MIN(), ANGLE_MAX(), 850  }, // JOINT08 ([09] 左：足首ロール)
+		{ ANGLE_MIN(), ANGLE_MAX(), 900  }, // JOINT09 (未使用)
+		{ ANGLE_MIN(), ANGLE_MAX(), 900  }, // JOINT10 (未使用)
+		{ ANGLE_MIN(), ANGLE_MAX(), 900  }, // JOINT11 (未使用)
+		{ ANGLE_MIN(), ANGLE_MAX(), 900  }, // JOINT12 ([10] 右：肩ピッチ)
+		{ ANGLE_MIN(), ANGLE_MAX(), 950  }, // JOINT13 ([11] 右：腿ヨー)
+		{ ANGLE_MIN(), ANGLE_MAX(), 550  }, // JOINT14 ([12] 右：肩ロール)
+		{ ANGLE_MIN(), ANGLE_MAX(), 1100 }, // JOINT15 ([13] 右：肘ロール)
+		{ ANGLE_MIN(), ANGLE_MAX(), 1000 }, // JOINT16 ([14] 右：腿ロール)
+		{ ANGLE_MIN(), ANGLE_MAX(), 1100 }, // JOINT17 ([15] 右：腿ピッチ)
+		{ ANGLE_MIN(), ANGLE_MAX(), 400  }, // JOINT18 ([16] 右：膝ピッチ)
+		{ ANGLE_MIN(), ANGLE_MAX(), 580  }, // JOINT19 ([17] 右：足首ピッチ)
+		{ ANGLE_MIN(), ANGLE_MAX(), 1000 }, // JOINT20 ([18] 右：足首ロール)
+		{ ANGLE_MIN(), ANGLE_MAX(), 900  }, // JOINT21 (未使用)
+		{ ANGLE_MIN(), ANGLE_MAX(), 900  }, // JOINT22 (未使用)
+		{ ANGLE_MIN(), ANGLE_MAX(), 900  }  // JOINT23 (未使用)
+	};
+
 	// Atmege32u4のEEPROMから、関節の設定情報を読み出します。
 	// EEPROM内に値が存在しない場合は、デフォルトの値を書き込みます。
 	void init()
@@ -388,10 +416,12 @@ namespace Joint
 		if (EEPROM.read(CONFIG_FLAG_ADDRESS()) != CONFIG_FLAG_VALUE())
 		{
 			EEPROM.write(CONFIG_FLAG_ADDRESS(), CONFIG_FLAG_VALUE());
+			delay(5);
 
 			for (int index = 0; index < sizeof(SETTINGS); index++)
 			{
 				EEPROM.write(CONFIG_BEGIN_ADDRESS() + index, filler[index]);
+				delay(5);
 			}
 		}
 		else
@@ -429,6 +459,7 @@ namespace Joint
 		for (int index = 0; index < sizeof(SETTINGS[joint_id].MIN); index++)
 		{
 			EEPROM.write(CONFIG_BEGIN_ADDRESS() + address_offset + index, filler[index]);
+			delay(5);
 		}
 
 		#ifdef _DEBUG
@@ -463,6 +494,7 @@ namespace Joint
 		for (int index = 0; index < sizeof(SETTINGS[joint_id].MAX); index++)
 		{
 			EEPROM.write(CONFIG_BEGIN_ADDRESS() + address_offset + index, filler[index]);
+			delay(5);
 		}
 
 		#ifdef _DEBUG
@@ -497,6 +529,7 @@ namespace Joint
 		for (int index = 0; index < sizeof(SETTINGS[joint_id].HOME); index++)
 		{
 			EEPROM.write(CONFIG_BEGIN_ADDRESS() + address_offset + index, filler[index]);
+			delay(5);
 		}
 
 		#ifdef _DEBUG
@@ -627,11 +660,11 @@ namespace Config
 			System::output_serial->println(F("in fuction : Config::setJointSettings()"));
 		#endif
 
-		unsigned char* filler = (unsigned char*)Joint::SETTINGS;
+		unsigned char* filler = (unsigned char*)Joint::SETTINGS_INITIAL;
 		
 		EEPROM.write(Joint::CONFIG_FLAG_ADDRESS(), Joint::CONFIG_FLAG_VALUE());
 
-		for (int index = 0; index < sizeof(Joint::SETTINGS); index++)
+		for (int index = 0; index < sizeof(Joint::SETTINGS_INITIAL); index++)
 		{
 			EEPROM.write(Joint::CONFIG_BEGIN_ADDRESS() + index, filler[index]);
 		}
