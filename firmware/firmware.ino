@@ -663,10 +663,12 @@ namespace Config
 		unsigned char* filler = (unsigned char*)Joint::SETTINGS_INITIAL;
 		
 		EEPROM.write(Joint::CONFIG_FLAG_ADDRESS(), Joint::CONFIG_FLAG_VALUE());
+		delay(5);
 
 		for (int index = 0; index < sizeof(Joint::SETTINGS_INITIAL); index++)
 		{
 			EEPROM.write(Joint::CONFIG_BEGIN_ADDRESS() + index, filler[index]);
+			delay(5);
 		}
 	}
 }
