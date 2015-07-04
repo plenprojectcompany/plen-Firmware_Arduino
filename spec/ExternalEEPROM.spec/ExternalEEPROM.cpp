@@ -3,28 +3,50 @@
 #include <Wire.h>
 
 // 独自ライブラリ関連
+#include "System.h"
 #include "ExternalEEPROM.h"
+
+
+#define _DEBUG false
+
+
+namespace {
+	#if _DEBUG
+		PLEN2::System system;
+	#endif
+}
 
 
 PLEN2::ExternalEEPROM::ExternalEEPROM()
 {
+	#if _DEBUG
+		system.outputSerial().println(F("in fuction : ExternalEEPROM::constructor()"));
+	#endif
+
 	Wire.begin();
 	Wire.setClock(CLOCK());
 }
 
 
-int PLEN2::ExternalEEPROM::readBlock(
+int PLEN2::ExternalEEPROM::readSlot(
 	unsigned int slot,
 	char         data[],
 	unsigned int read_size
 )
 {
 	#if _DEBUG
-		System::output_serial->println(F("in fuction : ExternalEEPROM::readBlock()"));
+		system.outputSerial().println(F("in fuction : ExternalEEPROM::readSlot()"));
 	#endif
 
-	if (read_size > SLOT_SIZE())
+	if (   (slot < SLOT_MIN())
+		|| (slot >= SLOT_MAX())
+		|| (read_size > SLOT_SIZE())
+	)
 	{
+		#if _DEBUG
+			system.outputSerial().println(F(">>> error : bad argument!"));
+		#endif
+
 		return -1;
 	}
 
@@ -37,11 +59,11 @@ int PLEN2::ExternalEEPROM::readBlock(
 		data_address  -= (SIZE() / 2);
 	}
 
-	#if _DEBUG_EXTEEPROM
-		System::output_serial->print(F("slave_address : "));
-		System::output_serial->println(slave_address, HEX);
-		System::output_serial->print(F("data_address : "));
-		System::output_serial->println(data_address, HEX);
+	#if _DEBUG
+		system.outputSerial().print(F(">>> slave_address : "));
+		system.outputSerial().println(slave_address, HEX);
+		system.outputSerial().print(F(">>> data_address : "));
+		system.outputSerial().println(data_address, HEX);
 	#endif
 
 	Wire.beginTransmission(slave_address);
@@ -73,18 +95,25 @@ int PLEN2::ExternalEEPROM::readBlock(
 }
 
 
-int PLEN2::ExternalEEPROM::writeBlock(
+int PLEN2::ExternalEEPROM::writeSlot(
 	unsigned int slot,
 	const char   data[],
 	unsigned int write_size
 )
 {
 	#if _DEBUG
-		System::output_serial->println(F("in fuction : ExternalEEPROM::writeBlock()"));
+		system.outputSerial().println(F("in fuction : ExternalEEPROM::writeSlot()"));
 	#endif
 
-	if (write_size > SLOT_SIZE())
+	if (   (slot < SLOT_MIN())
+		|| (slot >= SLOT_MAX())
+		|| (write_size > SLOT_SIZE() - 2)
+	)
 	{
+		#if _DEBUG
+			system.outputSerial().println(F(">>> error : bad argument!"));
+		#endif
+		
 		return -1;
 	}
 
@@ -97,11 +126,11 @@ int PLEN2::ExternalEEPROM::writeBlock(
 		data_address  -= (SIZE() / 2);
 	}
 
-	#if _DEBUG_EXTEEPROM
-		System::output_serial->print(F("slave_address : "));
-		System::output_serial->println(slave_address, HEX);
-		System::output_serial->print(F("data_address : "));
-		System::output_serial->println(data_address, HEX);
+	#if _DEBUG
+		system.outputSerial().print(F(">>> slave_address : "));
+		system.outputSerial().println(slave_address, HEX);
+		system.outputSerial().print(F(">>> data_address : "));
+		system.outputSerial().println(data_address, HEX);
 	#endif
 
 	Wire.beginTransmission(slave_address);

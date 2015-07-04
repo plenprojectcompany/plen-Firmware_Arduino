@@ -12,16 +12,10 @@
 #include "ExternalEEPROM.h"
 
 
-#define _DEBUG           false //!< デバッグプリントを行います。
-#define _DEBUG_INSTALL   false //!< モーションインストール回りのデバッグを行います。
-#define _DEBUG_EXTEEPROM false //!< EEPROMの読み書き回りのデバッグを行います。
-#define _DEBUG_HARD      false //!< 割り込み回りがシビアな処理についてもデバッグプリントを行います。
-
-
 /*
 namespace
 {
-	PLEN2::System system_ctrl;
+	PLEN2::System system;
 	
 	PLEN2::ExternalEEPROM   external_eeprom;
 	PLEN2::JointController  joint_controller;
@@ -31,23 +25,9 @@ namespace
 */
 
 
-/* TASK: ↓モーションクラスに統合する */
-#define _PLEN2__SYSTEM__PWM_OUT_00_07_REGISTER OCR1C
-#define _PLEN2__SYSTEM__PWM_OUT_08_15_REGISTER OCR1B
-#define _PLEN2__SYSTEM__PWM_OUT_16_23_REGISTER OCR1A
-
-
 void PLEN2::setup()
 {
-	pinMode(Pin::MULTIPLEXER_SELECT0(), OUTPUT);
-	pinMode(Pin::MULTIPLEXER_SELECT1(), OUTPUT);
-	pinMode(Pin::MULTIPLEXER_SELECT2(), OUTPUT);
-	pinMode(Pin::PWM_OUT_00_07(),       OUTPUT);
-	pinMode(Pin::PWM_OUT_08_15(),       OUTPUT);
-	pinMode(Pin::PWM_OUT_16_23(),       OUTPUT);
-
-	Joint::init();
-	Motion::init();
+	
 }
 
 

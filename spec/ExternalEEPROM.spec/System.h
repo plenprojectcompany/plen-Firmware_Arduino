@@ -4,8 +4,8 @@
 	@author Kazuyuki TAKASE
 */
 
-#ifndef _PLEN2_SYSTEM_H_
-#define _PLEN2_SYSTEM_H_
+#ifndef _PLEN2__SYSTEM_H_
+#define _PLEN2__SYSTEM_H_
 
 #include "Arduino.h"
 
@@ -73,4 +73,4 @@ namespace PLEN2
 	};
 }
 
-#endif // _PLEN2_SYSTEM_H_
+#endif // _PLEN2__SYSTEM_H_

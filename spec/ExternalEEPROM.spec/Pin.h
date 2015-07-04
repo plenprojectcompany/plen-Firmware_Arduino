@@ -4,8 +4,8 @@
 	@author Kazuyuki TAKASE
 */
 
-#ifndef _PLEN2_PIN_H_
-#define _PLEN2_PIN_H_
+#ifndef _PLEN2__PIN_H_
+#define _PLEN2__PIN_H_
 
 namespace PLEN2
 {
@@ -50,4 +50,4 @@ namespace PLEN2
 	}
 }
 
-#endif // _PLEN2_PIN_H_
+#endif // _PLEN2__PIN_H_

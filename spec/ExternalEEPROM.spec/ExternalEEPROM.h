@@ -4,8 +4,8 @@
 	@author Kazuyuki TAKASE
 */
 
-#ifndef _PLEN2_EXTERNAL_EEPROM_H_
-#define _PLEN2_EXTERNAL_EEPROM_H_
+#ifndef _PLEN2__EXTERNAL_EEPROM_H_
+#define _PLEN2__EXTERNAL_EEPROM_H_
 
 namespace PLEN2
 {
@@ -42,6 +42,12 @@ namespace PLEN2
 		//! @brief 外部EEPROMの1スロットの大きさ
 		inline static const int SLOT_SIZE() { return 32; }
 
+		//! @brief 外部EEPROMのスロットの最小値
+		inline static const int SLOT_MIN()  { return 0;  }
+
+		//! @brief 外部EEPROMのスロットの最大値
+		inline static const int SLOT_MAX()  { return SIZE() / SLOT_SIZE(); }
+
 		/*!
 			@brief コンストラクタ
 		*/
@@ -58,7 +64,7 @@ namespace PLEN2
 			@retval 非0 成功 (通常、read_sizeと同じ値となります。)
 			@retval -1  失敗
 		*/
-		int readBlock(unsigned int slot, char data[], unsigned int read_size);
+		int readSlot(unsigned int slot, char data[], unsigned int read_size);
 
 		/*!
 			@brief 外部EEPROMを1スロットごとに書き込むメソッド
@@ -79,8 +85,8 @@ namespace PLEN2
 			外部EEPROMへの書き込みには時間がかかります。(定格で3[msec]を要します。)
 			本実装では、メソッドの終了時にdelay()を10[msec]挿入してあります。
 		*/
-		int writeBlock(unsigned int slot, const char data[], unsigned int write_size);
+		int writeSlot(unsigned int slot, const char data[], unsigned int write_size);
 	};
 }
 
-#endif // _PLEN2_EXTERNAL_EEPROM_H_
+#endif // _PLEN2__EXTERNAL_EEPROM_H_

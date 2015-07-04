@@ -3,6 +3,8 @@
 #include "System.h"
 
 
+#define _DEBUG false
+
 #define _PLEN2__SYSTEM__USBSERIAL Serial
 #define _PLEN2__SYSTEM__BLESERIAL Serial1
 
@@ -12,8 +14,8 @@ PLEN2::System::System()
 	_p_input_serial  = &_PLEN2__SYSTEM__BLESERIAL;
 	_p_output_serial = &_PLEN2__SYSTEM__USBSERIAL;
 
-	_p_input_serial->begin(BLESERIAL_BAUDRATE());
-	_p_output_serial->begin(USBSERIAL_BAUDRATE());
+	_PLEN2__SYSTEM__BLESERIAL.begin(BLESERIAL_BAUDRATE());
+	_PLEN2__SYSTEM__USBSERIAL.begin(USBSERIAL_BAUDRATE());
 
 	pinMode(Pin::RS485_TXD(), OUTPUT);
 	pinMode(Pin::LED_OUT(),   OUTPUT);
@@ -41,13 +43,13 @@ void PLEN2::System::toggleInputSerial()
 		outputSerial().println(F("in fuction : System::toggleInputSerial()"));
 	#endif
 
-	if (_p_input_serial == &_SYSTEM__BLESERIAL)
+	if (_p_input_serial == &_PLEN2__SYSTEM__BLESERIAL)
 	{
-		_p_input_serial = &_SYSTEM__USBSERIAL;
+		_p_input_serial = &_PLEN2__SYSTEM__USBSERIAL;
 	}
 	else
 	{
-		_p_input_serial = &_SYSTEM__BLESERIAL;
+		_p_input_serial = &_PLEN2__SYSTEM__BLESERIAL;
 	}
 }
 
