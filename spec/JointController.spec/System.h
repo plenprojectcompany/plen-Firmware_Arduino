@@ -27,8 +27,8 @@ namespace PLEN2
 		//! @brief BLEシリアルインタフェースの通信速度
 		inline static const long BLESERIAL_BAUDRATE() { return 2000000L; }
 
-		Stream* _p_input_serial;  //!< 入力シリアルインスタンスのポインタ
-		Stream* _p_output_serial; //!< 出力シリアルインスタンスのポインタ
+		static Stream* _p_input_serial;  //!< 入力シリアルインスタンスのポインタ
+		static Stream* _p_output_serial; //!< 出力シリアルインスタンスのポインタ
 
 	public:
 		//! @brief MCU内EEPROMのサイズ

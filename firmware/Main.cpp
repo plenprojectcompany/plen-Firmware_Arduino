@@ -1,4 +1,4 @@
-// 標準Cライブラリ関連
+﻿// 標準Cライブラリ関連
 #include <string.h>
 
 // Arduinoライブラリ関連

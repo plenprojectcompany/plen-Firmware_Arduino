@@ -16,12 +16,14 @@ namespace {
 
 
 /*!
-	@brief テストケースの定義
+	@brief ランダムに選択したスロットに読み書きするテスト
+
+	ランダムな値を格納した配列を書き込んだ後、即座に読み込み同一性を検証します。
 */
 test(RandomSlot_ReadWrite) 
 {
 	#define _RANDOMSLOT_READWRITE__BUFFER_SIZE 30
-	const int BUFFER_SIZE = 30;
+	const int BUFFER_SIZE = _RANDOMSLOT_READWRITE__BUFFER_SIZE;
 
 	const int slot = random(PLEN2::ExternalEEPROM::SLOT_MIN(), PLEN2::ExternalEEPROM::SLOT_MAX());
 
@@ -45,6 +47,10 @@ test(RandomSlot_ReadWrite)
 }
 
 /*!
+	@brief すべてのスロットに読み書きするテスト
+
+	ランダムな値を格納した配列を書き込んだ後、即座に読み込み同一性を検証します。
+
 	@attention
 	このテストの実行には約41秒の時間を要します。
 	また、EEPROMの寿命を著しく縮めるため、普段は実行しないことをおすすめします。
@@ -53,7 +59,7 @@ test(AllSlot_ReadWrite)
 {
 	#if _TEST_HARD
 		#define _ALLSLOT_READWRITE__BUFFER_SIZE 30
-		const int BUFFER_SIZE = 30;
+		const int BUFFER_SIZE = _ALLSLOT_READWRITE__BUFFER_SIZE;
 
 
 		for (int slot = PLEN2::ExternalEEPROM::SLOT_MIN(); slot < PLEN2::ExternalEEPROM::SLOT_MAX(); slot++)
@@ -80,10 +86,13 @@ test(AllSlot_ReadWrite)
 	#endif
 }
 
+/*!
+	@brief 超過サイズバッファへの読み込みテスト
+*/
 test(RandomSlot_ReadOverflow)
 {
 	#define _RANDOMSLOT_READOVERFLOW__BUFFER_SIZE 33
-	const int BUFFER_SIZE = 33;
+	const int BUFFER_SIZE = _RANDOMSLOT_READOVERFLOW__BUFFER_SIZE;
 
 	const int slot = random(PLEN2::ExternalEEPROM::SLOT_MIN(), PLEN2::ExternalEEPROM::SLOT_MAX());
 	char data[_RANDOMSLOT_READOVERFLOW__BUFFER_SIZE] = { 0 };
@@ -96,10 +105,13 @@ test(RandomSlot_ReadOverflow)
 	assertEqual(expected, actual);
 }
 
+/*!
+	@brief 超過サイズバッファの書き込みテスト
+*/
 test(RandomSlot_WriteOverflow)
 {
 	#define _RANDOMSLOT_WRITEOVERFLOW__BUFFER_SIZE 31
-	const int BUFFER_SIZE = 31;
+	const int BUFFER_SIZE = _RANDOMSLOT_WRITEOVERFLOW__BUFFER_SIZE;
 
 	const int slot = random(PLEN2::ExternalEEPROM::SLOT_MIN(), PLEN2::ExternalEEPROM::SLOT_MAX());
 	char data[_RANDOMSLOT_WRITEOVERFLOW__BUFFER_SIZE] = { 0 };
@@ -112,10 +124,13 @@ test(RandomSlot_WriteOverflow)
 	assertEqual(expected, actual);
 }
 
+/*!
+	@brief 超過スロットの読み込みテスト
+*/
 test(SlotOverflow_Read)
 {
 	#define _SLOTOVERFLOW_READ__BUFFER_SIZE 1
-	const int BUFFER_SIZE = 1;
+	const int BUFFER_SIZE = _SLOTOVERFLOW_READ__BUFFER_SIZE;
 
 	const int slot = PLEN2::ExternalEEPROM::SLOT_MAX();
 	char data[_SLOTOVERFLOW_READ__BUFFER_SIZE] = { 0 };
@@ -128,10 +143,13 @@ test(SlotOverflow_Read)
 	assertEqual(expected, actual);
 }
 
+/*!
+	@brief 超過スロットへの書き込みテスト
+*/
 test(SlotOverflow_Write)
 {
 	#define _SLOTOVERFLOW_WRITE__BUFFER_SIZE 1
-	const int BUFFER_SIZE = 1;
+	const int BUFFER_SIZE = _SLOTOVERFLOW_WRITE__BUFFER_SIZE;
 
 	const int slot = PLEN2::ExternalEEPROM::SLOT_MAX();
 	char data[_SLOTOVERFLOW_WRITE__BUFFER_SIZE] = { 0 };
@@ -152,8 +170,9 @@ void setup()
 {
 	randomSeed(analogRead(0));
 
-	Serial.begin(115200);
 	while(!Serial); // for the Arduino Leonardo/Micro only.
+	Serial.println("Test started.");
+	Serial.println("=============");
 }
 
 void loop()

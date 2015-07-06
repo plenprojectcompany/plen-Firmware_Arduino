@@ -25,19 +25,9 @@ namespace PLEN2
 	class JointController
 	{
 	private:
-		/*!
-			@brief 関節設定の管理オブジェクト
-		*/
-		struct JointSetting
-		{
-			unsigned int MIN;  //!< 関節可動域最小値の設定
-			unsigned int MAX;  //!< 関節可動域最大値の設定
-			unsigned int HOME; //!< 関節初期位置の設定
-		};
-
-		#define _PLEN2_JOINTCONTROLLER__SUM 24 //!< 関節の実装個数
+		#define _PLEN2__JOINTCONTROLLER__SUM 24 //!< 関節の実装個数(コンパイル対策マクロ)
 		//! @brief 関節の実装個数
-		inline static const int SUM() { return _PLEN2_JOINTCONTROLLER__SUM; }
+		inline static const int SUM() { return _PLEN2__JOINTCONTROLLER__SUM; }
 
 		//! @brief 関節角度の最小値
 		inline static const int ANGLE_MIN()              { return 300;  }
@@ -66,15 +56,50 @@ namespace PLEN2
 		//! @brief 関節設定の保持アドレス
 		inline static const int SETTINGS_BEGIN_ADDRESS() { return 1;    }
 
-		JointSetting _SETTINGS[_PLEN2_JOINTCONTROLLER__SUM];         //!< 関節設定の管理インスタンス
-		JointSetting _SETTINGS_INITIAL[_PLEN2_JOINTCONTROLLER__SUM]; //!< 関節設定初期値の管理インスタンス
-
 		/*!
-			@brief 関節設定の読み込みメソッド
+			@brief 関節設定の管理クラス
 		*/
-		void loadSettings();
+		struct JointSetting
+		{
+			unsigned int MIN;  //!< 関節角度最小値の設定
+			unsigned int MAX;  //!< 関節角度最大値の設定
+			unsigned int HOME; //!< 関節角度初期値の設定
+
+			/*!
+				@brief コンストラクタ
+			*/
+			JointSetting()
+				: MIN(ANGLE_MIN()), MAX(ANGLE_MAX()), HOME(ANGLE_NEUTRAL())
+			{
+				// noop.
+			}
+
+			/*!
+				@brief コンストラクタ
+
+				@param [in] min  関節角度最小値
+				@param [in] max  関節角度最大値
+				@param [in] home 関節角度初期値
+			*/
+			JointSetting(unsigned int min, unsigned int max, unsigned int home)
+				: MIN(min), MAX(max), HOME(home)
+			{
+				// noop.
+			}
+		};
+
+		JointSetting _SETTINGS_INITIAL[_PLEN2__JOINTCONTROLLER__SUM]; //!< 関節設定初期値の管理インスタンス
+		JointSetting _SETTINGS[_PLEN2__JOINTCONTROLLER__SUM];         //!< 関節設定の管理インスタンス
 
 	public:
+		struct Multiplexer {
+			//! @brief マルチブレクサの実装個数
+			inline static const int SUM()            { return 3; }
+			
+			//! @brief 1つのマルチプレクサで制御可能な信号線数
+			inline static const int SELECTABLE_NUM() { return 8; }
+		};
+
 		/*!
 			@brief タイマ1 オーバーフロー割り込みベクタ，呼び出し回数
 
@@ -91,7 +116,7 @@ namespace PLEN2
 			本来はprivateにされるべき変数です。タイマ1 オーバーフロー割り込みベクタから
 			参照するためにpublicにされているので、基本的に外部からはこの変数を参照しないでください。
 		*/
-		volatile static unsigned int _pwms[_PLEN2_JOINTCONTROLLER__SUM];
+		static unsigned int _pwms[_PLEN2__JOINTCONTROLLER__SUM];
 
 		/*!
 			@brief コンストラクタ
@@ -99,22 +124,66 @@ namespace PLEN2
 		JointController();
 
 		/*!
-			@brief 
+			@brief 関節設定の読み込みメソッド
+
+			Atmega32u4の内部EEPROMから、関節設定を読み出します。
+			内部EEPROM内に値が存在しない場合は、デフォルトの値を書き込みます。
+
+			@attention
+			本来はコンストラクタ内で呼び出すべき処理ですが、
+			AVR MCUではコンストラクタ内で割り込みが発生した際、
+			プログラムが強制的に停止するようです。
+			<br>
+			本メソッドは、内部でシリアル通信と内部EEPROMへの読み書きを行うため、
+			その際に割り込みが発生します。そのため、コンストラクタ内に
+			本メソッドを記述することはできません。
+		*/
+		void loadSettings();
+
+		/*!
+			@brief 関節設定の初期化メソッド
+
+			内部EEPROM内に、デフォルトの関節設定を書き込みます。
+		*/
+		void resetSettings();
+
+		/*!
+			@brief 指定した関節の角度最小値を、指定した値に設定するメソッド
+
+			@param [in] joint_id 角度最小値を設定したい関節を番号で指定します。
+			@param [in] angle    角度を分解能1/10°単位で指定します。
+
+			@retun 実行結果
 		*/
 		bool setMinAngle(unsigned char joint_id, unsigned int angle);
 
 		/*!
-			@brief 
+			@brief 指定した関節の角度最大値を、指定した値に設定するメソッド
+
+			@param [in] joint_id 角度最大値を設定したい関節を番号で指定します。
+			@param [in] angle    角度を分解能1/10°単位で指定します。
+
+			@retun 実行結果
 		*/
 		bool setMaxAngle(unsigned char joint_id, unsigned int angle);
 
 		/*!
-			@brief 
+			@brief 指定した関節の角度初期値を、指定した値に設定するメソッド
+
+			@param [in] joint_id 角度初期値を設定したい関節を番号で指定します。
+			@param [in] angle    角度を分解能1/10°単位で指定します。
+
+			@retun 実行結果
 		*/
-		bool setNeutralAngle(unsigned char joint_id, unsigned int angle);
+		bool setHomeAngle(unsigned char joint_id, unsigned int angle);
 
 		/*!
-			@brief 
+			@brief 指定した関節の角度を、指定した値に設定するメソッド
+
+			@param [in] joint_id 角度を設定したい関節を番号で指定します。
+			@param [in] angle    角度を分解能1/10°単位で指定します。
+
+			@retun 実行結果
 		*/
 		bool setAngle(unsigned char joint_id, unsigned int angle);
 

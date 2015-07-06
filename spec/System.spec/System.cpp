@@ -3,10 +3,15 @@
 #include "System.h"
 
 
-#define _DEBUG false
+// マクロの定義
+#define _DEBUG true
 
 #define _PLEN2__SYSTEM__USBSERIAL Serial
 #define _PLEN2__SYSTEM__BLESERIAL Serial1
+
+
+Stream* PLEN2::System::_p_input_serial;
+Stream* PLEN2::System::_p_output_serial;
 
 
 PLEN2::System::System()

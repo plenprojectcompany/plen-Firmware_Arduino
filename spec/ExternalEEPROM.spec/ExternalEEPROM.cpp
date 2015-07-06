@@ -7,7 +7,7 @@
 #include "ExternalEEPROM.h"
 
 
-#define _DEBUG false
+#define _DEBUG true
 
 
 namespace {
@@ -19,10 +19,6 @@ namespace {
 
 PLEN2::ExternalEEPROM::ExternalEEPROM()
 {
-	#if _DEBUG
-		system.outputSerial().println(F("in fuction : ExternalEEPROM::constructor()"));
-	#endif
-
 	Wire.begin();
 	Wire.setClock(CLOCK());
 }

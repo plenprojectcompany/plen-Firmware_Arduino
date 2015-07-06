@@ -13,12 +13,6 @@ namespace Purser
 	}
 }
 
-namespace Multiplexer
-{
-	inline static const int SUM()            { return 3; } // 実装個数
-	inline static const int SELECTABLE_NUM() { return 8; } // 制御可能数
-}
-
 
 namespace Motion
 {
@@ -65,222 +59,6 @@ namespace Config
 }
 
 
-namespace Joint
-{
-	JointSetting SETTINGS[_JOINT__SUM] =
-	{
-		{ ANGLE_MIN(), ANGLE_MAX(), 900  }, // JOINT00 ([01] 左：肩ピッチ)
-		{ ANGLE_MIN(), ANGLE_MAX(), 1150 }, // JOINT01 ([02] 左：腿ヨー)
-		{ ANGLE_MIN(), ANGLE_MAX(), 1200 }, // JOINT02 ([03] 左：肩ロール)
-		{ ANGLE_MIN(), ANGLE_MAX(), 800  }, // JOINT03 ([04] 左：肘ロール)
-		{ ANGLE_MIN(), ANGLE_MAX(), 800  }, // JOINT04 ([05] 左：腿ロール)
-		{ ANGLE_MIN(), ANGLE_MAX(), 850  }, // JOINT05 ([06] 左：腿ピッチ)
-		{ ANGLE_MIN(), ANGLE_MAX(), 1400 }, // JOINT06 ([07] 左：膝ピッチ)
-		{ ANGLE_MIN(), ANGLE_MAX(), 1200 }, // JOINT07 ([08] 左：足首ピッチ)
-		{ ANGLE_MIN(), ANGLE_MAX(), 850  }, // JOINT08 ([09] 左：足首ロール)
-		{ ANGLE_MIN(), ANGLE_MAX(), 900  }, // JOINT09 (未使用)
-		{ ANGLE_MIN(), ANGLE_MAX(), 900  }, // JOINT10 (未使用)
-		{ ANGLE_MIN(), ANGLE_MAX(), 900  }, // JOINT11 (未使用)
-		{ ANGLE_MIN(), ANGLE_MAX(), 900  }, // JOINT12 ([10] 右：肩ピッチ)
-		{ ANGLE_MIN(), ANGLE_MAX(), 950  }, // JOINT13 ([11] 右：腿ヨー)
-		{ ANGLE_MIN(), ANGLE_MAX(), 550  }, // JOINT14 ([12] 右：肩ロール)
-		{ ANGLE_MIN(), ANGLE_MAX(), 1100 }, // JOINT15 ([13] 右：肘ロール)
-		{ ANGLE_MIN(), ANGLE_MAX(), 1000 }, // JOINT16 ([14] 右：腿ロール)
-		{ ANGLE_MIN(), ANGLE_MAX(), 1100 }, // JOINT17 ([15] 右：腿ピッチ)
-		{ ANGLE_MIN(), ANGLE_MAX(), 400  }, // JOINT18 ([16] 右：膝ピッチ)
-		{ ANGLE_MIN(), ANGLE_MAX(), 580  }, // JOINT19 ([17] 右：足首ピッチ)
-		{ ANGLE_MIN(), ANGLE_MAX(), 1000 }, // JOINT20 ([18] 右：足首ロール)
-		{ ANGLE_MIN(), ANGLE_MAX(), 900  }, // JOINT21 (未使用)
-		{ ANGLE_MIN(), ANGLE_MAX(), 900  }, // JOINT22 (未使用)
-		{ ANGLE_MIN(), ANGLE_MAX(), 900  }  // JOINT23 (未使用)
-	};
-
-	const JointSetting SETTINGS_INITIAL[_JOINT__SUM] =
-	{
-		{ ANGLE_MIN(), ANGLE_MAX(), 900  }, // JOINT00 ([01] 左：肩ピッチ)
-		{ ANGLE_MIN(), ANGLE_MAX(), 1150 }, // JOINT01 ([02] 左：腿ヨー)
-		{ ANGLE_MIN(), ANGLE_MAX(), 1200 }, // JOINT02 ([03] 左：肩ロール)
-		{ ANGLE_MIN(), ANGLE_MAX(), 800  }, // JOINT03 ([04] 左：肘ロール)
-		{ ANGLE_MIN(), ANGLE_MAX(), 800  }, // JOINT04 ([05] 左：腿ロール)
-		{ ANGLE_MIN(), ANGLE_MAX(), 850  }, // JOINT05 ([06] 左：腿ピッチ)
-		{ ANGLE_MIN(), ANGLE_MAX(), 1400 }, // JOINT06 ([07] 左：膝ピッチ)
-		{ ANGLE_MIN(), ANGLE_MAX(), 1200 }, // JOINT07 ([08] 左：足首ピッチ)
-		{ ANGLE_MIN(), ANGLE_MAX(), 850  }, // JOINT08 ([09] 左：足首ロール)
-		{ ANGLE_MIN(), ANGLE_MAX(), 900  }, // JOINT09 (未使用)
-		{ ANGLE_MIN(), ANGLE_MAX(), 900  }, // JOINT10 (未使用)
-		{ ANGLE_MIN(), ANGLE_MAX(), 900  }, // JOINT11 (未使用)
-		{ ANGLE_MIN(), ANGLE_MAX(), 900  }, // JOINT12 ([10] 右：肩ピッチ)
-		{ ANGLE_MIN(), ANGLE_MAX(), 950  }, // JOINT13 ([11] 右：腿ヨー)
-		{ ANGLE_MIN(), ANGLE_MAX(), 550  }, // JOINT14 ([12] 右：肩ロール)
-		{ ANGLE_MIN(), ANGLE_MAX(), 1100 }, // JOINT15 ([13] 右：肘ロール)
-		{ ANGLE_MIN(), ANGLE_MAX(), 1000 }, // JOINT16 ([14] 右：腿ロール)
-		{ ANGLE_MIN(), ANGLE_MAX(), 1100 }, // JOINT17 ([15] 右：腿ピッチ)
-		{ ANGLE_MIN(), ANGLE_MAX(), 400  }, // JOINT18 ([16] 右：膝ピッチ)
-		{ ANGLE_MIN(), ANGLE_MAX(), 580  }, // JOINT19 ([17] 右：足首ピッチ)
-		{ ANGLE_MIN(), ANGLE_MAX(), 1000 }, // JOINT20 ([18] 右：足首ロール)
-		{ ANGLE_MIN(), ANGLE_MAX(), 900  }, // JOINT21 (未使用)
-		{ ANGLE_MIN(), ANGLE_MAX(), 900  }, // JOINT22 (未使用)
-		{ ANGLE_MIN(), ANGLE_MAX(), 900  }  // JOINT23 (未使用)
-	};
-
-	// Atmege32u4のEEPROMから、関節の設定情報を読み出します。
-	// EEPROM内に値が存在しない場合は、デフォルトの値を書き込みます。
-	void init()
-	{
-		#ifdef _DEBUG
-			System::output_serial->println(F("in fuction : Joint::init()"));
-		#endif
-
-		unsigned char* filler = (unsigned char*)SETTINGS;
-		
-		if (EEPROM.read(CONFIG_FLAG_ADDRESS()) != CONFIG_FLAG_VALUE())
-		{
-			EEPROM.write(CONFIG_FLAG_ADDRESS(), CONFIG_FLAG_VALUE());
-			delay(5);
-
-			for (int index = 0; index < sizeof(SETTINGS); index++)
-			{
-				EEPROM.write(CONFIG_BEGIN_ADDRESS() + index, filler[index]);
-				delay(5);
-			}
-		}
-		else
-		{
-			for (int index = 0; index < sizeof(SETTINGS); index++)
-			{
-				filler[index] = EEPROM.read(CONFIG_BEGIN_ADDRESS() + index);
-			}
-		}
-	}
-
-	// 指定したサーボモータの関節可動域最小値を、指定した値に設定します。
-	void setMinAngle(unsigned char joint_id, unsigned int angle)
-	{
-		#if _DEBUG
-			System::output_serial->println(F("in fuction : Joint::setMinAngle()"));
-		#endif
-
-		if (joint_id >= SUM())
-		{
-			#if _DEBUG
-				System::output_serial->print(F(">>> joint_id : bad argment (value : "));
-				System::output_serial->print((int)joint_id);
-				System::output_serial->println(F(")"));
-			#endif
-
-			return;
-		}
-
-		SETTINGS[joint_id].MIN = angle;
-
-		unsigned char* filler = (unsigned char*)&(SETTINGS[joint_id].MIN);
-		int address_offset = (int)(filler) - (int)SETTINGS;
-
-		for (int index = 0; index < sizeof(SETTINGS[joint_id].MIN); index++)
-		{
-			EEPROM.write(CONFIG_BEGIN_ADDRESS() + address_offset + index, filler[index]);
-			delay(5);
-		}
-
-		#if _DEBUG
-			System::output_serial->print(F(">>> address_offset : "));
-			System::output_serial->println(address_offset);
-		#endif
-	}
-
-	// 指定したサーボモータの関節可動域最大値を、指定した値に設定します。
-	void setMaxAngle(unsigned char joint_id, unsigned int angle)
-	{
-		#if _DEBUG
-			System::output_serial->println(F("in fuction : Joint::setMaxAngle()"));
-		#endif
-
-		if (joint_id >= SUM())
-		{
-			#if _DEBUG
-				System::output_serial->print(F(">>> joint_id : bad argment (value : "));
-				System::output_serial->print((int)joint_id);
-				System::output_serial->println(F(")"));
-			#endif
-
-			return;
-		}
-
-		SETTINGS[joint_id].MAX = angle;
-
-		unsigned char* filler = (unsigned char*)&(SETTINGS[joint_id].MAX);
-		int address_offset = (int)(filler) - (int)SETTINGS;
-
-		for (int index = 0; index < sizeof(SETTINGS[joint_id].MAX); index++)
-		{
-			EEPROM.write(CONFIG_BEGIN_ADDRESS() + address_offset + index, filler[index]);
-			delay(5);
-		}
-
-		#if _DEBUG
-			System::output_serial->print(F(">>> address_offset : "));
-			System::output_serial->println(address_offset);
-		#endif
-	}
-
-	// 指定したサーボモータの関節初期位置を、指定した値に設定します。
-	void setHomeAngle(unsigned char joint_id, unsigned int angle)
-	{
-		#if _DEBUG
-			System::output_serial->println(F("in fuction : Joint::setHomeAngle()"));
-		#endif
-
-		if (joint_id >= SUM())
-		{
-			#if _DEBUG
-				System::output_serial->print(F(">>> joint_id : bad argment (value : "));
-				System::output_serial->print((int)joint_id);
-				System::output_serial->println(F(")"));
-			#endif
-
-			return;
-		}
-
-		SETTINGS[joint_id].HOME = angle;
-
-		unsigned char* filler = (unsigned char*)&(SETTINGS[joint_id].HOME);
-		int address_offset = (int)(filler) - (int)SETTINGS;
-
-		for (int index = 0; index < sizeof(SETTINGS[joint_id].HOME); index++)
-		{
-			EEPROM.write(CONFIG_BEGIN_ADDRESS() + address_offset + index, filler[index]);
-			delay(5);
-		}
-
-		#if _DEBUG
-			System::output_serial->print(F(">>> address_offset : "));
-			System::output_serial->println(address_offset);
-		#endif
-	}
-
-	// 指定したサーボモータの角度を、指定した値に設定します。
-	void setAngle(unsigned char joint_id, unsigned int angle)
-	{
-		#if _DEBUG_HARD
-			System::output_serial->println(F("in fuction : Joint::setAngle()"));
-		#endif
-
-		if (joint_id >= SUM())
-		{
-			#if _DEBUG_HARD
-				System::output_serial->print(F(">>> joint_id : bad argment (value : "));
-				System::output_serial->print((int)joint_id);
-				System::output_serial->println(F(")"));
-			#endif
-
-			return;
-		}
-
-		Config::frame.joint_angle[joint_id] = angle;
-	}
-}
-
-
 /**
  * コンフィグメソッド・変数
  * =============================================================================
@@ -298,26 +76,6 @@ namespace Config
 	bool disable()
 	{
 		return !enable;
-	}
-
-	// 保持している関節情報をダンプします。
-	void dumpJointSettings()
-	{
-		#if _DEBUG
-			System::output_serial->println(F("in fuction : Config::dumpJointSettings()"));
-		#endif
-
-		for (int index = 0; index < Joint::SUM(); index++)
-		{
-			System::output_serial->print(F("joint : "));
-			System::output_serial->println(index);
-			System::output_serial->print(F(">>> MAX  : "));
-			System::output_serial->println(Joint::SETTINGS[index].MAX);
-			System::output_serial->print(F(">>> MIN  : "));
-			System::output_serial->println(Joint::SETTINGS[index].MIN);
-			System::output_serial->print(F(">>> HOME : "));
-			System::output_serial->println(Joint::SETTINGS[index].HOME);
-		}
 	}
 
 	// 指定したスロットのモーション情報をダンプします。
@@ -371,30 +129,6 @@ namespace Config
 			}
 			System::output_serial->print(F("number : "));
 			System::output_serial->println((int)frame.number);
-		}
-	}
-
-	// 関節情報を初期化します。
-	void resetJointSettings()
-	{
-		#ifdef _DEBUG
-			System::output_serial->println(F("in fuction : Config::resetJointSettings()"));
-		#endif
-
-		unsigned char* filler = (unsigned char*)Joint::SETTINGS_INITIAL;
-		
-		EEPROM.write(Joint::CONFIG_FLAG_ADDRESS(), Joint::CONFIG_FLAG_VALUE());
-		delay(5);
-
-		for (int index = 0; index < sizeof(Joint::SETTINGS_INITIAL); index++)
-		{
-			EEPROM.write(Joint::CONFIG_BEGIN_ADDRESS() + index, filler[index]);
-			delay(5);
-		}
-
-		for (int index = 0; index < Joint::SUM(); index++)
-		{
-			Joint::SETTINGS[index] = Joint::SETTINGS_INITIAL[index];
 		}
 	}
 }
@@ -462,39 +196,6 @@ namespace Motion
 		}
 	}
 
-	// モーション関連の設定の初期関数です。
-	// Arduinoのsetup()内で読みだしてください。
-	void init()
-	{
-		// タイマ1の設定
-		// =========================================================================
-		// CAUTION:
-		// ---
-		// 比較一致の出力はLOWレベルの方が直感的でわかりやすいかと思いますが、
-		// それだとマルチプレクサで出力先を切り替える処理の最中にもPWM信号が
-		// 出力されているため、出力先切り替え時にインパルスノイズが乗ります。
-		cli();
-
-		TCCR1A =
-			_BV(WGM11)  | _BV(WGM10)  | // 10bit高速PWM動作に設定
-			_BV(COM1A1) | _BV(COM1A0) | // 比較一致でOC1AをHIGHレベルに出力
-			_BV(COM1B1) | _BV(COM1B0) | // 比較一致でOC1BをHIGHレベルに出力
-			_BV(COM1C1) | _BV(COM1C0);  // 比較一致でOC1CをHIGHレベルに出力
-
-		TCCR1B = 
-			_BV(WGM12) |                // 10bit高速PWM動作に設定
-			_BV(CS11)  | _BV(CS10);     // 前置分周64に設定
-
-		TIFR1 = _BV(OCF1A) | _BV(OCF1B) | _BV(OCF1C) | _BV(TOV1); // 割り込みフラグをクリア
-
-		for (int index = 0; index < Joint::SUM(); index++)
-		{
-			Frame::now->joint_angle[index] = Joint::SETTINGS[index].HOME;
-		}
-
-		sei();
-		TIMSK1 = _BV(TOIE1); // タイマ1、割り込み開始
-	}
 
 	void play(unsigned char motion_slot)
 	{

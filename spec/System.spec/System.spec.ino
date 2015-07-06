@@ -7,11 +7,14 @@
 
 namespace {
 	PLEN2::System system;
+	PLEN2::System system_another;
 }
 
 
 /*!
-	@brief テストケースの定義
+	@brief System::toggleInputSerial()を1回実行するテスト
+
+	当該メソッドの実行前後で、取得されるインスタンスが異なることを確認します。
 */
 test(ToggleInputSerial)
 {
@@ -23,6 +26,11 @@ test(ToggleInputSerial)
 	assertTrue(before != after);
 }
 
+/*!
+	@brief System::toggleInputSerial()を2回実行するテスト
+
+	当該メソッドの実行前後で、取得されるインスタンスが同一なことを確認します。
+*/
 test(ToggleInputSerial_x2)
 {
 	Stream* before = &(system.inputSerial());
@@ -34,6 +42,36 @@ test(ToggleInputSerial_x2)
 	assertTrue(before == after);
 }
 
+/*!
+	@brief 入力シリアルインスタンスの同一性のテスト
+
+	異なるSystemインスタンス間で、取得される入力シリアルインスタンスが
+	同一なことを確認します。
+*/
+test(InputSerial_Identical)
+{
+	Stream* rhs = &(system.inputSerial());
+	Stream* lhs = &(system_another.inputSerial());
+
+
+	assertTrue(rhs == lhs);
+}
+
+/*!
+	@brief 出力シリアルインスタンスの同一性のテスト
+
+	異なるSystemインスタンス間で、取得される出力シリアルインスタンスが
+	同一なことを確認します。
+*/
+test(OutputSerial_Identical)
+{
+	Stream* rhs = &(system.outputSerial());
+	Stream* lhs = &(system_another.outputSerial());
+
+
+	assertTrue(rhs == lhs);
+}
+
 
 /*!
 	@brief アプリケーション・エントリポイント
@@ -41,6 +79,9 @@ test(ToggleInputSerial_x2)
 void setup()
 {
 	while(!Serial); // for the Arduino Leonardo/Micro only.
+	
+	Serial.println("Test started.");
+	Serial.println("=============");
 }
 
 void loop()
