@@ -171,6 +171,7 @@ void setup()
 	randomSeed(analogRead(0));
 
 	while(!Serial); // for the Arduino Leonardo/Micro only.
+
 	Serial.println("Test started.");
 	Serial.println("=============");
 }

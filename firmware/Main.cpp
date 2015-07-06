@@ -7,22 +7,18 @@
 
 // 独自ライブラリ関連
 #include "Main.h"
-#include "System.h"
-#include "Pin.h"
-#include "ExternalEEPROM.h"
+#include "JointController.h"
+#include "MotionController.h"
 
 
-/*
+
 namespace
 {
-	PLEN2::System system;
-	
-	PLEN2::ExternalEEPROM   external_eeprom;
-	PLEN2::JointController  joint_controller;
-	PLEN2::MotionController motion_player(joint_controller);
+	PLEN2::JointController  joint_ctrl;
+	PLEN2::MotionController motion_ctrl(joint_controller);
 	PLEN2::Purser           purser;
 }
-*/
+
 
 
 void PLEN2::setup()
@@ -33,9 +29,9 @@ void PLEN2::setup()
 
 void PLEN2::loop()
 {
-	if (Config::disable() && Motion::playing)
+	if (purser.state().configDisable() && motion_ctrl.playing())
 	{
-		if (Motion::Frame::updatable())
+		if (motion_ctrl.updatable())
 		{
 			Motion::Frame::_updatable = false;
 			Motion::Frame::transition_count--;

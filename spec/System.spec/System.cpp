@@ -4,7 +4,7 @@
 
 
 // マクロの定義
-#define _DEBUG true
+#define _DEBUG false
 
 #define _PLEN2__SYSTEM__USBSERIAL Serial
 #define _PLEN2__SYSTEM__BLESERIAL Serial1

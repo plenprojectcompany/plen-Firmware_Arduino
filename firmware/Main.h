@@ -16,16 +16,20 @@
 
 	Build enviroment.
 	---
-	- Windows 8.1 Professional edition.
+	- Windows 8.1 Professional edition
+	- Windows 7 Home Premium
 	- Arduino IDE ver.1.6.0
+	- Sublime Text 2 ver.2.0.2
+	- [Stino](https://github.com/Robot-Will/Stino)
+	- [Arduino Unit](https://github.com/mmurdoch/arduinounit)
 
 	License.
 	---
 	This software is released under the MIT License.
 */
 
-#ifndef _PLEN2_MAIN_H_
-#define _PLEN2_MAIN_H_
+#ifndef _PLEN2__MAIN_H_
+#define _PLEN2__MAIN_H_
 
 namespace PLEN2
 {
@@ -52,4 +56,4 @@ namespace PLEN2
 	void loop();
 }
 
-#endif // _PLEN2_MAIN_H_
+#endif // _PLEN2__MAIN_H_

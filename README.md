@@ -7,8 +7,12 @@ Copyright (c) 2015.
 
 Build enviroment.
 ---
-- Windows 8.1 Professional edition.
+- Windows 8.1 Professional edition
+- Windows 7 Home Premium
 - Arduino IDE ver.1.6.0
+- Sublime Text 2 ver.2.0.2
+- [Stino](https://github.com/Robot-Will/Stino)
+- [Arduino Unit](https://github.com/mmurdoch/arduinounit)
 
 License.
 ---

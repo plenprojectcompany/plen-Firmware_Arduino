@@ -14,44 +14,6 @@ namespace Purser
 }
 
 
-namespace Motion
-{
-	struct HeaderDefinition
-	{
-		char          name[20];
-		unsigned char extra[3];
-		unsigned char frame_num;
-		unsigned char slot;
-	};
-
-	inline static const int SLOT_MIN()     { return 0;  }
-	inline static const int SLOT_MAX()     { return 99; }
-	inline static const int FLAMENUM_MIN() { return 1;  }
-	inline static const int FLAMENUM_MAX() { return 20; }
-	#define        _MOTION__FLAMENUM_MAX            20
-
-	namespace Frame
-	{
-		struct FrameDefinition
-		{
-			unsigned int  transition_delay_msec;
-			int           joint_angle[_JOINT__SUM];
-			unsigned char number;
-		};
-
-		// NOTE:
-		// ---
-		// 更新間隔は、本ファームウェアのタイマ割り込みの設定では約32[msec]です。
-		inline static const int UPDATE_MSEC() { return 32; }
-	}
-
-	void setHeader(HeaderDefinition*);
-	void getHeader(unsigned char, HeaderDefinition*);
-	void setFrame(unsigned char, Frame::FrameDefinition*);
-	void getFrame(unsigned char, unsigned char, Frame::FrameDefinition*);
-}
-
-
 namespace Config
 {
 	extern Motion::HeaderDefinition       header;
