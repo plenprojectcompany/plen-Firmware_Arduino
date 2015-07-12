@@ -22,6 +22,7 @@
 
 
 // #define _DEBUG           // デバッグプリントを行います。
+// #define _DEBUG_CODE      // コードインタプリタ回りのデバッグを行います。
 // #define _DEBUG_INSTALL   // モーションインストール回りのデバッグを行います。
 // #define _DEBUG_EXTEEPROM // EEPROMの読み書き回りのデバッグを行います。
 // #define _DEBUG_HARD      // 割り込み回りがシビアなメソッドについてもデバッグプリントを行います。
@@ -201,6 +202,7 @@ namespace System
 		#ifdef _DEBUG
 			System::output_serial->println(F("in fuction : System::timer1Start()"));
 		#endif
+
 
 		TIMSK1 = _BV(TOIE1);
 	}
@@ -727,6 +729,18 @@ namespace Motion
 			next = back;
 			back = temp;
 		}
+
+		void update()
+		{
+			_updatable = false;
+			transition_count--;
+
+			for (int index = 0; index < Joint::SUM(); index++)
+			{
+				now_fixed_point[index] += diff_fixed_point[index];
+				now->joint_angle[index] = now_fixed_point[index] >> 16;
+			}
+		}
 	}
 
 	// モーション関連の設定の初期関数です。
@@ -899,31 +913,32 @@ namespace Motion
  */
 namespace Code
 {
-	inline static const int CODE_FLAG_ADDRESS()  { return (Joint::CONFIG_BEGIN_ADDRESS() + sizeof(Joint::JointSetting) * Joint::SUM()); }
-	inline static const int CODE_FLAG_VALUE()    { return 0;   }
-	inline static const int CODE_BEGIN_ADDRESS() { return (CODE_FLAG_ADDRESS() + 1); }
-	inline static const int CODE_SIZE()          { return 5;   }
-	inline static const int STACK_MAX()          { return 128; }
+	inline static const int CODE_SIZE() { return 2;  }
+	inline static const int STACK_MAX() { return 64; }
 
-	unsigned int stack = 0;
-	unsigned int stack_backup = stack;
+	class CodeModel {
+	public:
+		unsigned char slot;
+		unsigned char loop;
+	};
+
+	CodeModel codes[64] = { 0 };
+
+	char stack = 0;
+	char stack_index = 0;
 	bool _running = false;
 
-	void run()
-	{
-		if (end())
-		{
-			if (EEPROM.read(CODE_FLAG_ADDRESS()) == CODE_FLAG_VALUE())
-			{
-				stack = stack_backup;
-			}
-			else
-			{
-				return;
-			}
-		}
+	unsigned char _loop;
 
-		_running = true;
+	void init()
+	{
+		#ifdef _DEBUG_CODE
+			System::output_serial->println(F("in fuction : Code::init()"));
+		#endif
+
+		stack = 0;
+		stack_index = 0;
+		_running = false;
 	}
 
 	bool running()
@@ -931,9 +946,95 @@ namespace Code
 		return _running;
 	}
 
-	bool end()
+	bool setCode(unsigned char slot, unsigned char loop)
 	{
-		return stack == 0;
+		#ifdef _DEBUG_CODE
+			System::output_serial->println(F("in fuction : Code::setCode()"));
+		#endif
+
+		if (stack == STACK_MAX())
+		{
+			return false;
+		}
+
+		stack++;
+
+		#ifdef _DEBUG_CODE
+			System::output_serial->print(F(">>> stack : "));
+			System::output_serial->println((int)stack);
+
+			System::output_serial->print(F(">>> slot : "));
+			System::output_serial->println((int)slot);
+
+			System::output_serial->print(F(">>> loop : "));
+			System::output_serial->println((int)loop);
+		#endif
+
+		codes[stack - 1].slot = slot;
+		codes[stack - 1].loop = loop;
+
+		return true;
+	}
+
+	bool getCode(unsigned char& slot, unsigned char& loop)
+	{
+		#ifdef _DEBUG_CODE
+			System::output_serial->println(F("in fuction : Code::getCode()"));
+		#endif
+
+		if (stack == 0)
+		{
+			return false;
+		}
+
+		slot = codes[stack_index].slot;
+		loop = codes[stack_index].loop;
+		stack_index++;
+
+		#ifdef _DEBUG_CODE
+			System::output_serial->print(F(">>> stack : "));
+			System::output_serial->println((int)stack);
+
+			System::output_serial->print(F(">>> slot : "));
+			System::output_serial->println((int)slot);
+
+			System::output_serial->print(F(">>> loop : "));
+			System::output_serial->println((int)loop);
+		#endif
+
+		stack--;
+
+		return true;
+	}
+
+	void run()
+	{
+		#ifdef _DEBUG_CODE
+			System::output_serial->println(F("in fuction : Code::run()"));
+		#endif
+
+		if (!Motion::playing())
+		{
+			stack_index = 0;
+			unsigned char slot;
+
+			if (getCode(slot, _loop))
+			{
+				#ifdef _DEBUG_CODE
+					System::output_serial->println(F(">>> getCode() == true"));
+				#endif
+
+				Motion::play(slot);
+				if (Motion::header.extra[0] != 1)
+				{
+					Motion::header.extra[0] = 1;
+					Motion::header.extra[1] = 0;
+					Motion::header.extra[2] = Motion::header.frame_num - 1;
+				}
+
+				_running = true;
+			}
+		}
 	}
 }
 
@@ -984,13 +1085,14 @@ namespace Purser
 			DUMP_JOINT_SETTING_COMMAND,  // [09] 関節設定のダンプコマンド
 			DUMP_MOTION_COMMAND,         // [10] モーションのダンプコマンド
 			RESET_JOINT_SETTING_COMMAND, // [11] 関節設定のリセットコマンド
+			SET_CODE_COMMAND,            // [12] コードの設定コマンド
 			PURSER_TOKEN_EOF,
 			PURSER_ERROR
 		} PurserToken;
 
 		const char* STR[] =
 		{
-			"",
+			"OTHER",
 			"$MP", // [00] モーションの再生
 			"$CR", // [01] コードの実行
 			"$MS", // [02] 停止
@@ -1002,7 +1104,8 @@ namespace Purser
 			"###", // [08] 読み込みシリアルの切り替え
 			"#DJ", // [09] 関節設定のダンプコマンド
 			"#DM", // [10] モーションのダンプコマンド
-			"#RJ"  // [11] 関節設定のリセットコマンド
+			"#RJ", // [11] 関節設定のリセットコマンド
+			"#SC"  // [12] コードの設定コマンド
 		};
 
 		PurserToken initial = OTHER;
@@ -1022,6 +1125,7 @@ namespace Purser
 			JOINT_ID_ELEMENT_INCOMING,
 			ANGLE_ELEMENT_INCOMING,
 			MOTION_SLOT_ELEMENT_INCOMING,
+			CODE_ELEMENT_INCOMING,
 			PURSER_STATE_EOF
 		} PurserState;
 
@@ -1036,25 +1140,27 @@ namespace Purser
 				"FRAME_ELEMENT_INCOMING",
 				"JOINT_ID_ELEMENT_INCOMING",
 				"ANGLE_ELEMENT_INCOMING",
-				"MOTION_SLOT_ELEMENT_INCOMING"
+				"MOTION_SLOT_ELEMENT_INCOMING",
+				"CODE_ELEMENT_INCOMING"
 			};
 		#endif
 
 		const PurserState TRANSITION_INIT[] =
 		{
-			INIT,                          // トークン"OTHER"入力時の状態遷移先
-			MOTION_SLOT_ELEMENT_INCOMING,  // トークン"MOTION_PLAY_COMMAND"入力時の状態遷移先
-			INIT,                          // トークン"CODE_RUN_COMMAND"入力時の状態遷移先
-			INIT,                          // トークン"STOP_COMMAND"入力時の状態遷移先
-			SLOT_ELEMENT_INCOMING,         // トークン"MOTION_INSTALL_COMMAND"入力時の状態遷移先
-			JOINT_ID_ELEMENT_INCOMING,     // トークン"JOINT_MIN_SETTING_COMMAND"入力時の状態遷移先
-			JOINT_ID_ELEMENT_INCOMING,     // トークン"JOINT_MAX_SETTING_COMMAND"入力時の状態遷移先
-			JOINT_ID_ELEMENT_INCOMING,     // トークン"JOINT_HOME_SETTING_COMMAND"入力時の状態遷移先
-			JOINT_ID_ELEMENT_INCOMING,     // トークン"JOINT_MOVE_COMMAND"入力時の状態遷移先
-			INIT,                          // トークン"SERIAL_TOGGLE_COMMAND"入力時の状態遷移先
-			INIT,                          // トークン"DUMP_JOINT_SETTING_COMMAND"入力時の状態遷移先
-			MOTION_SLOT_ELEMENT_INCOMING,  // トークン"DUMP_MOTION_COMMAND"入力時の状態遷移先
-			INIT                           // トークン"RESET_JOINT_SETTING_COMMAND"入力時の状態遷移先
+			INIT,                         // トークン"OTHER"入力時の状態遷移先
+			MOTION_SLOT_ELEMENT_INCOMING, // トークン"MOTION_PLAY_COMMAND"入力時の状態遷移先
+			INIT,                         // トークン"CODE_RUN_COMMAND"入力時の状態遷移先
+			INIT,                         // トークン"STOP_COMMAND"入力時の状態遷移先
+			SLOT_ELEMENT_INCOMING,        // トークン"MOTION_INSTALL_COMMAND"入力時の状態遷移先
+			JOINT_ID_ELEMENT_INCOMING,    // トークン"JOINT_MIN_SETTING_COMMAND"入力時の状態遷移先
+			JOINT_ID_ELEMENT_INCOMING,    // トークン"JOINT_MAX_SETTING_COMMAND"入力時の状態遷移先
+			JOINT_ID_ELEMENT_INCOMING,    // トークン"JOINT_HOME_SETTING_COMMAND"入力時の状態遷移先
+			JOINT_ID_ELEMENT_INCOMING,    // トークン"JOINT_MOVE_COMMAND"入力時の状態遷移先
+			INIT,                         // トークン"SERIAL_TOGGLE_COMMAND"入力時の状態遷移先
+			INIT,                         // トークン"DUMP_JOINT_SETTING_COMMAND"入力時の状態遷移先
+			MOTION_SLOT_ELEMENT_INCOMING, // トークン"DUMP_MOTION_COMMAND"入力時の状態遷移先
+			INIT,                         // トークン"RESET_JOINT_SETTING_COMMAND"入力時の状態遷移先
+			CODE_ELEMENT_INCOMING,        // トークン"SET_CODE_COMMAND"入力時の状態遷移先
 		};
 
 		const PurserState TRANSITION_SLOT_ELEMENT_INCOMING[] =
@@ -1097,6 +1203,11 @@ namespace Purser
 			INIT                           // トークン"OTHER"入力時の状態遷移先
 		};
 
+		const PurserState TRANSITION_CODE_ELEMENT_INCOMING[] = 
+		{
+			INIT                           // トークン"OTHER"入力時の状態遷移先
+		};
+
 		const PurserState* TRANSITION[] =
 		{
 			TRANSITION_INIT,
@@ -1107,7 +1218,8 @@ namespace Purser
 			TRANSITION_FRAME_ELEMENT_INCOMING,
 			TRANSITION_JOINT_ID_ELEMENT_INCOMING,
 			TRANSITION_ANGLE_ELEMENT_INCOMING,
-			TRANSITION_MOTION_SLOT_ELEMENT_INCOMING
+			TRANSITION_MOTION_SLOT_ELEMENT_INCOMING,
+			TRANSITION_CODE_ELEMENT_INCOMING
 		};
 
 		PurserState now = INIT;
@@ -1131,7 +1243,8 @@ namespace Purser
 			{ 4,  -1 }, // 状態"FRAME_ELEMENT_INCOMING"において到着するパケット
 			{ 2,  1  }, // 状態"JOINT_ID_ELEMENT_INCOMING"において到着するパケット
 			{ 3,  1  }, // 状態"ANGLE_ELEMENT_INCOMING"において到着するパケット
-			{ 2,  1  }  // 状態"MOTION_SLOT_ELEMENT_INCOMING"において到着するパケット
+			{ 2,  1  }, // 状態"MOTION_SLOT_ELEMENT_INCOMING"において到着するパケット
+			{ 2,  2  }  // 状態"CODE_ELEMENT_INCOMING"において到着するパケット
 		};
 	}
 
@@ -1158,6 +1271,7 @@ namespace Purser
 		Packet::DEFINITIONS[State::JOINT_ID_ELEMENT_INCOMING].count     = 1;
 		Packet::DEFINITIONS[State::ANGLE_ELEMENT_INCOMING].count        = 1;
 		Packet::DEFINITIONS[State::MOTION_SLOT_ELEMENT_INCOMING].count  = 1;
+		Packet::DEFINITIONS[State::CODE_ELEMENT_INCOMING].count         = 2;
 	}
 
 	// 1バイトをリングバッファ(もどき)に格納します。
@@ -1319,7 +1433,10 @@ namespace Purser
 
 					case Token::CODE_RUN_COMMAND:
 					{
-						System::output_serial->println(F("code run command."));
+						if (!Code::running())
+						{
+							Code::run();
+						}
 
 						break;
 					}
@@ -1336,7 +1453,6 @@ namespace Purser
 
 					default:
 					{
-						System::timer1Start();
 						Config::enable = false;
 
 						break;
@@ -1588,6 +1704,7 @@ namespace Purser
 					{
 						if (!Motion::playing())
 						{
+							System::timer1Start();
 							Motion::play(motion_slot);
 						}
 
@@ -1598,6 +1715,49 @@ namespace Purser
 					{
 						break;
 					}
+				}
+
+				break;
+			}
+
+			case State::CODE_ELEMENT_INCOMING:
+			{
+				if (Code::running())
+				{
+					return;
+				}
+
+				static unsigned char call_count = 0;
+				static unsigned char motion_slot;
+				static unsigned char loop_count;
+
+				if (call_count == 0)
+				{
+					motion_slot = strtol(Buffer::data, 0, Buffer::TO_NUM__BASE());
+
+					if (motion_slot > Motion::SLOT_MAX())
+					{
+						motion_slot = Motion::SLOT_MAX();
+					}
+
+					#ifdef _DEBUG
+						System::output_serial->print(F(">>> motion slot : "));
+						System::output_serial->println((int)motion_slot);
+					#endif
+
+					call_count++;
+				}
+				else if (call_count == 1)
+				{
+					loop_count = strtol(Buffer::data, 0, Buffer::TO_NUM__BASE());
+
+					#ifdef _DEBUG
+						System::output_serial->print(F(">>> loop count : "));
+						System::output_serial->println((int)loop_count);
+					#endif
+
+					Code::setCode(motion_slot, loop_count);
+					call_count = 0;
 				}
 
 				break;
@@ -1688,6 +1848,7 @@ void setup()
 
 	Joint::init();
 	Motion::init();
+	Code::init();
 }
 
 
@@ -1706,18 +1867,11 @@ void setup()
  */
 void loop()
 {
-	if (Config::disable() && Motion::playing())
+	if (Config::disable() && Motion::playing() && !Code::running())
 	{
 		if (Motion::Frame::updatable())
 		{
-			Motion::Frame::_updatable = false;
-			Motion::Frame::transition_count--;
-
-			for (int index = 0; index < Joint::SUM(); index++)
-			{
-				Motion::Frame::now_fixed_point[index] += Motion::Frame::diff_fixed_point[index];
-				Motion::Frame::now->joint_angle[index] = Motion::Frame::now_fixed_point[index] >> 16;
-			}
+			Motion::Frame::update();
 		}
 
 		if (Motion::Frame::updateFinished())
@@ -1757,6 +1911,85 @@ void loop()
 			else
 			{
 				Motion::stop();
+			}
+		}
+	}
+
+	if (Config::disable() && Motion::playing() && Code::running())
+	{
+		if (Motion::Frame::updatable())
+		{
+			Motion::Frame::update();
+		}
+
+		if (Motion::Frame::updateFinished())
+		{
+			#ifdef _DEBUG_CODE
+				System::output_serial->println(F(">>> Motion::Frame::updateFinished() == true"));
+			#endif
+
+			if (Motion::Frame::nextFrameLoadable())
+			{
+				Motion::Frame::buffering();
+				Motion::Frame::transition_count = Motion::Frame::next->transition_delay_msec / Motion::Frame::UPDATE_MSEC();
+
+				for (int index = 0; index < Joint::SUM(); index++)
+				{
+					Motion::Frame::now_fixed_point[index]  = (long)(Motion::Frame::now->joint_angle[index]) << 16;
+					Motion::Frame::diff_fixed_point[index] = ((long)(Motion::Frame::next->joint_angle[index]) << 16) - Motion::Frame::now_fixed_point[index];
+					Motion::Frame::diff_fixed_point[index] /= Motion::Frame::transition_count;
+				}
+				
+				if (   (Motion::header.extra[0] == 1)
+					&& (Motion::Frame::next->number == Motion::header.extra[2])
+					&& (Code::_loop >= 1))
+				{
+					Code::_loop--;
+
+					if (Code::_loop == 0)
+					{
+						Motion::header.extra[0] = 0;
+					}
+
+					Motion::getFrame(Motion::header.slot, Motion::header.extra[1], Motion::Frame::back);
+				}
+				else
+				{
+					Motion::getFrame(Motion::header.slot, Motion::Frame::next->number + 1, Motion::Frame::back);
+				}
+
+				for (int index = 0; index < Joint::SUM(); index++)
+				{
+					Motion::Frame::back->joint_angle[index] += Joint::SETTINGS[index].HOME;
+				}
+			}
+			else
+			{
+				unsigned char slot;
+
+				if (Code::getCode(slot, Code::_loop))
+				{
+					#ifdef _DEBUG_CODE
+						System::output_serial->println(F(">>> next code."));
+					#endif
+
+					Motion::play(slot);
+					if (Motion::header.extra[0] != 1)
+					{
+						Motion::header.extra[0] = 1;
+						Motion::header.extra[1] = 0;
+						Motion::header.extra[2] = Motion::header.frame_num - 1;
+					}
+				}
+				else
+				{
+					#ifdef _DEBUG_CODE
+						System::output_serial->println(F(">>> code end."));
+					#endif
+
+					Motion::stop();
+					Code::_running = false;
+				}
 			}
 		}
 	}
