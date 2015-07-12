@@ -141,7 +141,6 @@ test(RandomJoint_SetAngle)
 	);
 	
 	joint_ctrl.setAngle(joint_id, expected);
-	joint_ctrl.loadSettings();
 	unsigned int actual = PLEN2::JointController::_pwms[joint_id];
 
 	expected = PWMCalcHelper(joint_id, expected);
@@ -174,7 +173,7 @@ test(AllJoint_SetAngle)
 /*!
 	@brief 未定義関節への、各種取得メソッドのテスト
 */
-test(JointOverflow_GetMethod)
+test(JointOverflow_GetMethods)
 {
 	unsigned char joint_id = PLEN2::JointController::SUM();
 
@@ -195,7 +194,7 @@ test(JointOverflow_GetMethod)
 /*!
 	@brief 未定義関節への、各種設定メソッドのテスト
 */
-test(JointOverflow_SetMethod)
+test(JointOverflow_SetMethods)
 {
 	unsigned char joint_id = PLEN2::JointController::SUM();
 	unsigned int  angle    = random();

@@ -55,10 +55,10 @@ void PLEN2::MotionController::dump(unsigned char slot)
 
 		system.outputSerial().println(F("\t\"frames\": ["));
 
-		for (int index = 0; index < header.frame_num; index++)
+		for (int frame_index = 0; frame_index < header.frame_num; frame_index++)
 		{
 			Frame frame;
-			frame.number = index;
+			frame.number = frame_index;
 			getFrame(header.slot, &frame);
 
 			system.outputSerial().println(F("\t\t{"));
@@ -69,19 +69,35 @@ void PLEN2::MotionController::dump(unsigned char slot)
 
 			system.outputSerial().println(F("\t\t\t\"outputs\": ["));
 
-
-
-			system.outputSerial().println(F("\t\t\t]"));
-
-			system.outputSerial().print();
-
-			if ((index + 1) == header.frame_num)
+			for (int device_index = 0; device_index < JointController::SUM(); device_index++)
 			{
-				system.outputSerial().println(F("\t\t}"));
+				system.outputSerial().println(F("\t\t\t\t{"));
+
+					system.outputSerial().print(F("\t\t\t\t\t\"device:\" "));
+					system.outputSerial().println(device_index);
+
+					system.outputSerial().print(F("\t\t\t\t\t\"value:\" "));
+					system.outputSerial().println(frame.joint_angle[device_index]);
+
+				if ((device_index + 1) == JointController::SUM())
+				{
+				system.outputSerial().println(F("\t\t\t\t},"));
+				}
+				else
+				{
+				system.outputSerial().println(F("\t\t\t\t}"));
+				}
+			}
+
+				system.outputSerial().println(F("\t\t\t]"));
+
+			if ((frame_index + 1) == header.frame_num)
+			{
+			system.outputSerial().println(F("\t\t}"));
 			}
 			else
 			{
-				system.outputSerial().println(F("\t\t},"));
+			system.outputSerial().println(F("\t\t},"));
 			}
 		}
 

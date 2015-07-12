@@ -13,14 +13,6 @@ namespace Purser
 	}
 }
 
-
-namespace Config
-{
-	extern Motion::HeaderDefinition       header;
-	extern Motion::Frame::FrameDefinition frame;
-}
-
-
 /**
  * コンフィグメソッド・変数
  * =============================================================================
@@ -39,62 +31,7 @@ namespace Config
 	{
 		return !enable;
 	}
-
-	// 指定したスロットのモーション情報をダンプします。
-	void dumpMotion(unsigned char slot)
-	{
-		#if _DEBUG
-			System::output_serial->println(F("in fuction : Config::dumpMotion()"));
-		#endif
-
-		long begin_time = micros();
-		Motion::getHeader(slot, &header);
-		long end_time = micros();
-
-		char name[21];
-		name[20] = '\0';
-
-		System::output_serial->print(F("arg. slot : "));
-		System::output_serial->println((int)slot);
-		System::output_serial->print(F("exec time [us] : "));
-		System::output_serial->println(end_time - begin_time);
-		memcpy(name, header.name, 20);
-		System::output_serial->print(F("name : "));
-		System::output_serial->println(name);
-		System::output_serial->print(F("extra[0] : "));
-		System::output_serial->println((int)header.extra[0]);
-		System::output_serial->print(F("extra[1] : "));
-		System::output_serial->println((int)header.extra[1]);
-		System::output_serial->print(F("extra[2] : "));
-		System::output_serial->println((int)header.extra[2]);
-		System::output_serial->print(F("frame_num : "));
-		System::output_serial->println((int)header.frame_num);
-		System::output_serial->print(F("int. slot : "));
-		System::output_serial->println((int)header.slot);
-
-		for (int index = 0; index < header.frame_num; index++)
-		{
-			begin_time = micros();
-			Motion::getFrame(slot, index, &frame);
-			end_time = micros();
-
-			System::output_serial->print(F("exec time [us] : "));
-			System::output_serial->println(end_time - begin_time);
-			System::output_serial->print(F("transition_delay_msec : "));
-			System::output_serial->println(frame.transition_delay_msec);
-			for (int joint = 0; joint < Joint::SUM(); joint++)
-			{
-				System::output_serial->print(F("joint ["));
-				System::output_serial->print(joint);
-				System::output_serial->print(F("] : "));
-				System::output_serial->println(frame.joint_angle[joint]);
-			}
-			System::output_serial->print(F("number : "));
-			System::output_serial->println((int)frame.number);
-		}
-	}
 }
-
 
 /**
  * モーション管理メソッド・変数
