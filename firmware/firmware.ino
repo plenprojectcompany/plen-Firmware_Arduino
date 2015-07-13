@@ -21,11 +21,12 @@
 #include <Wire.h>
 
 
-// #define _DEBUG           // デバッグプリントを行います。
-// #define _DEBUG_CODE      // コードインタプリタ回りのデバッグを行います。
-// #define _DEBUG_INSTALL   // モーションインストール回りのデバッグを行います。
-// #define _DEBUG_EXTEEPROM // EEPROMの読み書き回りのデバッグを行います。
-// #define _DEBUG_HARD      // 割り込み回りがシビアなメソッドについてもデバッグプリントを行います。
+// #define _DEBUG             // デバッグプリントを行います。
+// #define _DEBUG_CODE        // コードインタプリタ回りのデバッグを行います。
+// #define _DEBUG_MOTION
+// #define _DEBUG_INSTALL     // モーションインストール回りのデバッグを行います。
+// #define _DEBUG_EXTEEPROM   // EEPROMの読み書き回りのデバッグを行います。
+// #define _DEBUG_HARD        // 割り込み回りがシビアなメソッドについてもデバッグプリントを行います。
 
 
 /**
@@ -852,6 +853,13 @@ namespace Motion
 		#ifdef _DEBUG_EXTEEPROM
 			System::output_serial->print(F("return : "));
 			System::output_serial->println(ret);
+		#endif
+
+		#ifdef _DEBUG_MOTION
+			System::output_serial->print("slot(arg) : ");
+			System::output_serial->println(motion_slot);
+			System::output_serial->print("slot(get) : ");
+			System::output_serial->println(p_header->slot);
 		#endif
 	}
 
