@@ -23,7 +23,7 @@
 
 // #define _DEBUG             // デバッグプリントを行います。
 // #define _DEBUG_CODE        // コードインタプリタ回りのデバッグを行います。
-// #define _DEBUG_MOTION
+// #define _DEBUG_MOTION      // モーション再生回りのデバッグを行います。
 // #define _DEBUG_INSTALL     // モーションインストール回りのデバッグを行います。
 // #define _DEBUG_EXTEEPROM   // EEPROMの読み書き回りのデバッグを行います。
 // #define _DEBUG_HARD        // 割り込み回りがシビアなメソッドについてもデバッグプリントを行います。
@@ -1046,6 +1046,22 @@ namespace Code
 	}
 }
 
+namespace Utility {
+	bool stop = false;
+
+	void motionStopHelper()
+	{
+		stop = true;
+		while (!Motion::Frame::updatable());
+		while (!Motion::Frame::updatable());
+		while (!Motion::Frame::updatable());
+	}
+
+	void motionPlayHelper()
+	{
+		stop = false;
+	}
+}
 
 /**
  * コマンドパーサの定義
@@ -1082,6 +1098,7 @@ namespace Purser
 		{
 			OTHER,
 			MOTION_PLAY_COMMAND,         // [00] モーションの再生
+			SET_CODE_COMMAND,            // [12] コードの設定コマンド
 			CODE_RUN_COMMAND,            // [01] コードの実行
 			STOP_COMMAND,                // [02] 停止
 			MOTION_INSTALL_COMMAND,      // [03] モーションデータのインストール
@@ -1093,7 +1110,6 @@ namespace Purser
 			DUMP_JOINT_SETTING_COMMAND,  // [09] 関節設定のダンプコマンド
 			DUMP_MOTION_COMMAND,         // [10] モーションのダンプコマンド
 			RESET_JOINT_SETTING_COMMAND, // [11] 関節設定のリセットコマンド
-			SET_CODE_COMMAND,            // [12] コードの設定コマンド
 			PURSER_TOKEN_EOF,
 			PURSER_ERROR
 		} PurserToken;
@@ -1102,6 +1118,7 @@ namespace Purser
 		{
 			"OTHER",
 			"$MP", // [00] モーションの再生
+			"#SC", // [12] コードの設定コマンド
 			"$CR", // [01] コードの実行
 			"$MS", // [02] 停止
 			"#IN", // [03] モーションデータのインストール
@@ -1112,8 +1129,7 @@ namespace Purser
 			"###", // [08] 読み込みシリアルの切り替え
 			"#DJ", // [09] 関節設定のダンプコマンド
 			"#DM", // [10] モーションのダンプコマンド
-			"#RJ", // [11] 関節設定のリセットコマンド
-			"#SC"  // [12] コードの設定コマンド
+			"#RJ"  // [11] 関節設定のリセットコマンド
 		};
 
 		PurserToken initial = OTHER;
@@ -1157,6 +1173,7 @@ namespace Purser
 		{
 			INIT,                         // トークン"OTHER"入力時の状態遷移先
 			MOTION_SLOT_ELEMENT_INCOMING, // トークン"MOTION_PLAY_COMMAND"入力時の状態遷移先
+			CODE_ELEMENT_INCOMING,        // トークン"SET_CODE_COMMAND"入力時の状態遷移先
 			INIT,                         // トークン"CODE_RUN_COMMAND"入力時の状態遷移先
 			INIT,                         // トークン"STOP_COMMAND"入力時の状態遷移先
 			SLOT_ELEMENT_INCOMING,        // トークン"MOTION_INSTALL_COMMAND"入力時の状態遷移先
@@ -1167,8 +1184,7 @@ namespace Purser
 			INIT,                         // トークン"SERIAL_TOGGLE_COMMAND"入力時の状態遷移先
 			INIT,                         // トークン"DUMP_JOINT_SETTING_COMMAND"入力時の状態遷移先
 			MOTION_SLOT_ELEMENT_INCOMING, // トークン"DUMP_MOTION_COMMAND"入力時の状態遷移先
-			INIT,                         // トークン"RESET_JOINT_SETTING_COMMAND"入力時の状態遷移先
-			CODE_ELEMENT_INCOMING,        // トークン"SET_CODE_COMMAND"入力時の状態遷移先
+			INIT                          // トークン"RESET_JOINT_SETTING_COMMAND"入力時の状態遷移先
 		};
 
 		const PurserState TRANSITION_SLOT_ELEMENT_INCOMING[] =
@@ -1389,7 +1405,7 @@ namespace Purser
 						// 非コンフィグモードからコンフィグモードに移ったときのみ、コンフィグフレームを初期化
 						if (Config::enable == false)
 						{
-							System::timer1Start();
+							Utility::motionPlayHelper();
 
 							for (int index = 0; index < Joint::SUM(); index++)
 							{
@@ -1405,7 +1421,7 @@ namespace Purser
 					case Token::MOTION_INSTALL_COMMAND:
 					{
 						// 割り込みの優先順序を考慮し、モーションの再生を中断
-						System::timer1Stop();
+						Utility::motionStopHelper();
 
 						break;
 					}
@@ -1427,7 +1443,7 @@ namespace Purser
 					case Token::DUMP_MOTION_COMMAND:
 					{
 						// 割り込みの優先順位を考慮し、モーションの再生を中断
-						System::timer1Stop();
+						Utility::motionStopHelper();
 
 						break;
 					}
@@ -1712,7 +1728,7 @@ namespace Purser
 					{
 						if (!Motion::playing())
 						{
-							System::timer1Start();
+							Utility::motionPlayHelper();
 							Motion::play(motion_slot);
 						}
 
@@ -1857,6 +1873,8 @@ void setup()
 	Joint::init();
 	Motion::init();
 	Code::init();
+
+	// #include "program.h" // プログラマブルモード時、コメントアウトする
 }
 
 
@@ -2090,7 +2108,7 @@ ISR(TIMER1_OVF_vect)
 			Joint::ANGLE_MIN(), Joint::ANGLE_MAX(), Joint::PWM::MIN(), Joint::PWM::MAX()
 		);
 	}
-	else
+	else if (!Utility::stop)
 	{
 		_SYSTEM__PWM_OUT_00_07_REGISTER = constrain(
 			map(
@@ -2115,6 +2133,12 @@ ISR(TIMER1_OVF_vect)
 			),
 			Joint::PWM::MAX(), Joint::PWM::MIN()
 		);
+	}
+	else
+	{
+		_SYSTEM__PWM_OUT_00_07_REGISTER = 1023;
+		_SYSTEM__PWM_OUT_08_15_REGISTER = 1023;
+		_SYSTEM__PWM_OUT_16_23_REGISTER = 1023;
 	}
 
 	output_select++;
