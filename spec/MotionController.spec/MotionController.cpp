@@ -1,4 +1,4 @@
-// Arduinoライブラリ関連
+﻿// Arduinoライブラリ関連
 #include "Arduino.h"
 
 // 独自ライブラリ関連
@@ -10,6 +10,11 @@ namespace {
 	PLEN2::System system;
 }
 
+
+void PLEN2::frameBuffering()
+{
+
+}
 
 void PLEN2::MotionController::dump(unsigned char slot)
 {
@@ -104,7 +109,4 @@ void PLEN2::MotionController::dump(unsigned char slot)
 		system.outputSerial().println(F("\t]"));
 	
 	system.outputSerial().println(F("}"));
-
-	Frame frame;
-	frame.number = 0;
 }

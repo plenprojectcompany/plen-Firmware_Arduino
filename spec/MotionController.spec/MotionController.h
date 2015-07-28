@@ -1,4 +1,4 @@
-/*!
+﻿/*!
 	@file   MotionController.h
 	@brief  モーションの管理クラスを提供します。
 	@author Kazuyuki TAKASE
@@ -19,12 +19,6 @@ namespace PLEN2
 */
 class PLEN2::MotionController
 {
-private:
-	JointController* _p_joint_ctrl;
-
-	unsigned char _transition_count;
-	
-
 public:
 	class Header
 	{
@@ -73,13 +67,54 @@ public:
 		int           joint_angle[_PLEN2__JOINTCONTROLLER__SUM]; //!< 各関節角度
 	};
 
+	/*!
+		@brief コンストラクタ
+
+		@param [in] joint_ctrl 関節管理インスタンス
+	*/
 	MotionController(JointController& joint_ctrl);
 
-	void setHeader(const Header* p_header);
-	void getHeader(Header* p_header);
-	void setFrame(unsigned char slot, const Frame* p_frame);
-	void getFrame(unsigned char slot, Frame* p_frame);
+	/*!
+		@brief モーションヘッダを外部EEPROMへ書き込むメソッド
 
+		@param [in] p_header モーションヘッダインスタンスのポインタ
+
+		@return 実行結果
+	*/
+	bool setHeader(const Header* p_header);
+
+	/*!
+		@brief モーションヘッダを外部EEPROMから読み込むメソッド
+
+		@param [in, out] p_header モーションヘッダインスタンスのポインタ
+
+		@return 実行結果
+	*/
+	bool getHeader(Header* p_header);
+
+	/*!
+		@brief モーションフレームを外部EEPROMへ書き込むメソッド
+
+		@param [in] slot    
+		@param [in] p_frame 
+
+		@return 実行結果
+	*/
+	bool setFrame(unsigned char slot, const Frame* p_frame);
+
+	/*!
+		@brief モーションフレームを外部EEPROMから読み込むメソッド
+
+		@param [in]      slot    
+		@param [in, out] p_frame 
+
+		@return 実行結果
+	*/
+	bool getFrame(unsigned char slot, Frame* p_frame);
+
+	/*!
+		
+	*/
 	bool playing();
 	bool frameUpdatable();
 	bool frameUpdateFinished();
@@ -89,6 +124,27 @@ public:
 	void frameBuffering();
 
 	void dump(unsigned char slot);
+
+// コンパイル対策マクロ
+	#define _PLEN2__MOTION_CONTROLLER__FRAMEBUFFER_LENGTH 3 //!< フレームバッファ長
+
+private:
+	//! @brief フレームバッファ長
+	inline static const int FRAMEBUFFER_LENGTH() { return _PLEN2__MOTION_CONTROLLER__FRAMEBUFFER_LENGTH; }
+
+	JointController* _p_joint_ctrl;  //!< 関節管理インスタンスのポインタ
+	
+	unsigned char _transition_count; //!< 遷移回数
+	bool          _playing;          //!< モーションを再生中であるか否かの論理
+
+	Header _header; //!< ヘッダインスタンス
+	Frame  _buffer[_PLEN2__MOTION_CONTROLLER__FRAMEBUFFER_LENGTH]; //!< フレームインスタンスバッファ
+	Frame* _p_now;  //!< 現在フレームへのポインタ
+	Frame* _p_next; //!< 次点フレームへのポインタ
+	Frame* _p_back; //!< 裏フレームへのポインタ
+
+	long _now_fixed_points[_PLEN2__JOINTCONTROLLER__SUM];  //!< 現在値計算用固定小数点バッファ
+	long _diff_fixed_points[_PLEN2__JOINTCONTROLLER__SUM]; //!< 差分計算用固定小数点バッファ
 };
 
 #endif // _PLEN2__MOTION_CONTROLLER_H_

@@ -41,22 +41,8 @@ namespace Config
  */
 namespace Motion
 {
-	bool _playing = false;
-	HeaderDefinition header = { 0 };
-
 	namespace Frame
 	{
-		unsigned int  transition_count = 0;
-		volatile bool _updatable       = false;
-
-		FrameDefinition  buffer[3] = { 0 };
-		FrameDefinition* now  = buffer;
-		FrameDefinition* next = buffer + 1;
-		FrameDefinition* back = buffer + 2;
-
-		long now_fixed_point[_JOINT__SUM]  = { 0 };
-		long diff_fixed_point[_JOINT__SUM] = { 0 };
-
 		bool updatable()
 		{
 			return _updatable;
