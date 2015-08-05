@@ -3,18 +3,170 @@
 
 // 独自ライブラリ関連
 #include "System.h"
+#include ""
 #include "MotionController.h"
 
 
 namespace {
-	PLEN2::System system;
+	PLEN2::System         system;
+	PLEN2::ExternalEEPROM exteeprom;
+
+
+	inline static const int PRECISION() { return 16; }
+	
+	inline long getFixedPoint(int value)
+	{
+		return (value << PRECISION());
+	}
 }
 
 
-void PLEN2::frameBuffering()
+PLEN2::MotionController::MotionController(JointController& joint_ctrl)
 {
 
 }
+
+
+bool PLEN2::MotionController::setHeader(const Header* p_header)
+{
+
+}
+
+
+bool PLEN2::MotionController::getHeader(Header* p_header)
+{
+
+}
+
+
+bool PLEN2::MotionController::setFrame(unsigned char slot, const Frame* p_frame)
+{
+
+}
+
+
+bool PLEN2::MotionController::getFrame(unsigned char slot, Frame* p_frame)
+{
+	#if _DEBUG
+		system.outputSerial().println(F("in fuction : MotionController::getFrame()"));
+	#endif
+
+	char* filler = (char*)p_frame;
+
+	int ret = exteeprom.readSlot()
+}
+
+
+bool PLEN2::MotionController::playing()
+{
+	#if _DEBUG
+		system.outputSerial().println(F("in fuction : MotionController::playing()"));
+	#endif
+
+	return _playing;
+}
+
+
+bool PLEN2::MotionController::frameUpdatable()
+{
+	#if _DEBUG
+		system.outputSerial().println(F("in fuction : MotionController::frameUpdatable()"));
+	#endif
+
+	volatile static unsigned char before_overflow_count = 0;
+	
+	bool result = (before_overflow_count != _p_joint_ctrl->_overflow_count);
+	before_overflow_count = _p_joint_ctrl->_overflow_count;
+
+	return result;
+}
+
+
+bool PLEN2::MotionController::frameUpdateFinished()
+{
+	#if _DEBUG
+		system.outputSerial().println(F("in fuction : MotionController::frameUpdateFinished()"));
+	#endif
+
+	return (_transition_count == 0);
+}
+
+
+bool PLEN2::MotionController::nextFrameLoadable()
+{
+	#if _DEBUG
+		system.outputSerial().println(F("in fuction : MotionController::nextFrameLoadable()"));
+	#endif
+
+	if (_header.codes[0] != 0) return true;
+
+	return ((_p_frame_next->number + 1) < _header.frame_num);
+}
+
+
+void PLEN2::MotionController::play(unsigned char slot)
+{
+	#if _DEBUG
+		system.outputSerial().println(F("in fuction : MotionController::play()"));
+	#endif
+
+	if (slot >= SLOT_MAX())
+	{
+		#if _DEBUG
+			system.outputSerial().print(F(">>> bad argment : slot = "));
+			system.outputSerial().println((int)slot);
+		#endif
+
+		return;
+	}
+
+	_header.slot = slot;
+	getHeader(&_header);
+
+	_p_frame_next->number = 0;
+	getFrame(_header.slot, _p_frame_next);
+
+	if (_header.frame_num > Header::FRAMENUM_MIN())
+	{
+		_p_frame_back->number = 1;
+		getFrame(_header.slot, _p_frame_back);
+	}
+
+	_transition_count = _p_frame_next->transition_time_ms / Frame::UPDATE_INTERVAL_MS();
+	for (int joint_id = 0; joint_id < JointController::SUM(); joint_id++)
+	{
+		_now_fixed_points[joint_id] = getFixedPoint(_p_frame_now->joint_angle[joint_id]);
+		
+		_diff_fixed_points[joint_id] =  getFixedPoint(_p_frame_next->joint_angle[joint_id]) - _now_fixed_points[joint_id];
+		_diff_fixed_points[joint_id] /= _transition_count;
+	}
+
+	_playing = true;
+}
+
+
+void PLEN2::MotionController::stop()
+{
+	#if _DEBUG
+		system.outputSerial().println(F("in fuction : MotionController::stop()"));
+	#endif
+
+	_header.codes[0] = 0;
+}
+
+
+void PLEN2::MotionController::frameBuffering()
+{
+	#if _DEBUG
+		system.outputSerial().println(F("in fuction : MotionController::frameBuffering()"));
+	#endif
+
+	Frame* p_frame_temp = _p_frame_now;
+	_p_frame_now  = _p_frame_next;
+	_p_frame_next = _p_frame_back;
+	_p_frame_back = p_frame_temp;
+}
+
 
 void PLEN2::MotionController::dump(unsigned char slot)
 {
@@ -24,6 +176,11 @@ void PLEN2::MotionController::dump(unsigned char slot)
 
 	if (slot >= SLOT_MAX())
 	{
+		#if _DEBUG
+			system.outputSerial().print(F(">>> bad argment : slot = "));
+			system.outputSerial().println((int)slot);
+		#endif
+
 		return;
 	}
 

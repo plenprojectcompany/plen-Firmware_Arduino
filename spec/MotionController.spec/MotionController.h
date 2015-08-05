@@ -95,8 +95,8 @@ public:
 	/*!
 		@brief モーションフレームを外部EEPROMへ書き込むメソッド
 
-		@param [in] slot    
-		@param [in] p_frame 
+		@param [in] slot    モーション番号
+		@param [in] p_frame モーションフレームインスタンスのポインタ
 
 		@return 実行結果
 	*/
@@ -105,24 +105,63 @@ public:
 	/*!
 		@brief モーションフレームを外部EEPROMから読み込むメソッド
 
-		@param [in]      slot    
-		@param [in, out] p_frame 
+		@param [in]      slot    モーション番号
+		@param [in, out] p_frame モーションフレームインスタンスのポインタ
 
 		@return 実行結果
 	*/
 	bool getFrame(unsigned char slot, Frame* p_frame);
 
 	/*!
-		
+		@brief モーションが再生中かを判定するメソッド
+
+		@return 判定結果
 	*/
 	bool playing();
+
+	/*!
+		@brief モーションフレームが更新可能かを判定するメソッド
+
+		@return 判定結果
+	*/
 	bool frameUpdatable();
+
+	/*!
+		@brief モーションフレームの更新が終了したかを判定するメソッド
+
+		@return 判定結果
+	*/
 	bool frameUpdateFinished();
 
+	/*!
+		@brief 次に読み込み可能なモーションフレームが存在するか判定するメソッド
+
+		@return 判定結果
+	*/
+	bool nextFrameLoadable();
+
+	/*!
+		@brief モーションを再生するメソッド
+
+		@param [in] slot モーション番号
+	*/
 	void play(unsigned char slot);
+
+	/*!
+		@brief モーションの再生を停止するメソッド
+	*/
 	void stop();
+
+	/*!
+		@brief モーションフレームのバッファリングを行うメソッド
+	*/
 	void frameBuffering();
 
+	/*!
+		@brief モーションのダンプをJSON形式で行うメソッド
+
+		@param [in] slot モーション番号
+	*/
 	void dump(unsigned char slot);
 
 // コンパイル対策マクロ
@@ -139,9 +178,9 @@ private:
 
 	Header _header; //!< ヘッダインスタンス
 	Frame  _buffer[_PLEN2__MOTION_CONTROLLER__FRAMEBUFFER_LENGTH]; //!< フレームインスタンスバッファ
-	Frame* _p_now;  //!< 現在フレームへのポインタ
-	Frame* _p_next; //!< 次点フレームへのポインタ
-	Frame* _p_back; //!< 裏フレームへのポインタ
+	Frame* _p_frame_now;  //!< 現在フレームへのポインタ
+	Frame* _p_frame_next; //!< 次点フレームへのポインタ
+	Frame* _p_frame_back; //!< 裏フレームへのポインタ
 
 	long _now_fixed_points[_PLEN2__JOINTCONTROLLER__SUM];  //!< 現在値計算用固定小数点バッファ
 	long _diff_fixed_points[_PLEN2__JOINTCONTROLLER__SUM]; //!< 差分計算用固定小数点バッファ
