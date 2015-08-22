@@ -2020,9 +2020,21 @@ void loop()
 		}
 	}
 
-	if (System::input_serial->available())
+	if (Serial1.available())
 	{
-		Purser::readByte(System::input_serial->read());
+		Purser::readByte(Serial1.read());
+
+		if (Purser::lexAccept())
+		{
+			Purser::makeTokenLog();
+			Purser::execEventHandler();
+			Purser::transition();
+		}
+	}
+
+	if (Serial.available())
+	{
+		Purser::readByte(Serial.read());
 
 		if (Purser::lexAccept())
 		{
@@ -2116,6 +2128,7 @@ ISR(TIMER1_OVF_vect)
 				Joint::ANGLE_MIN(), Joint::ANGLE_MAX(), Joint::PWM::MIN(), Joint::PWM::MAX()
 			),
 			Joint::PWM::MAX(), Joint::PWM::MIN()
+			// Joint::PWM::MIN(), Joint::PWM::MAX()
 		);
 
 		_SYSTEM__PWM_OUT_08_15_REGISTER = constrain(
@@ -2124,6 +2137,7 @@ ISR(TIMER1_OVF_vect)
 				Joint::ANGLE_MIN(), Joint::ANGLE_MAX(), Joint::PWM::MIN(), Joint::PWM::MAX()
 			),
 			Joint::PWM::MAX(), Joint::PWM::MIN()
+			// Joint::PWM::MIN(), Joint::PWM::MAX()
 		);
 
 		_SYSTEM__PWM_OUT_16_23_REGISTER = constrain(
@@ -2132,6 +2146,7 @@ ISR(TIMER1_OVF_vect)
 				Joint::ANGLE_MIN(), Joint::ANGLE_MAX(), Joint::PWM::MIN(), Joint::PWM::MAX()
 			),
 			Joint::PWM::MAX(), Joint::PWM::MIN()
+			// Joint::PWM::MIN(), Joint::PWM::MAX()
 		);
 	}
 	else
