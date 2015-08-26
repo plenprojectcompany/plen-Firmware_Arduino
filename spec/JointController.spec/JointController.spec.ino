@@ -13,11 +13,31 @@
 namespace {
 	PLEN2::JointController joint_ctrl;
 
-	unsigned int PWMCalcHelper(unsigned char joint_id, unsigned int angle)
+	unsigned int angle2PWM(unsigned char joint_id, unsigned int angle)
 	{
 		angle = constrain(angle, joint_ctrl.getMinAngle(joint_id), joint_ctrl.getMaxAngle(joint_id));
 
-		unsigned int pwm = constrain(map(angle, 300, 1500, 816, 492), 492, 816);
+		unsigned int pwm = map(
+			angle,
+			PLEN2::JointController::ANGLE_MIN(), PLEN2::JointController::ANGLE_MAX(),
+			PLEN2::JointController::PWM_MIN(),   PLEN2::JointController::PWM_MAX()
+		);
+
+		return pwm;
+	}
+
+	unsigned int angleDiff2PWM(unsigned char joint_id, int angle_diff)
+	{
+		unsigned int angle = constrain(
+			angle_diff + joint_ctrl.getHomeAngle(joint_id),
+			joint_ctrl.getMinAngle(joint_id), joint_ctrl.getMaxAngle(joint_id)
+		);
+
+		unsigned int pwm = map(
+			angle,
+			PLEN2::JointController::ANGLE_MIN(), PLEN2::JointController::ANGLE_MAX(),
+			PLEN2::JointController::PWM_MIN(),   PLEN2::JointController::PWM_MAX()
+		);
 
 		return pwm;
 	}
@@ -31,7 +51,9 @@ test(RandomJoint_SetMinAngle)
 {
 	unsigned char joint_id = random(PLEN2::JointController::SUM());
 
-	unsigned int expected = (unsigned int)random();
+	unsigned int expected = (unsigned int)random(
+		PLEN2::JointController::ANGLE_MIN(), joint_ctrl.getMaxAngle(joint_id)
+	);
 	
 	joint_ctrl.setMinAngle(joint_id, expected);
 	joint_ctrl.loadSettings();
@@ -48,7 +70,9 @@ test(AllJoint_SetMinAngle)
 {
 	for (unsigned char joint_id = 0; joint_id < PLEN2::JointController::SUM(); joint_id++)
 	{
-		unsigned int expected = (unsigned int)random();
+		unsigned int expected = (unsigned int)random(
+			PLEN2::JointController::ANGLE_MIN(), joint_ctrl.getMaxAngle(joint_id)
+		);
 		
 		joint_ctrl.setMinAngle(joint_id, expected);
 		joint_ctrl.loadSettings();
@@ -66,7 +90,9 @@ test(RandomJoint_SetMaxAngle)
 {
 	unsigned char joint_id = random(PLEN2::JointController::SUM());
 	
-	unsigned int expected = (unsigned int)random();
+	unsigned int expected = (unsigned int)random(
+		joint_ctrl.getMinAngle(joint_id) + 1, PLEN2::JointController::ANGLE_MAX() + 1
+	);
 	
 	joint_ctrl.setMaxAngle(joint_id, expected);
 	joint_ctrl.loadSettings();
@@ -83,7 +109,9 @@ test(AllJoint_SetMaxAngle)
 {
 	for (unsigned char joint_id = 0; joint_id < PLEN2::JointController::SUM(); joint_id++)
 	{
-		unsigned int expected = (unsigned int)random();
+		unsigned int expected = (unsigned int)random(
+			joint_ctrl.getMinAngle(joint_id) + 1, PLEN2::JointController::ANGLE_MAX() + 1
+		);
 		
 		joint_ctrl.setMaxAngle(joint_id, expected);
 		joint_ctrl.loadSettings();
@@ -101,7 +129,9 @@ test(RandomJoint_SetHomeAngle)
 {
 	unsigned char joint_id = random(PLEN2::JointController::SUM());
 	
-	unsigned int expected = (unsigned int)random();
+	unsigned int expected = (unsigned int)random(
+		joint_ctrl.getMinAngle(joint_id), joint_ctrl.getMaxAngle(joint_id) + 1
+	);
 	
 	joint_ctrl.setHomeAngle(joint_id, expected);
 	joint_ctrl.loadSettings();
@@ -118,7 +148,9 @@ test(AllJoint_SetHomeAngle)
 {
 	for (unsigned char joint_id = 0; joint_id < PLEN2::JointController::SUM(); joint_id++)
 	{
-		unsigned int expected = (unsigned int)random();
+		unsigned int expected = (unsigned int)random(
+			joint_ctrl.getMinAngle(joint_id), joint_ctrl.getMaxAngle(joint_id) + 1
+		);
 		
 		joint_ctrl.setHomeAngle(joint_id, expected);
 		joint_ctrl.loadSettings();
@@ -137,13 +169,13 @@ test(RandomJoint_SetAngle)
 	unsigned char joint_id = random(PLEN2::JointController::SUM());
 	
 	unsigned int expected = (unsigned int)random(
-		joint_ctrl.getMinAngle(joint_id), joint_ctrl.getMaxAngle(joint_id)
+		joint_ctrl.getMinAngle(joint_id), joint_ctrl.getMaxAngle(joint_id) + 1
 	);
 	
 	joint_ctrl.setAngle(joint_id, expected);
 	unsigned int actual = PLEN2::JointController::_pwms[joint_id];
 
-	expected = PWMCalcHelper(joint_id, expected);
+	expected = angle2PWM(joint_id, expected);
 
 
 	assertEqual(expected, actual);
@@ -157,13 +189,56 @@ test(AllJoint_SetAngle)
 	for (unsigned char joint_id = 0; joint_id < PLEN2::JointController::SUM(); joint_id++)
 	{
 		unsigned int expected = (unsigned int)random(
-			joint_ctrl.getMinAngle(joint_id), joint_ctrl.getMaxAngle(joint_id)
+			joint_ctrl.getMinAngle(joint_id), joint_ctrl.getMaxAngle(joint_id) + 1
 		);
 		
 		joint_ctrl.setAngle(joint_id, expected);
 		unsigned int actual = PLEN2::JointController::_pwms[joint_id];
 
-		expected = PWMCalcHelper(joint_id, expected);
+		expected = angle2PWM(joint_id, expected);
+
+
+		assertEqual(expected, actual);
+	}
+}
+
+/*!
+	@brief ランダムに選択した関節への、角度差分の設定テスト
+*/
+test(RandomJoint_SetAngleDiff)
+{
+	unsigned char joint_id = random(PLEN2::JointController::SUM());
+	
+	unsigned int expected = (unsigned int)random(
+		(int)joint_ctrl.getMinAngle(joint_id) - (int)joint_ctrl.getHomeAngle(joint_id),
+		(int)joint_ctrl.getMaxAngle(joint_id) - (int)joint_ctrl.getHomeAngle(joint_id) + 1
+	);
+	
+	joint_ctrl.setAngleDiff(joint_id, expected);
+	unsigned int actual = PLEN2::JointController::_pwms[joint_id];
+
+	expected = angleDiff2PWM(joint_id, expected);
+
+
+	assertEqual(expected, actual);
+}
+
+/*!
+	@brief 全ての関節への、角度差分の設定テスト
+*/
+test(AllJoint_SetAngleDiff)
+{
+	for (unsigned char joint_id = 0; joint_id < PLEN2::JointController::SUM(); joint_id++)
+	{
+		unsigned int expected = (unsigned int)random(
+			(int)joint_ctrl.getMinAngle(joint_id) - (int)joint_ctrl.getHomeAngle(joint_id),
+			(int)joint_ctrl.getMaxAngle(joint_id) - (int)joint_ctrl.getHomeAngle(joint_id) + 1
+		);
+		
+		joint_ctrl.setAngleDiff(joint_id, expected);
+		unsigned int actual = PLEN2::JointController::_pwms[joint_id];
+
+		expected = angleDiff2PWM(joint_id, expected);
 
 
 		assertEqual(expected, actual);
@@ -214,6 +289,9 @@ test(JointOverflow_SetMethods)
 
 	actual = joint_ctrl.setAngle(joint_id, angle);
 	assertEqual(expected, actual);
+
+	actual = joint_ctrl.setAngleDiff(joint_id, angle);
+	assertEqual(expected, actual);
 }
 
 /*!
@@ -254,6 +332,7 @@ void setup()
 {
 	randomSeed(analogRead(0));
 	joint_ctrl.loadSettings();
+	joint_ctrl.resetSettings();
 
 	while(!Serial); // for the Arduino Leonardo/Micro only.
 

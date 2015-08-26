@@ -3,7 +3,6 @@
 
 // 独自ライブラリ関連
 #include "System.h"
-#include ""
 #include "MotionController.h"
 
 
@@ -53,7 +52,10 @@ bool PLEN2::MotionController::getFrame(unsigned char slot, Frame* p_frame)
 
 	char* filler = (char*)p_frame;
 
-	int ret = exteeprom.readSlot()
+	int read_count = sizeof(Frame) / (ExternalEEPROM::SLOT_SIZE() - 2);
+	int read_size_sup = sizeof(Frame) - read_count * (ExternalEEPROM::SLOT_SIZE() - 2);
+
+	int ret = exteeprom.readSlot((int)slot * )
 }
 
 

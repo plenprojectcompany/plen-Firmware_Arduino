@@ -228,6 +228,18 @@ bool PLEN2::JointController::setMinAngle(unsigned char joint_id, unsigned int an
 		return false;
 	}
 
+	if (   angle >= _SETTINGS[joint_id].MAX
+		|| angle < ANGLE_MIN())
+	{
+		#if _DEBUG
+			system.outputSerial().print(F(">>> angle : bad argment (value : "));
+			system.outputSerial().print(angle);
+			system.outputSerial().println(F(")"));
+		#endif
+
+		return false;
+	}
+
 	_SETTINGS[joint_id].MIN = angle;
 
 	unsigned char* filler = (unsigned char*)&(_SETTINGS[joint_id].MIN);
@@ -265,6 +277,18 @@ bool PLEN2::JointController::setMaxAngle(unsigned char joint_id, unsigned int an
 		return false;
 	}
 
+	if (   angle <= _SETTINGS[joint_id].MIN
+		|| angle > ANGLE_MAX())
+	{
+		#if _DEBUG
+			system.outputSerial().print(F(">>> angle : bad argment (value : "));
+			system.outputSerial().print(angle);
+			system.outputSerial().println(F(")"));
+		#endif
+
+		return false;
+	}
+
 	_SETTINGS[joint_id].MAX = angle;
 
 	unsigned char* filler = (unsigned char*)&(_SETTINGS[joint_id].MAX);
@@ -296,6 +320,18 @@ bool PLEN2::JointController::setHomeAngle(unsigned char joint_id, unsigned int a
 		#if _DEBUG
 			system.outputSerial().print(F(">>> joint_id : bad argment (value : "));
 			system.outputSerial().print((int)joint_id);
+			system.outputSerial().println(F(")"));
+		#endif
+
+		return false;
+	}
+
+	if (   angle < _SETTINGS[joint_id].MIN
+		|| angle > _SETTINGS[joint_id].MAX)
+	{
+		#if _DEBUG
+			system.outputSerial().print(F(">>> angle : bad argment (value : "));
+			system.outputSerial().print(angle);
 			system.outputSerial().println(F(")"));
 		#endif
 
@@ -341,17 +377,39 @@ bool PLEN2::JointController::setAngle(unsigned char joint_id, unsigned int angle
 
 	angle = constrain(angle, _SETTINGS[joint_id].MIN, _SETTINGS[joint_id].MAX);
 
-	/*!
-		@attention
-		反転出力モードに設定しているため、PWM_MAX() < PWM_MIN()の順序が正しいです。
-	*/
-	_pwms[joint_id] = constrain(
-		map(
-			angle,
-			PLEN2::JointController::ANGLE_MIN(), PLEN2::JointController::ANGLE_MAX(),
-			PLEN2::JointController::PWM_MIN(),   PLEN2::JointController::PWM_MAX()
-		),
-		PLEN2::JointController::PWM_MAX(), PLEN2::JointController::PWM_MIN()
+	_pwms[joint_id] = map(
+		angle,
+		PLEN2::JointController::ANGLE_MIN(), PLEN2::JointController::ANGLE_MAX(),
+		PLEN2::JointController::PWM_MIN(),   PLEN2::JointController::PWM_MAX()
+	);
+
+	return true;
+}
+
+
+bool PLEN2::JointController::setAngleDiff(unsigned char joint_id, int angle_diff)
+{
+	#if _DEBUG_HARD
+		system.outputSerial().println(F("in fuction : JointController::setAngleDiff()"));
+	#endif
+
+	if (joint_id >= SUM())
+	{
+		#if _DEBUG_HARD
+			system.outputSerial().print(F(">>> joint_id : bad argment (value : "));
+			system.outputSerial().print((int)joint_id);
+			system.outputSerial().println(F(")"));
+		#endif
+
+		return false;
+	}
+
+	unsigned int angle = constrain(angle_diff + _SETTINGS[joint_id].HOME, _SETTINGS[joint_id].MIN, _SETTINGS[joint_id].MAX);
+
+	_pwms[joint_id] = map(
+		angle,
+		PLEN2::JointController::ANGLE_MIN(), PLEN2::JointController::ANGLE_MAX(),
+		PLEN2::JointController::PWM_MIN(),   PLEN2::JointController::PWM_MAX()
 	);
 
 	return true;
@@ -412,10 +470,6 @@ void PLEN2::JointController::dump()
 */
 ISR(TIMER1_OVF_vect)
 {
-	#if _DEBUG_HARD
-		system.outputSerial().println(F("in vector : TIMER1_OVF_vect"));
-	#endif
-
 	volatile static unsigned char output_select = 0;
 	volatile static unsigned char joint_select  = 1; // @attention ダブルバッファリングを考慮して1つ先読み
 

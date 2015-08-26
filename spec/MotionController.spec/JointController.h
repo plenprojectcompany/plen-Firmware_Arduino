@@ -29,24 +29,6 @@ class PLEN2::JointController
 	#define _PLEN2__JOINTCONTROLLER__SUM 24 //!< 関節の実装個数
 
 private:
-	//! @brief 関節角度の最小値
-	inline static const int ANGLE_MIN()              { return 300;  }
-
-	//! @brief 関節角度の最大値
-	inline static const int ANGLE_MAX()              { return 1500; }
-
-	//! @brief 関節角度の中間値
-	inline static const int ANGLE_NEUTRAL()          { return 900;  }
-
-	//! @brief パルス幅変調波の最小値
-	inline static const int PWM_MIN()                { return 816;  }
-
-	//! @brief パルス幅変調波の最大値
-	inline static const int PWM_MAX()                { return 492;  }
-
-	//! @brief パルス幅変調波の中間値
-	inline static const int PWM_NEUTRAL()            { return 654;  }
-
 	//! @brief 初期化フラグの保持アドレス
 	inline static const int FLAG_ADDRESS()           { return 0;    }
 	
@@ -101,6 +83,24 @@ public:
 		//! @brief 1つのマルチプレクサで制御可能な信号線数
 		inline static const int SELECTABLE_NUM() { return 8; }
 	};
+	
+	//! @brief パルス幅変調波の最小値
+	inline static const int PWM_MIN()                { return 492;  }
+
+	//! @brief パルス幅変調波の最大値
+	inline static const int PWM_MAX()                { return 816;  }
+
+	//! @brief パルス幅変調波の中間値
+	inline static const int PWM_NEUTRAL()            { return 654;  }
+
+	//! @brief 関節角度の最小値
+	inline static const int ANGLE_MIN()              { return 300;  }
+
+	//! @brief 関節角度の最大値
+	inline static const int ANGLE_MAX()              { return 1500; }
+
+	//! @brief 関節角度の中間値
+	inline static const int ANGLE_NEUTRAL()          { return 900;  }
 
 	//! @brief 関節の実装個数
 	inline static const int SUM() { return _PLEN2__JOINTCONTROLLER__SUM; }
@@ -186,7 +186,7 @@ public:
 		@param [in] joint_id 角度最小値を設定したい関節を番号で指定します。
 		@param [in] angle    角度を分解能1/10°単位で指定します。
 
-		@retun 実行結果
+		@return 実行結果
 	*/
 	bool setMinAngle(unsigned char joint_id, unsigned int angle);
 
@@ -196,7 +196,7 @@ public:
 		@param [in] joint_id 角度最大値を設定したい関節を番号で指定します。
 		@param [in] angle    角度を分解能1/10°単位で指定します。
 
-		@retun 実行結果
+		@return 実行結果
 	*/
 	bool setMaxAngle(unsigned char joint_id, unsigned int angle);
 
@@ -206,7 +206,7 @@ public:
 		@param [in] joint_id 角度初期値を設定したい関節を番号で指定します。
 		@param [in] angle    角度を分解能1/10°単位で指定します。
 
-		@retun 実行結果
+		@return 実行結果
 	*/
 	bool setHomeAngle(unsigned char joint_id, unsigned int angle);
 
@@ -216,7 +216,7 @@ public:
 		@param [in] joint_id 角度を設定したい関節を番号で指定します。
 		@param [in] angle    角度を分解能1/10°単位で指定します。
 
-		@retun 実行結果
+		@return 実行結果
 
 		@attention
 		必ずしも、**angle**の値がそのまま設定されるわけではありません。
@@ -224,6 +224,21 @@ public:
 		その値を設定します。単体テストの際にはそれを考慮して、テストを記述する必要があります。
 	*/
 	bool setAngle(unsigned char joint_id, unsigned int angle);
+
+	/*!
+		@brief 指定した関節の角度を、指定した値 + その関節における初期角度に設定するメソッド
+
+		@param [in] joint_id   角度を設定したい関節を番号で指定します。
+		@param [in] angle_diff 角度差分を分解能1/10°単位で指定します。
+
+		@return 実行結果
+
+		@attention
+		必ずしも、**angle**の値が意図したように設定されるわけではありません。
+		ユーザが指定した関節角度の最大・最小値、およびサーボモータ自体の可動範囲内に丸めた後、
+		その値を設定します。単体テストの際にはそれを考慮して、テストを記述する必要があります。
+	*/
+	bool setAngleDiff(unsigned char joint_id, int angle_diff);
 
 	/*!
 		@brief 関節設定のダンプコマンド

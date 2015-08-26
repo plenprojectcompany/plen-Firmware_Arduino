@@ -10,4 +10,9 @@ void loop()
 	{
 		Serial.write(Serial1.read());
 	}
+
+	if (Serial.available())
+	{
+		Serial.write(Serial.read());
+	}
 }

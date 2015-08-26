@@ -36,6 +36,18 @@ Stream& PLEN2::System::inputSerial()
 }
 
 
+Stream& PLEN2::System::USBSerial()
+{
+	return _PLEN2__SYSTEM__USBSERIAL;
+}
+
+
+Stream& PLEN2::System::BLESerial()
+{
+	return _PLEN2__SYSTEM__BLESERIAL;
+}
+
+
 Stream& PLEN2::System::outputSerial()
 {
 	return *_p_output_serial;

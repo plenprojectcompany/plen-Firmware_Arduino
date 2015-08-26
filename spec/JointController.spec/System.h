@@ -55,6 +55,20 @@ public:
 	Stream& inputSerial();
 
 	/*!
+		@brief  USBシリアルインスタンスの取得メソッド
+
+		@return USBシリアルインスタンスの参照
+	*/
+	Stream& USBSerial();
+
+	/*!
+		@brief  BLEシリアルインスタンスの取得メソッド
+
+		@return BLEシリアルインスタンスの参照
+	*/
+	Stream& BLESerial();
+
+	/*!
 		@brief  出力シリアルインスタンスの取得メソッド
 		
 		@return 出力シリアルインスタンスの参照
