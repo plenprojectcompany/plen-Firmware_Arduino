@@ -1,7 +1,8 @@
 /*!
-	@file   Pin.h
-	@brief  各デバイスの機能をArduinoのピンマッピングに即して、別名として提供します。
-	@author Kazuyuki TAKASE
+	@file      Pin.h
+	@brief     各デバイスの機能をArduinoのピンマッピングに即して、別名として提供します。
+	@author    Kazuyuki TAKASE
+	@copyright The MIT License - http://opensource.org/licenses/mit-license.php
 */
 
 #ifndef _PLEN2__PIN_H_

@@ -16,6 +16,7 @@
 #include "MotionController.h"
 
 
+// ファイル内グローバルインスタンスの定義
 namespace {
 	PLEN2::System         system;
 	PLEN2::ExternalEEPROM exteeprom;
@@ -32,7 +33,12 @@ namespace {
 
 PLEN2::MotionController::MotionController(JointController& joint_ctrl)
 {
+	_p_joint_ctrl = &joint_ctrl;
 
+	_playing = false;
+	_p_frame_now  = _buffer;
+	_p_frame_next = _buffer + 1;
+	_p_frame_back = _buffer + 2;
 }
 
 
@@ -42,15 +48,17 @@ bool PLEN2::MotionController::setHeader(const Header* p_header)
 		system.outputSerial().println(F("in fuction : MotionController::setHeader()"));
 	#endif
 	
-	if (slot >= SLOT_MAX())
+	if (p_header->slot >= SLOT_MAX())
 	{
 		#if _DEBUG
 			system.outputSerial().print(F(">>> bad argment : slot = "));
 			system.outputSerial().println((int)slot);
 		#endif
 
-		return;
+		return false;
 	}
+
+	
 }
 
 
@@ -60,14 +68,14 @@ bool PLEN2::MotionController::getHeader(Header* p_header)
 		system.outputSerial().println(F("in fuction : MotionController::setHeader()"));
 	#endif
 	
-	if (slot >= SLOT_MAX())
+	if (p_header->slot >= SLOT_MAX())
 	{
 		#if _DEBUG
 			system.outputSerial().print(F(">>> bad argment : slot = "));
 			system.outputSerial().println((int)slot);
 		#endif
 
-		return;
+		return false;
 	}
 }
 

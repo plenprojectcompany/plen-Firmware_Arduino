@@ -1,7 +1,8 @@
 /*!
-	@file   JointController.h
-	@brief  関節の管理クラスを提供します。
-	@author Kazuyuki TAKASE
+	@file      JointController.h
+	@brief     関節の管理クラスを提供します。
+	@author    Kazuyuki TAKASE
+	@copyright The MIT License - http://opensource.org/licenses/mit-license.php
 */
 
 #ifndef _PLEN2__JOINT_CONTROLLER_H_
@@ -85,13 +86,13 @@ public:
 	};
 	
 	//! @brief パルス幅変調波の最小値
-	inline static const int PWM_MIN()                { return 492;  }
+	inline static const int PWM_MIN()                { return 810;  }
 
 	//! @brief パルス幅変調波の最大値
-	inline static const int PWM_MAX()                { return 816;  }
+	inline static const int PWM_MAX()                { return 493;  }
 
 	//! @brief パルス幅変調波の中間値
-	inline static const int PWM_NEUTRAL()            { return 654;  }
+	inline static const int PWM_NEUTRAL()            { return 652;  }
 
 	//! @brief 関節角度の最小値
 	inline static const int ANGLE_MIN()              { return 300;  }

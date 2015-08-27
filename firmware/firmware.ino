@@ -1,38 +1,5 @@
 #include "Main.h"
 
-namespace Purser
-{
-	namespace Buffer
-	{
-		// NOTE:
-		// ---
-		// バッファサイズはBLEのペイロード(20byte)以上ならばOK
-		inline static const int LENGTH()       { return 32; }
-		#define        _BUFFER__LENGTH                  32
-		inline static const int TO_NUM__BASE() { return 16; } // 数値に変換する際の基数
-	}
-}
-
-/**
- * コンフィグメソッド・変数
- * =============================================================================
- */
-namespace Config
-{
-	bool          enable   = false;
-
-	unsigned char joint_id = 0;
-	unsigned int  angle    = 0;
-
-	Motion::HeaderDefinition       header = { 0 };
-	Motion::Frame::FrameDefinition frame  = { 0 };
-
-	bool disable()
-	{
-		return !enable;
-	}
-}
-
 /**
  * モーション管理メソッド・変数
  * =============================================================================
@@ -307,12 +274,6 @@ namespace Utility {
  */
 namespace Purser
 {
-	namespace Buffer
-	{
-		char data[_BUFFER__LENGTH] = { 0 };
-		char position = 0;
-	}
-
 	namespace Token
 	{
 		typedef enum
@@ -1056,16 +1017,4 @@ namespace Purser
 			init();
 		}
 	}
-}
-
-
-void setup()
-{
-	PLEN2::setup();
-}
-
-
-void loop()
-{
-	PLEN2::loop();
 }

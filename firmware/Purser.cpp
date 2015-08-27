@@ -1,5 +1,3 @@
-#line 2 "MotionController.spec.ino"
-
 /*
 	Copyright (c) 2015.
 	- Kazuyuki TAKASE - https://github.com/Guvalif
@@ -10,3 +8,11 @@
 */
 
 
+// 独自ライブラリ関連
+#include "Purser.h"
+
+
+// ファイル内グローバルインスタンスの定義
+namespace {
+	
+}

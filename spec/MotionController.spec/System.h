@@ -1,7 +1,8 @@
 /*!
-	@file   System.h
-	@brief  AVR MCUにおける基本機能の管理クラスを提供します。
-	@author Kazuyuki TAKASE
+	@file      System.h
+	@brief     AVR MCUにおける基本機能の管理クラスを提供します。
+	@author    Kazuyuki TAKASE
+	@copyright The MIT License - http://opensource.org/licenses/mit-license.php
 */
 
 #ifndef _PLEN2__SYSTEM_H_
