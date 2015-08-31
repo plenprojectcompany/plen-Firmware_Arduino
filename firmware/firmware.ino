@@ -1,15 +1,27 @@
 /**
- * PLEN2 - Atmega32u4向け ファームウェア
+ * PLEN2 - Firmware for Arduino (Atmega32u4)
  * =============================================================================
- * Copyright (c) 2015 Kazuyuki TAKASE.
- * PLEN Project Company Ltd. - http://plen.jp/
+ *
+ * Code name "Cytisus" (version 1.00).
+ *
+ * Copyright (c) 2015.
+ * ---
+ * - Kazuyuki TAKASE - https://github.com/Guvalif
+ * - PLEN Project Company Ltd. - http://plen.jp/
  * 
  * Build enviroment.
  * ---
- * Windows 8.1 Professional edition.
- * Arduino IDE ver.1.6.0
- *
+ * - Windows 8.1 Professional edition
+ * - Windows 7 Home Premium
+ * - Arduino IDE ver.1.6.0
+ * - Sublime Text 2 ver.2.0.2
+ * - [Stino](https://github.com/Robot-Will/Stino)
+ * - [Arduino Unit](https://github.com/mmurdoch/arduinounit)
+ * 
+ * License.
+ * ---
  * This software is released under the MIT License.
+ * (See also : http://opensource.org/licenses/mit-license.php)
  */
 
 
@@ -22,6 +34,8 @@
 
 
 // #define _DEBUG           // デバッグプリントを行います。
+// #define _DEBUG_CODE      // コードインタプリタ回りのデバッグを行います。
+// #define _DEBUG_MOTION    // モーション再生回りのデバッグを行います。
 // #define _DEBUG_INSTALL   // モーションインストール回りのデバッグを行います。
 // #define _DEBUG_EXTEEPROM // EEPROMの読み書き回りのデバッグを行います。
 // #define _DEBUG_HARD      // 割り込み回りがシビアなメソッドについてもデバッグプリントを行います。
@@ -119,9 +133,9 @@ namespace Joint
 
 	namespace PWM
 	{
-		inline static const int NEUTRAL() { return 654; } // 機械的中間PWM
-		inline static const int MIN()     { return 816; } // 機械的可動最大PWM
-		inline static const int MAX()     { return 492; } // 機械的可動最小PWM
+		inline static const int NEUTRAL() { return 652; } // 機械的中間PWM
+		inline static const int MIN()     { return 493; } // 機械的可動最大PWM
+		inline static const int MAX()     { return 810; } // 機械的可動最小PWM
 	}
 }
 
@@ -135,11 +149,11 @@ namespace Motion
 		unsigned char slot;
 	};
 
-	inline static const int  SLOT_MIN()     { return 0;  }
-	inline static const int  SLOT_MAX()     { return 99; }
-	inline static const int  FLAMENUM_MIN() { return 1;  }
-	inline static const int  FLAMENUM_MAX() { return 20; }
-	#define         _MOTION__FLAMENUM_MAX            20
+	inline static const int SLOT_MIN()     { return 0;  }
+	inline static const int SLOT_MAX()     { return 99; }
+	inline static const int FLAMENUM_MIN() { return 1;  }
+	inline static const int FLAMENUM_MAX() { return 20; }
+	#define        _MOTION__FLAMENUM_MAX            20
 
 	namespace Frame
 	{
@@ -152,7 +166,7 @@ namespace Motion
 
 		// NOTE:
 		// ---
-		// タイマ割り込みの現在の設定では、更新間隔は約32[msec]です。
+		// 更新間隔は、本ファームウェアのタイマ割り込みの設定では約32[msec]です。
 		inline static const int UPDATE_MSEC() { return 32; }
 	}
 
@@ -196,15 +210,18 @@ namespace System
 		}
 	}
 
+	// Timer1割り込みを許可します。
 	void timer1Start()
 	{
 		#ifdef _DEBUG
 			System::output_serial->println(F("in fuction : System::timer1Start()"));
 		#endif
 
+
 		TIMSK1 = _BV(TOIE1);
 	}
 
+	// Timer1割り込みを禁止します。
 	void timer1Stop()
 	{
 		#ifdef _DEBUG
@@ -275,7 +292,7 @@ namespace ExternalEEPROM
 			{
 				for (int index = 0; index < read_size; index++)
 				{
-					*data++ = Wire.read();
+					data[index] = Wire.read();
 				}
 			}
 			else
@@ -291,7 +308,7 @@ namespace ExternalEEPROM
 	// CAUTION!:
 	// ---
 	// EEPROMへの書き込みには時間がかかるので、このメソッドの使用後に
-	// delay()を5～10[msec]程度、ハードコーディングしてください。
+	// delay()を5[msec]程度、ハードコーディングしてください。
 	int writeBlock(unsigned int slot, char* data, unsigned int write_size = BLOCK())
 	{
 		#ifdef _DEBUG
@@ -375,7 +392,7 @@ namespace Joint
 		{ ANGLE_MIN(), ANGLE_MAX(), 900  }  // JOINT23 (未使用)
 	};
 
-	JointSetting SETTINGS_INITIAL[_JOINT__SUM] =
+	const JointSetting SETTINGS_INITIAL[_JOINT__SUM] =
 	{
 		{ ANGLE_MIN(), ANGLE_MAX(), 900  }, // JOINT00 ([01] 左：肩ピッチ)
 		{ ANGLE_MIN(), ANGLE_MAX(), 1150 }, // JOINT01 ([02] 左：腿ヨー)
@@ -654,10 +671,11 @@ namespace Config
 		}
 	}
 
-	void setJointSettings()
+	// 関節情報を初期化します。
+	void resetJointSettings()
 	{
 		#ifdef _DEBUG
-			System::output_serial->println(F("in fuction : Config::setJointSettings()"));
+			System::output_serial->println(F("in fuction : Config::resetJointSettings()"));
 		#endif
 
 		unsigned char* filler = (unsigned char*)Joint::SETTINGS_INITIAL;
@@ -669,6 +687,11 @@ namespace Config
 		{
 			EEPROM.write(Joint::CONFIG_BEGIN_ADDRESS() + index, filler[index]);
 			delay(5);
+		}
+
+		for (int index = 0; index < Joint::SUM(); index++)
+		{
+			Joint::SETTINGS[index] = Joint::SETTINGS_INITIAL[index];
 		}
 	}
 }
@@ -682,7 +705,7 @@ namespace Config
  */
 namespace Motion
 {
-	bool playing = false;
+	bool _playing = false;
 	HeaderDefinition header = { 0 };
 
 	namespace Frame
@@ -722,6 +745,18 @@ namespace Motion
 			next = back;
 			back = temp;
 		}
+
+		void update()
+		{
+			_updatable = false;
+			transition_count--;
+
+			for (int index = 0; index < Joint::SUM(); index++)
+			{
+				now_fixed_point[index] += diff_fixed_point[index];
+				now->joint_angle[index] = now_fixed_point[index] >> 16;
+			}
+		}
 	}
 
 	// モーション関連の設定の初期関数です。
@@ -738,14 +773,14 @@ namespace Motion
 		cli();
 
 		TCCR1A =
-			_BV(WGM11) | _BV(WGM10) |   // 10bit高速PWM動作に設定
+			_BV(WGM11)  | _BV(WGM10)  | // 10bit高速PWM動作に設定
 			_BV(COM1A1) | _BV(COM1A0) | // 比較一致でOC1AをHIGHレベルに出力
 			_BV(COM1B1) | _BV(COM1B0) | // 比較一致でOC1BをHIGHレベルに出力
 			_BV(COM1C1) | _BV(COM1C0);  // 比較一致でOC1CをHIGHレベルに出力
 
 		TCCR1B = 
 			_BV(WGM12) |                // 10bit高速PWM動作に設定
-			_BV(CS11) | _BV(CS10);      // 前置分周64に設定
+			_BV(CS11)  | _BV(CS10);     // 前置分周64に設定
 
 		TIFR1 = _BV(OCF1A) | _BV(OCF1B) | _BV(OCF1C) | _BV(TOV1); // 割り込みフラグをクリア
 
@@ -760,7 +795,7 @@ namespace Motion
 
 	void play(unsigned char motion_slot)
 	{
-		playing = true;
+		_playing = true;
 
 		getHeader(motion_slot, &header);
 		getFrame(motion_slot, 0, Frame::next);
@@ -785,6 +820,16 @@ namespace Motion
 			Frame::diff_fixed_point[index] = (((long)(Frame::next->joint_angle[index]) << 16) - Frame::now_fixed_point[index]);
 			Frame::diff_fixed_point[index] /= Frame::transition_count;
 		}
+	}
+
+	void stop()
+	{
+		_playing = false;
+	}
+
+	bool playing()
+	{
+		return _playing;
 	}
 
 	// モーション定義情報を外部EEPROMへ書き込みます。
@@ -823,6 +868,13 @@ namespace Motion
 		#ifdef _DEBUG_EXTEEPROM
 			System::output_serial->print(F("return : "));
 			System::output_serial->println(ret);
+		#endif
+
+		#ifdef _DEBUG_MOTION
+			System::output_serial->print("slot(arg) : ");
+			System::output_serial->println(motion_slot);
+			System::output_serial->print("slot(get) : ");
+			System::output_serial->println(p_header->slot);
 		#endif
 	}
 
@@ -879,6 +931,151 @@ namespace Motion
 
 
 /**
+ * コードインタプリタの定義
+ * =============================================================================
+ */
+namespace Code
+{
+	inline static const int CODE_SIZE() { return 2;  }
+	inline static const int STACK_MAX() { return 64; }
+
+	class CodeModel {
+	public:
+		unsigned char slot;
+		unsigned char loop;
+	};
+
+	CodeModel codes[64] = { 0 };
+
+	char stack = 0;
+	char stack_index = 0;
+	bool _running = false;
+
+	unsigned char _loop;
+
+	void init()
+	{
+		#ifdef _DEBUG_CODE
+			System::output_serial->println(F("in fuction : Code::init()"));
+		#endif
+
+		stack = 0;
+		stack_index = 0;
+		_running = false;
+	}
+
+	bool running()
+	{
+		return _running;
+	}
+
+	bool setCode(unsigned char slot, unsigned char loop)
+	{
+		#ifdef _DEBUG_CODE
+			System::output_serial->println(F("in fuction : Code::setCode()"));
+		#endif
+
+		if (stack == STACK_MAX())
+		{
+			return false;
+		}
+
+		stack++;
+
+		#ifdef _DEBUG_CODE
+			System::output_serial->print(F(">>> stack : "));
+			System::output_serial->println((int)stack);
+
+			System::output_serial->print(F(">>> slot : "));
+			System::output_serial->println((int)slot);
+
+			System::output_serial->print(F(">>> loop : "));
+			System::output_serial->println((int)loop);
+		#endif
+
+		codes[stack - 1].slot = slot;
+		codes[stack - 1].loop = loop;
+
+		return true;
+	}
+
+	bool getCode(unsigned char& slot, unsigned char& loop)
+	{
+		#ifdef _DEBUG_CODE
+			System::output_serial->println(F("in fuction : Code::getCode()"));
+		#endif
+
+		if (stack == 0)
+		{
+			return false;
+		}
+
+		slot = codes[stack_index].slot;
+		loop = codes[stack_index].loop;
+		stack_index++;
+
+		#ifdef _DEBUG_CODE
+			System::output_serial->print(F(">>> stack : "));
+			System::output_serial->println((int)stack);
+
+			System::output_serial->print(F(">>> slot : "));
+			System::output_serial->println((int)slot);
+
+			System::output_serial->print(F(">>> loop : "));
+			System::output_serial->println((int)loop);
+		#endif
+
+		stack--;
+
+		return true;
+	}
+
+	void run()
+	{
+		#ifdef _DEBUG_CODE
+			System::output_serial->println(F("in fuction : Code::run()"));
+		#endif
+
+		if (!Motion::playing())
+		{
+			stack_index = 0;
+			unsigned char slot;
+
+			if (getCode(slot, _loop))
+			{
+				#ifdef _DEBUG_CODE
+					System::output_serial->println(F(">>> getCode() == true"));
+				#endif
+
+				Motion::play(slot);
+				if (Motion::header.extra[0] != 1)
+				{
+					Motion::header.extra[0] = 1;
+					Motion::header.extra[1] = 0;
+					Motion::header.extra[2] = Motion::header.frame_num - 1;
+				}
+
+				_running = true;
+			}
+		}
+	}
+}
+
+namespace Utility {
+	bool stop = false;
+
+	void motionStopHelper()
+	{
+		stop = true;
+	}
+
+	void motionPlayHelper()
+	{
+		stop = false;
+	}
+}
+
+/**
  * コマンドパーサの定義
  * =============================================================================
  * NOTE:
@@ -912,35 +1109,39 @@ namespace Purser
 		typedef enum
 		{
 			OTHER,
-			MOTION_PLAY_COMMAND,        // [00] モーションの再生
-			STOP_COMMAND,               // [01] 停止
-			MOTION_INSTALL_COMMAND,     // [02] モーションデータのインストール
-			JOINT_MIN_SETTING_COMMAND,  // [03] 関節可動域最小値の設定
-			JOINT_MAX_SETTING_COMMAND,  // [04] 関節可動域最大値の設定
-			JOINT_HOME_SETTING_COMMAND, // [05] 関節初期位置の設定
-			JOINT_MOVE_COMMAND,         // [06] 関節可動命令
-			SERIAL_TOGGLE_COMMAND,      // [07] 読み込みシリアルの切り替え
-			DUMP_JOINT_SETTING_COMMAND, // [08] 関節設定のダンプコマンド
-			DUMP_MOTION_COMMAND,        // [09] モーションのダンプコマンド
-			SET_JOINT_SETTING_COMMAND,  // [10] 関節設定の書き込みコマンド
+			MOTION_PLAY_COMMAND,         // [00] モーションの再生
+			SET_CODE_COMMAND,            // [12] コードの設定コマンド
+			CODE_RUN_COMMAND,            // [01] コードの実行
+			STOP_COMMAND,                // [02] 停止
+			MOTION_INSTALL_COMMAND,      // [03] モーションデータのインストール
+			JOINT_MIN_SETTING_COMMAND,   // [04] 関節可動域最小値の設定
+			JOINT_MAX_SETTING_COMMAND,   // [05] 関節可動域最大値の設定
+			JOINT_HOME_SETTING_COMMAND,  // [06] 関節初期位置の設定
+			JOINT_MOVE_COMMAND,          // [07] 関節可動命令
+			SERIAL_TOGGLE_COMMAND,       // [08] 読み込みシリアルの切り替え
+			DUMP_JOINT_SETTING_COMMAND,  // [09] 関節設定のダンプコマンド
+			DUMP_MOTION_COMMAND,         // [10] モーションのダンプコマンド
+			RESET_JOINT_SETTING_COMMAND, // [11] 関節設定のリセットコマンド
 			PURSER_TOKEN_EOF,
 			PURSER_ERROR
 		} PurserToken;
 
 		const char* STR[] =
 		{
-			"",
+			"OTHER",
 			"$MP", // [00] モーションの再生
-			"$MS", // [01] 停止
-			"#IN", // [02] モーションデータのインストール
-			"#MI", // [03] 関節可動域最小値の設定
-			"#MA", // [04] 関節可動域最大値の設定
-			"#HO", // [05] 関節初期位置の設定
-			"#SA", // [06] 関節可動命令
-			"###", // [07] 読み込みシリアルの切り替え
-			"#DJ", // [08] 関節設定のダンプコマンド
-			"#DM", // [09] モーションのダンプコマンド
-			"#SJ"  // [10] 関節設定の書き込みコマンド
+			"#SC", // [12] コードの設定コマンド
+			"$CR", // [01] コードの実行
+			"$MS", // [02] 停止
+			"#IN", // [03] モーションデータのインストール
+			"#MI", // [04] 関節可動域最小値の設定
+			"#MA", // [05] 関節可動域最大値の設定
+			"#HO", // [06] 関節初期位置の設定
+			"#SA", // [07] 関節可動命令
+			"###", // [08] 読み込みシリアルの切り替え
+			"#DJ", // [09] 関節設定のダンプコマンド
+			"#DM", // [10] モーションのダンプコマンド
+			"#RJ"  // [11] 関節設定のリセットコマンド
 		};
 
 		PurserToken initial = OTHER;
@@ -960,6 +1161,7 @@ namespace Purser
 			JOINT_ID_ELEMENT_INCOMING,
 			ANGLE_ELEMENT_INCOMING,
 			MOTION_SLOT_ELEMENT_INCOMING,
+			CODE_ELEMENT_INCOMING,
 			PURSER_STATE_EOF
 		} PurserState;
 
@@ -974,24 +1176,27 @@ namespace Purser
 				"FRAME_ELEMENT_INCOMING",
 				"JOINT_ID_ELEMENT_INCOMING",
 				"ANGLE_ELEMENT_INCOMING",
-				"MOTION_SLOT_ELEMENT_INCOMING"
+				"MOTION_SLOT_ELEMENT_INCOMING",
+				"CODE_ELEMENT_INCOMING"
 			};
 		#endif
 
 		const PurserState TRANSITION_INIT[] =
 		{
-			INIT,                          // トークン"OTHER"入力時の状態遷移先
-			MOTION_SLOT_ELEMENT_INCOMING,  // トークン"MOTION_PLAY_COMMAND"入力時の状態遷移先
-			INIT,                          // トークン"STOP_COMMAND"入力時の状態遷移先
-			SLOT_ELEMENT_INCOMING,         // トークン"MOTION_INSTALL_COMMAND"入力時の状態遷移先
-			JOINT_ID_ELEMENT_INCOMING,     // トークン"JOINT_MIN_SETTING_COMMAND"入力時の状態遷移先
-			JOINT_ID_ELEMENT_INCOMING,     // トークン"JOINT_MAX_SETTING_COMMAND"入力時の状態遷移先
-			JOINT_ID_ELEMENT_INCOMING,     // トークン"JOINT_HOME_SETTING_COMMAND"入力時の状態遷移先
-			JOINT_ID_ELEMENT_INCOMING,     // トークン"JOINT_MOVE_COMMAND"入力時の状態遷移先
-			INIT,                          // トークン"SERIAL_TOGGLE_COMMAND"入力時の状態遷移先
-			INIT,                          // トークン"DUMP_JOINT_SETTING_COMMAND"入力時の状態遷移先
-			MOTION_SLOT_ELEMENT_INCOMING,  // トークン"DUMP_MOTION_COMMAND"入力時の状態遷移先
-			INIT                           // トークン"SET_JOINT_SETTING_COMMAND"入力時の状態遷移先
+			INIT,                         // トークン"OTHER"入力時の状態遷移先
+			MOTION_SLOT_ELEMENT_INCOMING, // トークン"MOTION_PLAY_COMMAND"入力時の状態遷移先
+			CODE_ELEMENT_INCOMING,        // トークン"SET_CODE_COMMAND"入力時の状態遷移先
+			INIT,                         // トークン"CODE_RUN_COMMAND"入力時の状態遷移先
+			INIT,                         // トークン"STOP_COMMAND"入力時の状態遷移先
+			SLOT_ELEMENT_INCOMING,        // トークン"MOTION_INSTALL_COMMAND"入力時の状態遷移先
+			JOINT_ID_ELEMENT_INCOMING,    // トークン"JOINT_MIN_SETTING_COMMAND"入力時の状態遷移先
+			JOINT_ID_ELEMENT_INCOMING,    // トークン"JOINT_MAX_SETTING_COMMAND"入力時の状態遷移先
+			JOINT_ID_ELEMENT_INCOMING,    // トークン"JOINT_HOME_SETTING_COMMAND"入力時の状態遷移先
+			JOINT_ID_ELEMENT_INCOMING,    // トークン"JOINT_MOVE_COMMAND"入力時の状態遷移先
+			INIT,                         // トークン"SERIAL_TOGGLE_COMMAND"入力時の状態遷移先
+			INIT,                         // トークン"DUMP_JOINT_SETTING_COMMAND"入力時の状態遷移先
+			MOTION_SLOT_ELEMENT_INCOMING, // トークン"DUMP_MOTION_COMMAND"入力時の状態遷移先
+			INIT                          // トークン"RESET_JOINT_SETTING_COMMAND"入力時の状態遷移先
 		};
 
 		const PurserState TRANSITION_SLOT_ELEMENT_INCOMING[] =
@@ -1034,6 +1239,11 @@ namespace Purser
 			INIT                           // トークン"OTHER"入力時の状態遷移先
 		};
 
+		const PurserState TRANSITION_CODE_ELEMENT_INCOMING[] = 
+		{
+			INIT                           // トークン"OTHER"入力時の状態遷移先
+		};
+
 		const PurserState* TRANSITION[] =
 		{
 			TRANSITION_INIT,
@@ -1044,7 +1254,8 @@ namespace Purser
 			TRANSITION_FRAME_ELEMENT_INCOMING,
 			TRANSITION_JOINT_ID_ELEMENT_INCOMING,
 			TRANSITION_ANGLE_ELEMENT_INCOMING,
-			TRANSITION_MOTION_SLOT_ELEMENT_INCOMING
+			TRANSITION_MOTION_SLOT_ELEMENT_INCOMING,
+			TRANSITION_CODE_ELEMENT_INCOMING
 		};
 
 		PurserState now = INIT;
@@ -1068,7 +1279,8 @@ namespace Purser
 			{ 4,  -1 }, // 状態"FRAME_ELEMENT_INCOMING"において到着するパケット
 			{ 2,  1  }, // 状態"JOINT_ID_ELEMENT_INCOMING"において到着するパケット
 			{ 3,  1  }, // 状態"ANGLE_ELEMENT_INCOMING"において到着するパケット
-			{ 2,  1  }  // 状態"MOTION_SLOT_ELEMENT_INCOMING"において到着するパケット
+			{ 2,  1  }, // 状態"MOTION_SLOT_ELEMENT_INCOMING"において到着するパケット
+			{ 2,  2  }  // 状態"CODE_ELEMENT_INCOMING"において到着するパケット
 		};
 	}
 
@@ -1095,6 +1307,7 @@ namespace Purser
 		Packet::DEFINITIONS[State::JOINT_ID_ELEMENT_INCOMING].count     = 1;
 		Packet::DEFINITIONS[State::ANGLE_ELEMENT_INCOMING].count        = 1;
 		Packet::DEFINITIONS[State::MOTION_SLOT_ELEMENT_INCOMING].count  = 1;
+		Packet::DEFINITIONS[State::CODE_ELEMENT_INCOMING].count         = 2;
 	}
 
 	// 1バイトをリングバッファ(もどき)に格納します。
@@ -1204,7 +1417,7 @@ namespace Purser
 						// 非コンフィグモードからコンフィグモードに移ったときのみ、コンフィグフレームを初期化
 						if (Config::enable == false)
 						{
-							System::timer1Start();
+							Utility::motionPlayHelper();
 
 							for (int index = 0; index < Joint::SUM(); index++)
 							{
@@ -1220,7 +1433,7 @@ namespace Purser
 					case Token::MOTION_INSTALL_COMMAND:
 					{
 						// 割り込みの優先順序を考慮し、モーションの再生を中断
-						System::timer1Stop();
+						Utility::motionStopHelper();
 
 						break;
 					}
@@ -1242,21 +1455,31 @@ namespace Purser
 					case Token::DUMP_MOTION_COMMAND:
 					{
 						// 割り込みの優先順位を考慮し、モーションの再生を中断
-						System::timer1Stop();
+						Utility::motionStopHelper();
 
 						break;
 					}
 
-					case Token::SET_JOINT_SETTING_COMMAND:
+					case Token::RESET_JOINT_SETTING_COMMAND:
 					{
-						Config::setJointSettings();
+						Config::resetJointSettings();
+
+						break;
+					}
+
+					case Token::CODE_RUN_COMMAND:
+					{
+						if (!Code::running())
+						{
+							Code::run();
+						}
 
 						break;
 					}
 
 					case Token::STOP_COMMAND:
 					{
-						if (Motion::playing)
+						if (Motion::playing())
 						{
 							Motion::header.extra[0] = 0;
 						}
@@ -1266,7 +1489,6 @@ namespace Purser
 
 					default:
 					{
-						System::timer1Start();
 						Config::enable = false;
 
 						break;
@@ -1516,8 +1738,9 @@ namespace Purser
 
 					case Token::MOTION_PLAY_COMMAND:
 					{
-						if (!Motion::playing)
+						if (!Motion::playing())
 						{
+							Utility::motionPlayHelper();
 							Motion::play(motion_slot);
 						}
 
@@ -1528,6 +1751,49 @@ namespace Purser
 					{
 						break;
 					}
+				}
+
+				break;
+			}
+
+			case State::CODE_ELEMENT_INCOMING:
+			{
+				if (Code::running())
+				{
+					return;
+				}
+
+				static unsigned char call_count = 0;
+				static unsigned char motion_slot;
+				static unsigned char loop_count;
+
+				if (call_count == 0)
+				{
+					motion_slot = strtol(Buffer::data, 0, Buffer::TO_NUM__BASE());
+
+					if (motion_slot > Motion::SLOT_MAX())
+					{
+						motion_slot = Motion::SLOT_MAX();
+					}
+
+					#ifdef _DEBUG
+						System::output_serial->print(F(">>> motion slot : "));
+						System::output_serial->println((int)motion_slot);
+					#endif
+
+					call_count++;
+				}
+				else if (call_count == 1)
+				{
+					loop_count = strtol(Buffer::data, 0, Buffer::TO_NUM__BASE());
+
+					#ifdef _DEBUG
+						System::output_serial->print(F(">>> loop count : "));
+						System::output_serial->println((int)loop_count);
+					#endif
+
+					Code::setCode(motion_slot, loop_count);
+					call_count = 0;
 				}
 
 				break;
@@ -1618,6 +1884,7 @@ void setup()
 
 	Joint::init();
 	Motion::init();
+	Code::init();
 }
 
 
@@ -1636,18 +1903,11 @@ void setup()
  */
 void loop()
 {
-	if (Config::disable() && Motion::playing)
+	if (Config::disable() && Motion::playing() && !Code::running())
 	{
 		if (Motion::Frame::updatable())
 		{
-			Motion::Frame::_updatable = false;
-			Motion::Frame::transition_count--;
-
-			for (int index = 0; index < Joint::SUM(); index++)
-			{
-				Motion::Frame::now_fixed_point[index] += Motion::Frame::diff_fixed_point[index];
-				Motion::Frame::now->joint_angle[index] = Motion::Frame::now_fixed_point[index] >> 16;
-			}
+			Motion::Frame::update();
 		}
 
 		if (Motion::Frame::updateFinished())
@@ -1686,14 +1946,105 @@ void loop()
 			}
 			else
 			{
-				Motion::playing = false;
+				Motion::stop();
 			}
 		}
 	}
 
-	if (System::input_serial->available())
+	if (Config::disable() && Motion::playing() && Code::running())
 	{
-		Purser::readByte(System::input_serial->read());
+		if (Motion::Frame::updatable())
+		{
+			Motion::Frame::update();
+		}
+
+		if (Motion::Frame::updateFinished())
+		{
+			#ifdef _DEBUG_CODE
+				System::output_serial->println(F(">>> Motion::Frame::updateFinished() == true"));
+			#endif
+
+			if (Motion::Frame::nextFrameLoadable())
+			{
+				Motion::Frame::buffering();
+				Motion::Frame::transition_count = Motion::Frame::next->transition_delay_msec / Motion::Frame::UPDATE_MSEC();
+
+				for (int index = 0; index < Joint::SUM(); index++)
+				{
+					Motion::Frame::now_fixed_point[index]  = (long)(Motion::Frame::now->joint_angle[index]) << 16;
+					Motion::Frame::diff_fixed_point[index] = ((long)(Motion::Frame::next->joint_angle[index]) << 16) - Motion::Frame::now_fixed_point[index];
+					Motion::Frame::diff_fixed_point[index] /= Motion::Frame::transition_count;
+				}
+				
+				if (   (Motion::header.extra[0] == 1)
+					&& (Motion::Frame::next->number == Motion::header.extra[2])
+					&& (Code::_loop >= 1))
+				{
+					Code::_loop--;
+
+					if (Code::_loop == 0)
+					{
+						Motion::header.extra[0] = 0;
+					}
+
+					Motion::getFrame(Motion::header.slot, Motion::header.extra[1], Motion::Frame::back);
+				}
+				else
+				{
+					Motion::getFrame(Motion::header.slot, Motion::Frame::next->number + 1, Motion::Frame::back);
+				}
+
+				for (int index = 0; index < Joint::SUM(); index++)
+				{
+					Motion::Frame::back->joint_angle[index] += Joint::SETTINGS[index].HOME;
+				}
+			}
+			else
+			{
+				unsigned char slot;
+
+				if (Code::getCode(slot, Code::_loop))
+				{
+					#ifdef _DEBUG_CODE
+						System::output_serial->println(F(">>> next code."));
+					#endif
+
+					Motion::play(slot);
+					if (Motion::header.extra[0] != 1)
+					{
+						Motion::header.extra[0] = 1;
+						Motion::header.extra[1] = 0;
+						Motion::header.extra[2] = Motion::header.frame_num - 1;
+					}
+				}
+				else
+				{
+					#ifdef _DEBUG_CODE
+						System::output_serial->println(F(">>> code end."));
+					#endif
+
+					Motion::stop();
+					Code::_running = false;
+				}
+			}
+		}
+	}
+
+	if (_SYSTEM__USBSERIAL.available())
+	{
+		Purser::readByte(_SYSTEM__USBSERIAL.read());
+
+		if (Purser::lexAccept())
+		{
+			Purser::makeTokenLog();
+			Purser::execEventHandler();
+			Purser::transition();
+		}
+	}
+
+	if (_SYSTEM__BLESERIAL.available())
+	{
+		Purser::readByte(_SYSTEM__BLESERIAL.read());
 
 		if (Purser::lexAccept())
 		{
@@ -1779,14 +2130,14 @@ ISR(TIMER1_OVF_vect)
 			Joint::ANGLE_MIN(), Joint::ANGLE_MAX(), Joint::PWM::MIN(), Joint::PWM::MAX()
 		);
 	}
-	else
+	else if (!Utility::stop)
 	{
 		_SYSTEM__PWM_OUT_00_07_REGISTER = constrain(
 			map(
 				Motion::Frame::now->joint_angle[joint_select + 0 * Multiplexer::SELECTABLE_NUM()],
 				Joint::ANGLE_MIN(), Joint::ANGLE_MAX(), Joint::PWM::MIN(), Joint::PWM::MAX()
 			),
-			Joint::PWM::MAX(), Joint::PWM::MIN()
+			Joint::PWM::MIN(), Joint::PWM::MAX()
 		);
 
 		_SYSTEM__PWM_OUT_08_15_REGISTER = constrain(
@@ -1794,7 +2145,7 @@ ISR(TIMER1_OVF_vect)
 				Motion::Frame::now->joint_angle[joint_select + 1 * Multiplexer::SELECTABLE_NUM()],
 				Joint::ANGLE_MIN(), Joint::ANGLE_MAX(), Joint::PWM::MIN(), Joint::PWM::MAX()
 			),
-			Joint::PWM::MAX(), Joint::PWM::MIN()
+			Joint::PWM::MIN(), Joint::PWM::MAX()
 		);
 
 		_SYSTEM__PWM_OUT_16_23_REGISTER = constrain(
@@ -1802,8 +2153,14 @@ ISR(TIMER1_OVF_vect)
 				Motion::Frame::now->joint_angle[joint_select + 2 * Multiplexer::SELECTABLE_NUM()],
 				Joint::ANGLE_MIN(), Joint::ANGLE_MAX(), Joint::PWM::MIN(), Joint::PWM::MAX()
 			),
-			Joint::PWM::MAX(), Joint::PWM::MIN()
+			Joint::PWM::MIN(), Joint::PWM::MAX()
 		);
+	}
+	else
+	{
+		_SYSTEM__PWM_OUT_00_07_REGISTER = 1023;
+		_SYSTEM__PWM_OUT_08_15_REGISTER = 1023;
+		_SYSTEM__PWM_OUT_16_23_REGISTER = 1023;
 	}
 
 	output_select++;
