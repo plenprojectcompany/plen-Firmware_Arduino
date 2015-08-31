@@ -1,15 +1,27 @@
 /**
- * PLEN2 - Atmega32u4向け ファームウェア
+ * PLEN2 - Firmware for Arduino (Atmega32u4)
  * =============================================================================
- * Copyright (c) 2015 Kazuyuki TAKASE.
- * PLEN Project Company Ltd. - http://plen.jp/
+ *
+ * Code name "Cytisus" (version 1.00).
+ *
+ * Copyright (c) 2015.
+ * ---
+ * - Kazuyuki TAKASE - https://github.com/Guvalif
+ * - PLEN Project Company Ltd. - http://plen.jp/
  * 
  * Build enviroment.
  * ---
- * Windows 8.1 Professional edition.
- * Arduino IDE ver.1.6.0
- *
+ * - Windows 8.1 Professional edition
+ * - Windows 7 Home Premium
+ * - Arduino IDE ver.1.6.0
+ * - Sublime Text 2 ver.2.0.2
+ * - [Stino](https://github.com/Robot-Will/Stino)
+ * - [Arduino Unit](https://github.com/mmurdoch/arduinounit)
+ * 
+ * License.
+ * ---
  * This software is released under the MIT License.
+ * (See also : http://opensource.org/licenses/mit-license.php)
  */
 
 
@@ -21,12 +33,12 @@
 #include <Wire.h>
 
 
-// #define _DEBUG             // デバッグプリントを行います。
-// #define _DEBUG_CODE        // コードインタプリタ回りのデバッグを行います。
-// #define _DEBUG_MOTION      // モーション再生回りのデバッグを行います。
-// #define _DEBUG_INSTALL     // モーションインストール回りのデバッグを行います。
-// #define _DEBUG_EXTEEPROM   // EEPROMの読み書き回りのデバッグを行います。
-// #define _DEBUG_HARD        // 割り込み回りがシビアなメソッドについてもデバッグプリントを行います。
+// #define _DEBUG           // デバッグプリントを行います。
+// #define _DEBUG_CODE      // コードインタプリタ回りのデバッグを行います。
+// #define _DEBUG_MOTION    // モーション再生回りのデバッグを行います。
+// #define _DEBUG_INSTALL   // モーションインストール回りのデバッグを行います。
+// #define _DEBUG_EXTEEPROM // EEPROMの読み書き回りのデバッグを行います。
+// #define _DEBUG_HARD      // 割り込み回りがシビアなメソッドについてもデバッグプリントを行います。
 
 
 /**
@@ -121,9 +133,9 @@ namespace Joint
 
 	namespace PWM
 	{
-		inline static const int NEUTRAL() { return 654; } // 機械的中間PWM
-		inline static const int MIN()     { return 816; } // 機械的可動最大PWM
-		inline static const int MAX()     { return 492; } // 機械的可動最小PWM
+		inline static const int NEUTRAL() { return 652; } // 機械的中間PWM
+		inline static const int MIN()     { return 493; } // 機械的可動最大PWM
+		inline static const int MAX()     { return 810; } // 機械的可動最小PWM
 	}
 }
 
@@ -154,7 +166,7 @@ namespace Motion
 
 		// NOTE:
 		// ---
-		// タイマ割り込みの現在の設定では、更新間隔は約32[msec]です。
+		// 更新間隔は、本ファームウェアのタイマ割り込みの設定では約32[msec]です。
 		inline static const int UPDATE_MSEC() { return 32; }
 	}
 
@@ -198,6 +210,7 @@ namespace System
 		}
 	}
 
+	// Timer1割り込みを許可します。
 	void timer1Start()
 	{
 		#ifdef _DEBUG
@@ -208,6 +221,7 @@ namespace System
 		TIMSK1 = _BV(TOIE1);
 	}
 
+	// Timer1割り込みを禁止します。
 	void timer1Stop()
 	{
 		#ifdef _DEBUG
@@ -278,7 +292,7 @@ namespace ExternalEEPROM
 			{
 				for (int index = 0; index < read_size; index++)
 				{
-					*data++ = Wire.read();
+					data[index] = Wire.read();
 				}
 			}
 			else
@@ -294,7 +308,7 @@ namespace ExternalEEPROM
 	// CAUTION!:
 	// ---
 	// EEPROMへの書き込みには時間がかかるので、このメソッドの使用後に
-	// delay()を5～10[msec]程度、ハードコーディングしてください。
+	// delay()を5[msec]程度、ハードコーディングしてください。
 	int writeBlock(unsigned int slot, char* data, unsigned int write_size = BLOCK())
 	{
 		#ifdef _DEBUG
@@ -378,7 +392,7 @@ namespace Joint
 		{ ANGLE_MIN(), ANGLE_MAX(), 900  }  // JOINT23 (未使用)
 	};
 
-	JointSetting SETTINGS_INITIAL[_JOINT__SUM] =
+	const JointSetting SETTINGS_INITIAL[_JOINT__SUM] =
 	{
 		{ ANGLE_MIN(), ANGLE_MAX(), 900  }, // JOINT00 ([01] 左：肩ピッチ)
 		{ ANGLE_MIN(), ANGLE_MAX(), 1150 }, // JOINT01 ([02] 左：腿ヨー)
@@ -657,6 +671,7 @@ namespace Config
 		}
 	}
 
+	// 関節情報を初期化します。
 	void resetJointSettings()
 	{
 		#ifdef _DEBUG
@@ -1052,9 +1067,6 @@ namespace Utility {
 	void motionStopHelper()
 	{
 		stop = true;
-		while (!Motion::Frame::updatable());
-		while (!Motion::Frame::updatable());
-		while (!Motion::Frame::updatable());
 	}
 
 	void motionPlayHelper()
@@ -1873,8 +1885,6 @@ void setup()
 	Joint::init();
 	Motion::init();
 	Code::init();
-
-	// #include "program.h" // プログラマブルモード時、コメントアウトする
 }
 
 
@@ -2020,9 +2030,9 @@ void loop()
 		}
 	}
 
-	if (Serial1.available())
+	if (_SYSTEM__USBSERIAL.available())
 	{
-		Purser::readByte(Serial1.read());
+		Purser::readByte(_SYSTEM__USBSERIAL.read());
 
 		if (Purser::lexAccept())
 		{
@@ -2032,9 +2042,9 @@ void loop()
 		}
 	}
 
-	if (Serial.available())
+	if (_SYSTEM__BLESERIAL.available())
 	{
-		Purser::readByte(Serial.read());
+		Purser::readByte(_SYSTEM__BLESERIAL.read());
 
 		if (Purser::lexAccept())
 		{
@@ -2127,8 +2137,7 @@ ISR(TIMER1_OVF_vect)
 				Motion::Frame::now->joint_angle[joint_select + 0 * Multiplexer::SELECTABLE_NUM()],
 				Joint::ANGLE_MIN(), Joint::ANGLE_MAX(), Joint::PWM::MIN(), Joint::PWM::MAX()
 			),
-			Joint::PWM::MAX(), Joint::PWM::MIN()
-			// Joint::PWM::MIN(), Joint::PWM::MAX()
+			Joint::PWM::MIN(), Joint::PWM::MAX()
 		);
 
 		_SYSTEM__PWM_OUT_08_15_REGISTER = constrain(
@@ -2136,8 +2145,7 @@ ISR(TIMER1_OVF_vect)
 				Motion::Frame::now->joint_angle[joint_select + 1 * Multiplexer::SELECTABLE_NUM()],
 				Joint::ANGLE_MIN(), Joint::ANGLE_MAX(), Joint::PWM::MIN(), Joint::PWM::MAX()
 			),
-			Joint::PWM::MAX(), Joint::PWM::MIN()
-			// Joint::PWM::MIN(), Joint::PWM::MAX()
+			Joint::PWM::MIN(), Joint::PWM::MAX()
 		);
 
 		_SYSTEM__PWM_OUT_16_23_REGISTER = constrain(
@@ -2145,8 +2153,7 @@ ISR(TIMER1_OVF_vect)
 				Motion::Frame::now->joint_angle[joint_select + 2 * Multiplexer::SELECTABLE_NUM()],
 				Joint::ANGLE_MIN(), Joint::ANGLE_MAX(), Joint::PWM::MIN(), Joint::PWM::MAX()
 			),
-			Joint::PWM::MAX(), Joint::PWM::MIN()
-			// Joint::PWM::MIN(), Joint::PWM::MAX()
+			Joint::PWM::MIN(), Joint::PWM::MAX()
 		);
 	}
 	else
