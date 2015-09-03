@@ -13,6 +13,7 @@
 
 // 独自ライブラリ関連
 #include "System.h"
+#include "ExternalEEPROM.h"
 #include "MotionController.h"
 
 
@@ -28,6 +29,38 @@ namespace {
 	{
 		return (value << PRECISION());
 	}
+
+	inline int getUnfixedPoint(long value)
+	{
+		return (value >> PRECISION());
+	}
+
+	template<typename T>
+	int SIZE_SUP()
+	{
+		return (sizeof(T) % PLEN2::ExternalEEPROM::SLOT_SIZE());
+	}
+
+	template<typename T>
+	int SLOTNUM()
+	{
+		const int slot_count = sizeof(T) / PLEN2::ExternalEEPROM::SLOT_SIZE();
+
+		int slot_num = 0;
+		slot_num += slot_count;
+		slot_num += (SIZE_SUP<T>()? 1 : 0);
+
+		return slot_num;
+	}
+
+	int SLOTNUM_MOTION_FULL()
+	{
+		int slot_num = 0;
+		slot_num += SLOTNUM<PLEN2::MotionController::Header>();
+		slot_num += SLOTNUM<PLEN2::MotionController::Frame>() * PLEN2::MotionController::Header::FRAMENUM_MAX();
+
+		return slot_num;
+	}
 }
 
 
@@ -38,37 +71,149 @@ PLEN2::MotionController::MotionController(JointController& joint_ctrl)
 	_playing = false;
 	_p_frame_now  = _buffer;
 	_p_frame_next = _buffer + 1;
-	_p_frame_back = _buffer + 2;
+
+	for (int joint_id = 0; joint_id < JointController::SUM(); joint_id++)
+	{
+		_p_frame_now->joint_angle[joint_id] = 0;
+	}
 }
 
 
 bool PLEN2::MotionController::setHeader(const Header* p_header)
 {
 	#if _DEBUG
-		system.outputSerial().println(F("in fuction : MotionController::setHeader()"));
+		system.outputSerial().println(F("=== in fuction : MotionController::setHeader()"));
 	#endif
 	
-	if (p_header->slot >= SLOT_MAX())
+	if (p_header->slot >= Header::SLOT_MAX())
 	{
 		#if _DEBUG
-			system.outputSerial().print(F(">>> bad argment : slot = "));
+			system.outputSerial().print(F(">>> bad argment : p_header->slot = "));
 			system.outputSerial().println((int)slot);
 		#endif
 
 		return false;
 	}
 
-	
+	int write_count = SLOTNUM<Header>();
+	int write_size_sup = (SIZE_SUP<Header>()? SIZE_SUP<Header>() : ExternalEEPROM::SLOT_SIZE());
+
+	const char* filler = (const char*)p_header;
+
+	for (int count = 0; count < (write_count - 1); count++)
+	{
+		int ret = exteeprom.writeSlot(
+			(int)p_header->slot * SLOTNUM_MOTION_FULL() + count,
+			filler + ExternalEEPROM::SLOT_SIZE() * count,
+			ExternalEEPROM::SLOT_SIZE()
+		);
+
+		if (ret != 0)
+		{
+			#if _DEBUG
+				system.outputSerial().print(F(">>> failed : ret["));
+				system.outputSerial().print(count);
+				system.outputSerial().print(F("] = "));
+				system.outputSerial().println(ret);
+			#endif
+
+			return false;
+		}
+	}
+
+	int ret = exteeprom.writeSlot(
+		(int)p_header->slot * SLOTNUM_MOTION_FULL() + write_count,
+		filler + ExternalEEPROM::SLOT_SIZE() * write_count,
+		write_size_sup
+	);
+
+	if (ret != 0)
+	{
+		#if _DEBUG
+			system.outputSerial().print(F(">>> failed : ret["));
+			system.outputSerial().print(write_count - 1);
+			system.outputSerial().print(F("] = "));
+			system.outputSerial().println(ret);
+		#endif
+
+		return false;
+	}
+
+	return true;
 }
 
 
 bool PLEN2::MotionController::getHeader(Header* p_header)
 {
 	#if _DEBUG
-		system.outputSerial().println(F("in fuction : MotionController::setHeader()"));
+		system.outputSerial().println(F("=== in fuction : MotionController::setHeader()"));
 	#endif
 	
-	if (p_header->slot >= SLOT_MAX())
+	if (p_header->slot >= Header::SLOT_MAX())
+	{
+		#if _DEBUG
+			system.outputSerial().print(F(">>> bad argment : p_header->slot = "));
+			system.outputSerial().println((int)slot);
+		#endif
+
+		return false;
+	}
+
+	int read_count = SLOTNUM<Header>();
+	int read_size_sup = (SIZE_SUP<Header>()? SIZE_SUP<Header>() : ExternalEEPROM::SLOT_SIZE());
+
+	char* filler = (char*)p_header;
+
+	for (int count = 0; count < (read_count - 1); count++)
+	{
+		int ret = exteeprom.readSlot(
+			(int)p_header->slot * SLOTNUM_MOTION_FULL() + count,
+			filler + ExternalEEPROM::SLOT_SIZE() * count,
+			ExternalEEPROM::SLOT_SIZE()
+		);
+
+		if (ret != ExternalEEPROM::SLOT_SIZE())
+		{
+			#if _DEBUG
+				system.outputSerial().print(F(">>> failed : ret["));
+				system.outputSerial().print(count);
+				system.outputSerial().print(F("] = "));
+				system.outputSerial().println(ret);
+			#endif
+
+			return false;
+		}
+	}
+
+	int ret = exteeprom.readSlot(
+		(int)p_header->slot * SLOTNUM_MOTION_FULL() + read_count,
+		filler + ExternalEEPROM::SLOT_SIZE() * read_count,
+		read_size_sup
+	);
+
+	if (ret != read_size_sup)
+	{
+		#if _DEBUG
+			system.outputSerial().print(F(">>> failed : ret["));
+			system.outputSerial().print(read_count - 1);
+			system.outputSerial().print(F("] = "));
+			system.outputSerial().println(ret);
+		#endif
+
+		return false;
+	}
+
+	return true;
+}
+
+
+bool PLEN2::MotionController::setFrame(unsigned char slot, const Frame* p_frame)
+{
+	#if _DEBUG
+		system.outputSerial().println(F("=== in fuction : MotionController::setFrame()"));
+	#endif
+	
+	if (slot >= Header::SLOT_MAX())
 	{
 		#if _DEBUG
 			system.outputSerial().print(F(">>> bad argment : slot = "));
@@ -77,57 +222,145 @@ bool PLEN2::MotionController::getHeader(Header* p_header)
 
 		return false;
 	}
-}
 
-
-bool PLEN2::MotionController::setFrame(unsigned char slot, const Frame* p_frame)
-{
-	#if _DEBUG
-		system.outputSerial().println(F("in fuction : MotionController::setFrame()"));
-	#endif
-	
-	if (slot >= SLOT_MAX())
+	if (p_frame->number >= Header::FRAMENUM_MAX())
 	{
 		#if _DEBUG
-			system.outputSerial().print(F(">>> bad argment : slot = "));
-			system.outputSerial().println((int)slot);
+			system.outputSerial().print(F(">>> bad argment : p_flame->flame_num = "));
+			system.outputSerial().println((int)p_frame->flame_num);
 		#endif
 
-		return;
+		return false;
 	}
 
+	int frame_num = p_frame->number;
+	int write_count = SLOTNUM<Frame>();
+	int write_size_sup = (SIZE_SUP<Frame>()? SIZE_SUP<Frame>() : ExternalEEPROM::SLOT_SIZE());
+
+	const char* filler = (const char*)p_frame;
+
+	for (int count = 0; count < (write_count - 1); count++)
+	{
+		int ret = exteeprom.writeSlot(
+			(int)slot * SLOTNUM_MOTION_FULL() + SLOTNUM<Header>() + frame_num * SLOTNUM<Frame>() + count,
+			filler + ExternalEEPROM::SLOT_SIZE() * count,
+			ExternalEEPROM::SLOT_SIZE()
+		);
+
+		if (ret != 0)
+		{
+			#if _DEBUG
+				system.outputSerial().print(F(">>> failed : ret["));
+				system.outputSerial().print(count);
+				system.outputSerial().print(F("] = "));
+				system.outputSerial().println(ret);
+			#endif
+
+			return false;
+		}
+	}
+
+	int ret = exteeprom.writeSlot(
+		(int)slot * SLOTNUM_MOTION_FULL() + SLOTNUM<Header>() + frame_num * SLOTNUM<Frame>() + write_count,
+		filler + ExternalEEPROM::SLOT_SIZE() * write_count,
+		write_size_sup
+	);
+
+	if (ret != 0)
+	{
+		#if _DEBUG
+			system.outputSerial().print(F(">>> failed : ret["));
+			system.outputSerial().print(write_count - 1);
+			system.outputSerial().print(F("] = "));
+			system.outputSerial().println(ret);
+		#endif
+
+		return false;
+	}
+
+	return true;
 }
 
 
 bool PLEN2::MotionController::getFrame(unsigned char slot, Frame* p_frame)
 {
 	#if _DEBUG
-		system.outputSerial().println(F("in fuction : MotionController::getFrame()"));
+		system.outputSerial().println(F("=== in fuction : MotionController::getFrame()"));
 	#endif
 	
-	if (slot >= SLOT_MAX())
+	if (slot >= Header::SLOT_MAX())
 	{
 		#if _DEBUG
 			system.outputSerial().print(F(">>> bad argment : slot = "));
 			system.outputSerial().println((int)slot);
 		#endif
 
-		return;
+		return false;
 	}
+
+	if (p_frame->number >= Header::FRAMENUM_MAX())
+	{
+		#if _DEBUG
+			system.outputSerial().print(F(">>> bad argment : p_flame->flame_num = "));
+			system.outputSerial().println((int)p_frame->flame_num);
+		#endif
+
+		return false;
+	}
+
+	int frame_num = p_frame->number;
+	int read_count = SLOTNUM<Frame>();
+	int read_size_sup = (SIZE_SUP<Frame>()? SIZE_SUP<Frame>() : ExternalEEPROM::SLOT_SIZE());
 
 	char* filler = (char*)p_frame;
 
-	int read_count = sizeof(Frame) / (ExternalEEPROM::SLOT_SIZE() - 2);
-	int read_size_sup = sizeof(Frame) - read_count * (ExternalEEPROM::SLOT_SIZE() - 2);
+	for (int count = 0; count < (read_count - 1); count++)
+	{
+		int ret = exteeprom.readSlot(
+			(int)slot * SLOTNUM_MOTION_FULL() + SLOTNUM<Header>() + frame_num * SLOTNUM<Frame>() + count,
+			filler + ExternalEEPROM::SLOT_SIZE() * count,
+			ExternalEEPROM::SLOT_SIZE()
+		);
 
-	int ret = exteeprom.readSlot((int)slot * )
+		if (ret != ExternalEEPROM::SLOT_SIZE())
+		{
+			#if _DEBUG
+				system.outputSerial().print(F(">>> failed : ret["));
+				system.outputSerial().print(count);
+				system.outputSerial().print(F("] = "));
+				system.outputSerial().println(ret);
+			#endif
+
+			return false;
+		}
+	}
+
+	int ret = exteeprom.readSlot(
+		(int)slot * SLOTNUM_MOTION_FULL() + SLOTNUM<Header>() + frame_num * SLOTNUM<Frame>() + read_count,
+		filler + ExternalEEPROM::SLOT_SIZE() * read_count,
+		read_size_sup
+	);
+
+	if (ret != read_size_sup)
+	{
+		#if _DEBUG
+			system.outputSerial().print(F(">>> failed : ret["));
+			system.outputSerial().print(read_count - 1);
+			system.outputSerial().print(F("] = "));
+			system.outputSerial().println(ret);
+		#endif
+
+		return false;
+	}
+
+	return true;
 }
 
 
 bool PLEN2::MotionController::playing()
 {
 	#if _DEBUG
-		system.outputSerial().println(F("in fuction : MotionController::playing()"));
+		system.outputSerial().println(F("=== in fuction : MotionController::playing()"));
 	#endif
 
 	return _playing;
@@ -137,7 +370,7 @@ bool PLEN2::MotionController::playing()
 bool PLEN2::MotionController::frameUpdatable()
 {
 	#if _DEBUG
-		system.outputSerial().println(F("in fuction : MotionController::frameUpdatable()"));
+		system.outputSerial().println(F("=== in fuction : MotionController::frameUpdatable()"));
 	#endif
 
 	volatile static unsigned char before_overflow_count = 0;
@@ -152,7 +385,7 @@ bool PLEN2::MotionController::frameUpdatable()
 bool PLEN2::MotionController::frameUpdateFinished()
 {
 	#if _DEBUG
-		system.outputSerial().println(F("in fuction : MotionController::frameUpdateFinished()"));
+		system.outputSerial().println(F("=== in fuction : MotionController::frameUpdateFinished()"));
 	#endif
 
 	return (_transition_count == 0);
@@ -162,7 +395,7 @@ bool PLEN2::MotionController::frameUpdateFinished()
 bool PLEN2::MotionController::nextFrameLoadable()
 {
 	#if _DEBUG
-		system.outputSerial().println(F("in fuction : MotionController::nextFrameLoadable()"));
+		system.outputSerial().println(F("=== in fuction : MotionController::nextFrameLoadable()"));
 	#endif
 
 	if (_header.codes[0] != 0) return true;
@@ -174,10 +407,10 @@ bool PLEN2::MotionController::nextFrameLoadable()
 void PLEN2::MotionController::play(unsigned char slot)
 {
 	#if _DEBUG
-		system.outputSerial().println(F("in fuction : MotionController::play()"));
+		system.outputSerial().println(F("=== in fuction : MotionController::play()"));
 	#endif
 
-	if (slot >= SLOT_MAX())
+	if (slot >= Header::SLOT_MAX())
 	{
 		#if _DEBUG
 			system.outputSerial().print(F(">>> bad argment : slot = "));
@@ -193,13 +426,8 @@ void PLEN2::MotionController::play(unsigned char slot)
 	_p_frame_next->number = 0;
 	getFrame(_header.slot, _p_frame_next);
 
-	if (_header.frame_num > Header::FRAMENUM_MIN())
-	{
-		_p_frame_back->number = 1;
-		getFrame(_header.slot, _p_frame_back);
-	}
-
 	_transition_count = _p_frame_next->transition_time_ms / Frame::UPDATE_INTERVAL_MS();
+
 	for (int joint_id = 0; joint_id < JointController::SUM(); joint_id++)
 	{
 		_now_fixed_points[joint_id] = getFixedPoint(_p_frame_now->joint_angle[joint_id]);
@@ -209,39 +437,131 @@ void PLEN2::MotionController::play(unsigned char slot)
 	}
 
 	_playing = true;
+	frameUpdatable();
 }
 
 
 void PLEN2::MotionController::stop()
 {
 	#if _DEBUG
-		system.outputSerial().println(F("in fuction : MotionController::stop()"));
+		system.outputSerial().println(F("=== in fuction : MotionController::stop()"));
 	#endif
 
 	_header.codes[0] = 0;
 }
 
 
+void PLEN2::MotionController::frameUpdata()
+{
+	#if _DEBUG
+		system.outputSerial().println(F("=== in fuction : MotionController::frameUpdata()"));
+	#endif	
+
+	_transition_count--;
+
+	for (int joint_id = 0; joint_id < JointController::SUM(); joint_id++)
+	{
+		_now_fixed_points[joint_id] += _diff_fixed_points[joint_id];
+		_p_joint_ctrl->setAngleDiff(joint_id, getUnfixedPoint(_now_fixed_points[joint_id]));
+	}
+}
+
+
 void PLEN2::MotionController::frameBuffering()
 {
 	#if _DEBUG
-		system.outputSerial().println(F("in fuction : MotionController::frameBuffering()"));
+		system.outputSerial().println(F("=== in fuction : MotionController::frameBuffering()"));
 	#endif
 
 	Frame* p_frame_temp = _p_frame_now;
 	_p_frame_now  = _p_frame_next;
-	_p_frame_next = _p_frame_back;
-	_p_frame_back = p_frame_temp;
+	_p_frame_next = p_frame_temp;
+}
+
+
+void PLEN2::MotionController::loadNextFrame()
+{
+	#if _DEBUG
+		system.outputSerial().println(F("=== in fuction : MotionController::loadNextFrame()"));
+	#endif
+
+	unsigned char number_now = _p_frame_now->number;
+	frameBuffering();
+
+	switch (_header.codes[0])
+	{
+		case 0:
+		{
+			_p_frame_next->number++;
+			getFrame(_header.slot, _p_frame_next);
+
+			break;
+		}
+
+		case 1:
+		{
+			if (number_now == _header.codes[2])
+			{
+				_p_frame_next->number = _header.codes[1];
+				getFrame(_header.slot, _p_frame_next);
+			}
+			else
+			{
+				_p_frame_next->number++;
+				getFrame(_header.slot, _p_frame_next);	
+			}
+
+			break;
+		}
+
+		case 2:
+		{
+			if (number_now == _header.frame_num - 1)
+			{
+				_header.slot = _header.codes[1];
+				getHeader(&_header);
+
+				_p_frame_next->number = 0;
+				getFrame(_header.slot, _p_frame_next);
+			}
+			else
+			{
+				_p_frame_next->number++;
+				getFrame(_header.slot, _p_frame_next);
+			}
+
+			break;
+		}
+
+		default:
+		{
+			#if _DEBUG
+
+			#endif
+
+			return;
+		}
+	}
+
+	_transition_count = _p_frame_next->transition_time_ms / Frame::UPDATE_INTERVAL_MS();
+
+	for (int joint_id = 0; joint_id < JointController::SUM(); joint_id++)
+	{
+		_now_fixed_points[joint_id] = getFixedPoint(_p_frame_now->joint_angle[joint_id]);
+		
+		_diff_fixed_points[joint_id] = getFixedPoint(_p_frame_next->joint_angle[joint_id]) - _now_fixed_points[joint_id];
+		_diff_fixed_points[joint_id] /= _transition_count;
+	}
 }
 
 
 void PLEN2::MotionController::dump(unsigned char slot)
 {
 	#if _DEBUG
-		system.outputSerial().println(F("in fuction : MotionController::dump()"));
+		system.outputSerial().println(F("=== in fuction : MotionController::dump()"));
 	#endif
 
-	if (slot >= SLOT_MAX())
+	if (slot >= Header::SLOT_MAX())
 	{
 		#if _DEBUG
 			system.outputSerial().print(F(">>> bad argment : slot = "));

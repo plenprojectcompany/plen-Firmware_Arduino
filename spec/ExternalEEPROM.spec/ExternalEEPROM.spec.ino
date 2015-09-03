@@ -1,14 +1,5 @@
 #line 2 "ExternalEEPROM.spec.ino"
 
-/*
-	Copyright (c) 2015.
-	- Kazuyuki TAKASE - https://github.com/Guvalif
-	- PLEN Project Company Ltd. - http://plen.jp
-
-	This software is released under the MIT License.
-	(See also : http://opensource.org/licenses/mit-license.php)
-*/
-
 
 // Arduinoライブラリ関連
 #include <Wire.h>
@@ -18,7 +9,7 @@
 #include "ExternalEEPROM.h"
 
 
-#define _TEST_HARD false //!< プロセッサに負荷のかかるテストについても実行します。
+#define _TEST_HARD true //!< プロセッサに負荷のかかるテストについても実行します。
 
 namespace {
 	PLEN2::ExternalEEPROM ext_eeprom;
@@ -101,7 +92,7 @@ test(AllSlot_ReadWrite)
 */
 test(RandomSlot_ReadOverflow)
 {
-	#define _RANDOMSLOT_READOVERFLOW__BUFFER_SIZE 33
+	#define _RANDOMSLOT_READOVERFLOW__BUFFER_SIZE 31
 	const int BUFFER_SIZE = _RANDOMSLOT_READOVERFLOW__BUFFER_SIZE;
 
 	const int slot = random(PLEN2::ExternalEEPROM::SLOT_MIN(), PLEN2::ExternalEEPROM::SLOT_MAX());

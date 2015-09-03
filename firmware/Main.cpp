@@ -17,86 +17,64 @@
 
 // 独自ライブラリ関連
 #include "Main.h"
+#include "System.h"
 #include "JointController.h"
 #include "MotionController.h"
 
 
-
 namespace
 {
+	PLEN2::System           system;
+	PLEN2::Purser           purser;
 	PLEN2::JointController  joint_ctrl;
 	PLEN2::MotionController motion_ctrl(joint_controller);
-	PLEN2::Purser           purser;
+	PLEN2::Interpreter      interpreter;
 }
-
 
 
 void PLEN2::setup()
 {
-	
+	joint_ctrl.loadSettings();
 }
 
 
 void PLEN2::loop()
 {
-	if (purser.state().configDisable() && motion_ctrl.playing())
+	if (motion_ctrl.playing())
 	{
-		if (motion_ctrl.updatable())
+		if (motion_ctrl.frameUpdatable())
 		{
-			Motion::Frame::_updatable = false;
-			Motion::Frame::transition_count--;
-
-			for (int index = 0; index < Joint::SUM(); index++)
-			{
-				Motion::Frame::now_fixed_point[index] += Motion::Frame::diff_fixed_point[index];
-				Motion::Frame::now->joint_angle[index] = Motion::Frame::now_fixed_point[index] >> 16;
-			}
+			motion_ctrl.frameUpdata();
 		}
 
-		if (Motion::Frame::updateFinished())
+		if (motion_ctrl.frameUpdateFinished())
 		{
-			if (Motion::Frame::nextFrameLoadable())
+			if (motion_ctrl.nextFrameLoadable())
 			{
-				Motion::Frame::buffering();
-				Motion::Frame::transition_count = Motion::Frame::next->transition_delay_msec / Motion::Frame::UPDATE_MSEC();
-
-				for (int index = 0; index < Joint::SUM(); index++)
-				{
-					Motion::Frame::now_fixed_point[index]  = (long)(Motion::Frame::now->joint_angle[index]) << 16;
-					Motion::Frame::diff_fixed_point[index] = ((long)(Motion::Frame::next->joint_angle[index]) << 16) - Motion::Frame::now_fixed_point[index];
-					Motion::Frame::diff_fixed_point[index] /= Motion::Frame::transition_count;
-				}
-
-				if (   (Motion::header.extra[0] == 1)
-					&& (Motion::Frame::next->number == Motion::header.extra[2]))
-				{
-					Motion::getFrame(Motion::header.slot, Motion::header.extra[1], Motion::Frame::back);
-				}
-				else if (   (Motion::header.extra[0] == 2)
-					     && (Motion::Frame::next->number == (Motion::header.frame_num - 1)))
-				{
-					Motion::getFrame(Motion::header.extra[1], 0, Motion::Frame::back);
-				}
-				else
-				{
-					Motion::getFrame(Motion::header.slot, Motion::Frame::next->number + 1, Motion::Frame::back);
-				}
-
-				for (int index = 0; index < Joint::SUM(); index++)
-				{
-					Motion::Frame::back->joint_angle[index] += Joint::SETTINGS[index].HOME;
-				}
+				motion_ctrl.loadNextFrame();
 			}
 			else
 			{
-				Motion::playing = false;
+				motion_ctrl.stop();
 			}
 		}
 	}
 
-	if (System::input_serial->available())
+	if (system.USBSerial().available())
 	{
-		Purser::readByte(System::input_serial->read());
+		Purser::readByte(system.USBSerial().available());
+
+		if (Purser::lexAccept())
+		{
+			Purser::makeTokenLog();
+			Purser::execEventHandler();
+			Purser::transition();
+		}
+	}
+
+	if (system.BLESerial().available())
+	{
+		Purser::readByte(system.BLESerial().available());
 
 		if (Purser::lexAccept())
 		{

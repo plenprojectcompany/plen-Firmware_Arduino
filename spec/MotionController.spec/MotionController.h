@@ -41,10 +41,10 @@ public:
 		inline static const int SLOT_MAX()     { return 100; }
 
 		//! @brief フレーム数の最小値
-		inline static const int FLAMENUM_MIN() { return 1;   }
+		inline static const int FRAMENUM_MIN() { return 1;   }
 
 		//! @brief フレーム数の最大値
-		inline static const int FLAMENUM_MAX() { return 20;  }
+		inline static const int FRAMENUM_MAX() { return 20;  }
 
 		unsigned char slot;                                               //!< スロット番号
 		char          name[_PLEN2__MOTIONCONTROLLER__HEADER__NAMELENGTH]; //!< モーション名
@@ -153,10 +153,15 @@ public:
 	*/
 	void stop();
 
-	/*!
-		@brief モーションフレームのバッファリングを行うメソッド
+	/*
+		@brief 遷移中のモーションフレームを更新するメソッド
 	*/
-	void frameBuffering();
+	void frameUpdata();
+
+	/*!
+		@brief 次のモーションフレームを読み込むメソッド
+	*/
+	void loadNextFrame();
 
 	/*!
 		@brief モーションのダンプをJSON形式で行うメソッド
@@ -166,11 +171,17 @@ public:
 	void dump(unsigned char slot);
 
 // コンパイル対策マクロ
-	#define _PLEN2__MOTION_CONTROLLER__FRAMEBUFFER_LENGTH 3 //!< フレームバッファ長
+	#define _PLEN2__MOTION_CONTROLLER__FRAMEBUFFER_LENGTH 2 //!< フレームバッファ長
 
 private:
 	//! @brief フレームバッファ長
 	inline static const int FRAMEBUFFER_LENGTH() { return _PLEN2__MOTION_CONTROLLER__FRAMEBUFFER_LENGTH; }
+
+	/*!
+		@brief モーションフレームのバッファリングを行うメソッド
+	*/
+	void frameBuffering();
+
 
 	JointController* _p_joint_ctrl;  //!< 関節管理インスタンスのポインタ
 	
@@ -181,7 +192,6 @@ private:
 	Frame  _buffer[_PLEN2__MOTION_CONTROLLER__FRAMEBUFFER_LENGTH]; //!< フレームインスタンスバッファ
 	Frame* _p_frame_now;  //!< 現在フレームへのポインタ
 	Frame* _p_frame_next; //!< 次点フレームへのポインタ
-	Frame* _p_frame_back; //!< 裏フレームへのポインタ
 
 	long _now_fixed_points[_PLEN2__JOINTCONTROLLER__SUM];  //!< 現在値計算用固定小数点バッファ
 	long _diff_fixed_points[_PLEN2__JOINTCONTROLLER__SUM]; //!< 差分計算用固定小数点バッファ

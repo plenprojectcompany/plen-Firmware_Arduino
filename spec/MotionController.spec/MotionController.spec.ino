@@ -1,12 +1,29 @@
 #line 2 "MotionController.spec.ino"
 
-/*
-	Copyright (c) 2015.
-	- Kazuyuki TAKASE - https://github.com/Guvalif
-	- PLEN Project Company Ltd. - http://plen.jp
 
-	This software is released under the MIT License.
-	(See also : http://opensource.org/licenses/mit-license.php)
-*/
+// Arduinoライブラリ関連
+#include <Wire.h>
+#include <EEPROM.h>
+
+// 独自ライブラリ関連
+#include <ArduinoUnit.h>
+#include "JointController.h"
+#include "MotionController.h"
 
 
+namespace {
+	PLEN2::JointController  joint_ctrl;
+	PLEN2::MotionController motion_ctrl(joint_ctrl);
+}
+
+
+void setup()
+{
+	joint_ctrl.loadSettings();
+}
+
+
+void loop()
+{
+	// noop.
+}

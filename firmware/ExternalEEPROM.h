@@ -30,26 +30,29 @@ class PLEN2::ExternalEEPROM
 {
 private:
 	//! @brief I2Cインタフェースの通信速度
-	inline static const long CLOCK()      { return 400000L;  }
+	inline static const long CLOCK()         { return 400000L; }
 	
 	//! @brief メモリサイズ(byte)
-	inline static const long SIZE()       { return 0x20000L; }
+	inline static const long SIZE()          { return 0x20000L; }
 	
 	//! @brief I2Cネットワーク上での機器アドレス
-	inline static const int  ADDRESS()    { return 0x50;     }
+	inline static const int  ADDRESS()       { return 0x50; }
+
+	//! @brief 領域アドレス指定のバイト数
+	inline static const int  ADDRESS_BYTES() { return 2; }
 	
 	//! @brief メモリチップの選択ビット
-	inline static const int  SELECT_BIT() { return 2;        }
+	inline static const int  SELECT_BIT()    { return 2; }
 
 public:
 	//! @brief 外部EEPROMの1スロットの大きさ
-	inline static const int SLOT_SIZE() { return 32; }
+	inline static const int SLOT_SIZE() { return (32 - ADDRESS_BYTES()); }
 
 	//! @brief 外部EEPROMのスロット最小値
-	inline static const int SLOT_MIN()  { return 0;  }
+	inline static const int SLOT_MIN()  { return 0; }
 
 	//! @brief 外部EEPROMのスロット最大値
-	inline static const int SLOT_MAX()  { return SIZE() / SLOT_SIZE(); }
+	inline static const int SLOT_MAX()  { return SIZE() / (SLOT_SIZE() + ADDRESS_BYTES()); }
 
 	/*!
 		@brief コンストラクタ

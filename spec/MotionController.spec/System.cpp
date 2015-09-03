@@ -40,12 +40,6 @@ PLEN2::System::System()
 }
 
 
-Stream& PLEN2::System::inputSerial()
-{
-	return *_p_input_serial;
-}
-
-
 Stream& PLEN2::System::USBSerial()
 {
 	return _PLEN2__SYSTEM__USBSERIAL;
@@ -58,6 +52,12 @@ Stream& PLEN2::System::BLESerial()
 }
 
 
+Stream& PLEN2::System::inputSerial()
+{
+	return *_p_input_serial;
+}
+
+
 Stream& PLEN2::System::outputSerial()
 {
 	return *_p_output_serial;
@@ -67,7 +67,7 @@ Stream& PLEN2::System::outputSerial()
 void PLEN2::System::toggleInputSerial()
 {
 	#if _DEBUG
-		outputSerial().println(F("in fuction : System::toggleInputSerial()"));
+		outputSerial().println(F("=== in fuction : System::toggleInputSerial()"));
 	#endif
 
 	if (_p_input_serial == &_PLEN2__SYSTEM__BLESERIAL)
@@ -84,7 +84,7 @@ void PLEN2::System::toggleInputSerial()
 void PLEN2::System::timer1Attach()
 {
 	#if _DEBUG
-		outputSerial().println(F("in fuction : System::timer1Attach()"));
+		outputSerial().println(F("=== in fuction : System::timer1Attach()"));
 	#endif
 
 	TIMSK1 = _BV(TOIE1);
@@ -94,7 +94,7 @@ void PLEN2::System::timer1Attach()
 void PLEN2::System::timer1Detach()
 {
 	#if _DEBUG
-		outputSerial().println(F("in fuction : System::timer1Detach()"));
+		outputSerial().println(F("=== in fuction : System::timer1Detach()"));
 	#endif
 
 	TIMSK1 &= ~_BV(TOIE1);
