@@ -20,6 +20,7 @@ namespace {
 void setup()
 {
 	joint_ctrl.loadSettings();
+	joint_ctrl.resetSettings();
 }
 
 

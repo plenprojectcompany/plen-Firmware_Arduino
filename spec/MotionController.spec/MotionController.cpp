@@ -185,25 +185,22 @@ bool PLEN2::MotionController::getHeader(Header* p_header)
 		}
 	}
 
-	if (read_size_sup)
+	int ret = exteeprom.readSlot(
+		(int)p_header->slot * SLOTNUM_MOTION_FULL() + read_count,
+		filler + ExternalEEPROM::SLOT_SIZE() * read_count,
+		read_size_sup
+	);
+
+	if (ret != read_size_sup)
 	{
-		int ret = exteeprom.readSlot(
-			(int)p_header->slot * SLOTNUM_MOTION_FULL() + read_count,
-			filler + ExternalEEPROM::SLOT_SIZE() * read_count,
-			read_size_sup
-		);
+		#if _DEBUG
+			system.outputSerial().print(F(">>> failed : ret["));
+			system.outputSerial().print(read_count - 1);
+			system.outputSerial().print(F("] = "));
+			system.outputSerial().println(ret);
+		#endif
 
-		if (ret != read_size_sup)
-		{
-			#if _DEBUG
-				system.outputSerial().print(F(">>> failed : ret["));
-				system.outputSerial().print(read_count - 1);
-				system.outputSerial().print(F("] = "));
-				system.outputSerial().println(ret);
-			#endif
-
-			return false;
-		}
+		return false;
 	}
 
 	return true;
@@ -338,25 +335,22 @@ bool PLEN2::MotionController::getFrame(unsigned char slot, Frame* p_frame)
 		}
 	}
 
-	if (read_size_sup)
+	int ret = exteeprom.readSlot(
+		(int)slot * SLOTNUM_MOTION_FULL() + SLOTNUM<Header>() + frame_num * SLOTNUM<Frame>() + read_count,
+		filler + ExternalEEPROM::SLOT_SIZE() * read_count,
+		read_size_sup
+	);
+
+	if (ret != read_size_sup)
 	{
-		int ret = exteeprom.readSlot(
-			(int)slot * SLOTNUM_MOTION_FULL() + SLOTNUM<Header>() + frame_num * SLOTNUM<Frame>() + read_count,
-			filler + ExternalEEPROM::SLOT_SIZE() * read_count,
-			read_size_sup
-		);
+		#if _DEBUG
+			system.outputSerial().print(F(">>> failed : ret["));
+			system.outputSerial().print(read_count - 1);
+			system.outputSerial().print(F("] = "));
+			system.outputSerial().println(ret);
+		#endif
 
-		if (ret != read_size_sup)
-		{
-			#if _DEBUG
-				system.outputSerial().print(F(">>> failed : ret["));
-				system.outputSerial().print(read_count - 1);
-				system.outputSerial().print(F("] = "));
-				system.outputSerial().println(ret);
-			#endif
-
-			return false;
-		}
+		return false;
 	}
 
 	return true;
