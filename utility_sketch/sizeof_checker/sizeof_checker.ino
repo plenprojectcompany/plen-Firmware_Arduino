@@ -23,6 +23,12 @@ void setup()
 	Serial.print(F("float : "));
 	Serial.print(sizeof(float));
 	Serial.println(F(" byte"));
+
+	int endianness = 0x01;
+	const char* scanner = (const char*)&endianness;
+
+	Serial.print(F("Endianness : "));
+	Serial.println((scanner[0])? "little" : "big");
 }
 
 

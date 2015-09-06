@@ -99,6 +99,17 @@ bool PLEN2::MotionController::setHeader(const Header* p_header)
 		return false;
 	}
 
+	if (   (p_header->frame_num > Header::FRAMENUM_MAX())
+		|| (p_header->frame_num < Header::FRAMENUM_MIN()))
+	{
+		#if _DEBUG
+			system.outputSerial().print(F(">>> bad argment : p_header->frame_num = "));
+			system.outputSerial().println((int)p_header->frame_num);
+		#endif
+
+		return false;
+	}
+
 	int write_count = SLOTNUM<Header>();
 	int write_size_sup = (SIZE_SUP<Header>()? SIZE_SUP<Header>() : ExternalEEPROM::SLOT_SIZE());
 
@@ -458,13 +469,23 @@ void PLEN2::MotionController::play(unsigned char slot)
 }
 
 
+void PLEN2::MotionController::stopping()
+{
+	#if _DEBUG
+		system.outputSerial().println(F("=== in fuction : MotionController::stopping()"));
+	#endif
+
+	_header.codes[0] = 0;
+}
+
+
 void PLEN2::MotionController::stop()
 {
 	#if _DEBUG
 		system.outputSerial().println(F("=== in fuction : MotionController::stop()"));
 	#endif
 
-	_header.codes[0] = 0;
+	_playing = false;
 }
 
 

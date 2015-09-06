@@ -99,3 +99,21 @@ void PLEN2::System::timer1Detach()
 
 	TIMSK1 &= ~_BV(TOIE1);
 }
+
+
+void PLEN2::System::dump()
+{
+	#if _DEBUG
+		outputSerial().println(F("=== in fuction : System::dump()"));
+	#endif
+
+	outputSerial().println(F("{"));
+		outputSerial().print(F("\t\"codename\": \""));
+		outputSerial().print(CODENAME());
+		outputSerial().println(F("\","));
+
+		outputSerial().print(F("\t\"version\": \""));
+		outputSerial().print(VERSION());
+		outputSerial().println(F("\""));
+	outputSerial().println(F("}"));
+}

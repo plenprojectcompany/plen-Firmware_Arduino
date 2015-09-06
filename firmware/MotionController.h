@@ -43,16 +43,16 @@ public:
 		inline static const int CODE_SIZE()    { return _PLEN2__MOTIONCONTROLLER__HEADER__CODESIZE;   }
 
 		//! @brief スロット番号の最小値
-		inline static const int SLOT_MIN()     { return 0;   }
+		inline static const int SLOT_MIN()     { return 0;  }
 
 		//! @brief スロット番号の最大値
-		inline static const int SLOT_MAX()     { return 100; }
+		inline static const int SLOT_MAX()     { return 99; }
 
 		//! @brief フレーム数の最小値
-		inline static const int FRAMENUM_MIN() { return 1;   }
+		inline static const int FRAMENUM_MIN() { return 1;  }
 
 		//! @brief フレーム数の最大値
-		inline static const int FRAMENUM_MAX() { return 20;  }
+		inline static const int FRAMENUM_MAX() { return 20; }
 
 		char          name[_PLEN2__MOTIONCONTROLLER__HEADER__NAMELENGTH]; //!< モーション名
 		unsigned char codes[_PLEN2__MOTIONCONTROLLER__HEADER__CODESIZE];  //!< コード領域
@@ -163,6 +163,15 @@ public:
 		@param [in] slot モーション番号
 	*/
 	void play(unsigned char slot);
+
+	/*!
+		@brief モーションの再生停止を予約するメソッド
+
+		@note
+		実行直後にモーションの再生が中断されるわけではなく、
+		次のストップフラグをもつフレームに遭遇した段階で再生を停止します。
+	*/
+	void stopping();
 
 	/*!
 		@brief モーションの再生を停止するメソッド

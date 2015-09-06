@@ -5,8 +5,12 @@
 #include <ArduinoUnit.h>
 #include "System.h"
 
+// テストケース選択用プリプロセスマクロ
+#define _TEST_USER true //!< ユーザテストについても実行します。
 
-namespace {
+// ファイル内グローバルインスタンスの定義
+namespace
+{
 	PLEN2::System system;
 	PLEN2::System system_another;
 }
@@ -73,13 +77,29 @@ test(OutputSerial_Identical)
 	assertTrue(rhs == lhs);
 }
 
+/*!
+	@brief システム構成のダンプテスト
+
+	ユーザによる目視でのテストです。
+*/
+test(Dump)
+{
+	#if _TEST_USER
+		system.dump();
+
+		pass();
+	#else
+		skip();
+	#endif
+}
+
 
 /*!
 	@brief アプリケーション・エントリポイント
 */
 void setup()
 {
-	while(!Serial); // for the Arduino Leonardo/Micro only.
+	while (!Serial); // for the Arduino Leonardo/Micro only.
 	
 	Serial.println("Test started.");
 	Serial.println("=============");

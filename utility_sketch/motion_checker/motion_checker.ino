@@ -34,7 +34,7 @@ loop_begin:
 	{
 		if (motion_ctrl.frameUpdatable())
 		{
-			motion_ctrl.frameUpdate();
+			motion_ctrl.frameUpdata();
 		}
 
 		if (motion_ctrl.frameUpdateFinished())
@@ -42,6 +42,10 @@ loop_begin:
 			if (motion_ctrl.nextFrameLoadable())
 			{
 				motion_ctrl.loadNextFrame();
+			}
+			else
+			{
+				motion_ctrl.stop();
 			}
 		}
 	}

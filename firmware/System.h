@@ -25,11 +25,17 @@ namespace PLEN2
 class PLEN2::System
 {
 private:
+	//! @brief コードネーム
+	inline static const char* CODENAME()           { return "Cytisus"; }
+
+	//! @brief バージョン番号
+	inline static const char* VERSION()            { return "1.1.0";   }
+
 	//! @brief USBシリアルインタフェースの通信速度
-	inline static const long USBSERIAL_BAUDRATE() { return 2000000L; }
+	inline static const long  USBSERIAL_BAUDRATE() { return 2000000L;  }
 	
 	//! @brief BLEシリアルインタフェースの通信速度
-	inline static const long BLESERIAL_BAUDRATE() { return 2000000L; }
+	inline static const long  BLESERIAL_BAUDRATE() { return 2000000L;  }
 
 	static Stream* _p_input_serial;  //!< 入力シリアルインスタンスのポインタ
 	static Stream* _p_output_serial; //!< 出力シリアルインスタンスのポインタ
@@ -90,6 +96,11 @@ public:
 		@brief タイマ1割り込みの禁止メソッド
 	*/
 	void timer1Detach();
+
+	/*!
+		@brief システム構成のダンプメソッド
+	*/
+	void dump();
 };
 
 #endif // _PLEN2__SYSTEM_H_
