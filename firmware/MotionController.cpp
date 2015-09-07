@@ -31,7 +31,7 @@ namespace {
 	
 	inline long getFixedPoint(int value)
 	{
-		return (value << PRECISION());
+		return ((long)value << PRECISION());
 	}
 
 	inline int getUnfixedPoint(long value)
@@ -388,16 +388,7 @@ bool PLEN2::MotionController::frameUpdatable()
 		system.outputSerial().println(F("=== in fuction : MotionController::frameUpdatable()"));
 	#endif
 
-	volatile static unsigned char before_overflow_count = 0;
-	
-	bool result = (before_overflow_count != _p_joint_ctrl->_overflow_count);
-	
-	if (result == true)
-	{
-		before_overflow_count = _p_joint_ctrl->_overflow_count;
-	}
-
-	return result;
+	return _p_joint_ctrl->_1cycle_finished;
 }
 
 
@@ -419,7 +410,7 @@ bool PLEN2::MotionController::nextFrameLoadable()
 
 	if (_header.codes[0] != 0) return true;
 
-	return ((_p_frame_now->number + 1) < _header.frame_num);
+	return ((_p_frame_next->number + 1) < _header.frame_num);
 }
 
 
@@ -465,7 +456,6 @@ void PLEN2::MotionController::play(unsigned char slot)
 	}
 
 	_playing = true;
-	frameUpdatable();
 }
 
 
@@ -486,6 +476,7 @@ void PLEN2::MotionController::stop()
 	#endif
 
 	_playing = false;
+	frameBuffering();
 }
 
 
@@ -502,6 +493,8 @@ void PLEN2::MotionController::frameUpdate()
 		_now_fixed_points[joint_id] += _diff_fixed_points[joint_id];
 		_p_joint_ctrl->setAngleDiff(joint_id, getUnfixedPoint(_now_fixed_points[joint_id]));
 	}
+
+	_p_joint_ctrl->_1cycle_finished = false;
 }
 
 
@@ -523,14 +516,14 @@ void PLEN2::MotionController::loadNextFrame()
 		system.outputSerial().println(F("=== in fuction : MotionController::loadNextFrame()"));
 	#endif
 
-	unsigned char number_now = _p_frame_now->number;
+	unsigned char number_now = _p_frame_next->number;
 	frameBuffering();
 
 	switch (_header.codes[0])
 	{
 		case 0:
 		{
-			_p_frame_next->number++;
+			_p_frame_next->number = number_now + 1;
 			getFrame(_header.slot, _p_frame_next);
 
 			break;
@@ -545,7 +538,7 @@ void PLEN2::MotionController::loadNextFrame()
 			}
 			else
 			{
-				_p_frame_next->number++;
+				_p_frame_next->number = number_now + 1;
 				getFrame(_header.slot, _p_frame_next);	
 			}
 
@@ -564,7 +557,7 @@ void PLEN2::MotionController::loadNextFrame()
 			}
 			else
 			{
-				_p_frame_next->number++;
+				_p_frame_next->number = number_now + 1;
 				getFrame(_header.slot, _p_frame_next);
 			}
 

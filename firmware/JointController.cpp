@@ -34,6 +34,7 @@ namespace {
 
 
 volatile unsigned char PLEN2::JointController::_overflow_count;
+volatile bool PLEN2::JointController::_1cycle_finished = false;
 unsigned int PLEN2::JointController::_pwms[_PLEN2__JOINTCONTROLLER__SUM];
 
 
@@ -110,7 +111,7 @@ void PLEN2::JointController::loadSettings()
 
 		@attention
 		比較一致の出力はLOWレベルの方が直感的でわかりやすいかと思いますが、
-		それだとマルチプレクサで出力先を切り替える処理の最中にもPWM信号が
+		その場合マルチプレクサで出力先を切り替える処理の最中にもPWM信号が
 		出力されてしまうため、出力先切り替え時にインパルスノイズが乗ります。
 	*/
 	cli();
@@ -511,4 +512,5 @@ ISR(TIMER1_OVF_vect)
 	++joint_select  &= (PLEN2::JointController::Multiplexer::SELECTABLE_NUM() - 1);
 
 	PLEN2::JointController::_overflow_count++;
+	(joint_select == 0)? (PLEN2::JointController::_1cycle_finished = true) : 0;
 }

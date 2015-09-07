@@ -23,7 +23,7 @@ namespace Purser
 void setup()
 {
 	joint_ctrl.loadSettings();
-	joint_ctrl.resetSettings();
+	// joint_ctrl.resetSettings();
 }
 
 void loop()
@@ -34,17 +34,25 @@ loop_begin:
 	{
 		if (motion_ctrl.frameUpdatable())
 		{
-			motion_ctrl.frameUpdata();
+			system.USBSerial().println("update : ");
+
+			motion_ctrl.frameUpdate();
 		}
 
 		if (motion_ctrl.frameUpdateFinished())
 		{
+			system.USBSerial().println("update finished");
+
 			if (motion_ctrl.nextFrameLoadable())
 			{
+				system.USBSerial().println("load next");
+
 				motion_ctrl.loadNextFrame();
 			}
 			else
 			{
+				system.USBSerial().println("stop");
+
 				motion_ctrl.stop();
 			}
 		}
@@ -71,7 +79,7 @@ loop_begin:
 
 		if (Purser::position == 3)
 		{
-			motion_ctrl.dump(atoi(Purser::buffer + 1));
+			// motion_ctrl.dump(atoi(Purser::buffer + 1));
 			motion_ctrl.play(atoi(Purser::buffer + 1));
 			
 			Purser::position = 0;

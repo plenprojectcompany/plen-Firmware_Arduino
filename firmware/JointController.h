@@ -86,10 +86,10 @@ public:
 	};
 	
 	//! @brief パルス幅変調波の最小値
-	inline static const int PWM_MIN()                { return 810;  }
+	inline static const int PWM_MIN()                { return 493;  }
 
 	//! @brief パルス幅変調波の最大値
-	inline static const int PWM_MAX()                { return 493;  }
+	inline static const int PWM_MAX()                { return 810;  }
 
 	//! @brief パルス幅変調波の中間値
 	inline static const int PWM_NEUTRAL()            { return 652;  }
@@ -114,6 +114,15 @@ public:
 		参照するためにpublicにされているので、基本的に外部からはこの変数を参照しないでください。
 	*/
 	volatile static unsigned char _overflow_count;
+
+	/*!
+		@brief PWM出力処理，1サイクルの終了判定変数
+
+		@attention
+		本来はprivateにされるべき変数です。タイマ1 オーバーフロー割り込みベクタから
+		参照するためにpublicにされているので、基本的に外部からはこの変数を参照しないでください。
+	*/
+	volatile static bool _1cycle_finished;
 
 	/*!
 		@brief パルス幅変調波，出力用配列
