@@ -45,8 +45,7 @@ int PLEN2::ExternalEEPROM::readSlot(
 		system.outputSerial().println(F("=== in fuction : ExternalEEPROM::readSlot()"));
 	#endif
 
-	if (   (slot < SLOT_MIN())
-		|| (slot >= SLOT_MAX())
+	if (   (slot >= SLOT_END())
 		|| (read_size > SLOT_SIZE())
 	)
 	{
@@ -58,7 +57,7 @@ int PLEN2::ExternalEEPROM::readSlot(
 	}
 
 	int  slave_address = ADDRESS();
-	long data_address  = (long)slot * (SLOT_SIZE() + ADDRESS_BYTES());
+	long data_address  = (long)slot * CHUNK_SIZE();
 
 	if (data_address >= (SIZE() / 2))
 	{
@@ -112,8 +111,7 @@ int PLEN2::ExternalEEPROM::writeSlot(
 		system.outputSerial().println(F("=== in fuction : ExternalEEPROM::writeSlot()"));
 	#endif
 
-	if (   (slot < SLOT_MIN())
-		|| (slot >= SLOT_MAX())
+	if (   (slot >= SLOT_END())
 		|| (write_size > SLOT_SIZE())
 	)
 	{
@@ -125,7 +123,7 @@ int PLEN2::ExternalEEPROM::writeSlot(
 	}
 
 	int  slave_address = ADDRESS();
-	long data_address  = (long)slot * (SLOT_SIZE() + ADDRESS_BYTES());
+	long data_address  = (long)slot * CHUNK_SIZE();
 
 	if (data_address >= (SIZE() / 2))
 	{

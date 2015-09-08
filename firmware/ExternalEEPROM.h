@@ -45,14 +45,17 @@ private:
 	inline static const int  SELECT_BIT()    { return 2; }
 
 public:
+	//! @brief 外部EEPROMの1チャンクの大きさ
+	inline static const int CHUNK_SIZE() { return 32; }
+
 	//! @brief 外部EEPROMの1スロットの大きさ
-	inline static const int SLOT_SIZE() { return (32 - ADDRESS_BYTES()); }
+	inline static const int SLOT_SIZE()  { return (CHUNK_SIZE() - ADDRESS_BYTES()); }
 
-	//! @brief 外部EEPROMのスロット最小値
-	inline static const int SLOT_MIN()  { return 0; }
+	//! @brief 外部EEPROMのスロット開始値
+	inline static const int SLOT_BEGIN() { return 0; }
 
-	//! @brief 外部EEPROMのスロット最大値
-	inline static const int SLOT_MAX()  { return SIZE() / (SLOT_SIZE() + ADDRESS_BYTES()); }
+	//! @brief 外部EEPROMのスロット終了値
+	inline static const int SLOT_END()   { return SIZE() / CHUNK_SIZE(); }
 
 	/*!
 		@brief コンストラクタ

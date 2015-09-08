@@ -1,4 +1,6 @@
 #include <stdlib.h>
+#include <string.h>
+
 #include <Wire.h>
 #include <EEPROM.h>
 #include "System.h"
@@ -11,15 +13,20 @@ namespace
 	PLEN2::System           system;
 	PLEN2::JointController  joint_ctrl;
 	PLEN2::MotionController motion_ctrl(joint_ctrl);
+
+	const char BASE = 16;
 }
 
 namespace Purser
 {
-	char buffer[4] = { '\0', '\0', '\0', '\0' };
+	char buffer[6] = { '\0', '\0', '\0', '\0', '\0', '\0' };
 	char position  = 0;
 }
 
 
+/*!
+	@brief Application Entry Point
+*/
 void setup()
 {
 	joint_ctrl.loadSettings();
@@ -68,19 +75,17 @@ loop_begin:
 
 				goto loop_begin;
 			}
-
-			system.USBSerial().read();
-			Purser::position++;
-
-			goto loop_begin;
 		}
 
 		Purser::buffer[Purser::position++] = system.USBSerial().read();
 
-		if (Purser::position == 3)
+		if (Purser::position == 6)
 		{
-			// motion_ctrl.dump(atoi(Purser::buffer + 1));
-			motion_ctrl.play(atoi(Purser::buffer + 1));
+			if (strncasecmp(Purser::buffer, "$mp", 3) == 0)
+			{
+				// motion_ctrl.dump(atoi(Purser::buffer + 1));
+				motion_ctrl.play(strtol(Purser::buffer + 3, NULL, BASE));
+			}
 			
 			Purser::position = 0;
 		}

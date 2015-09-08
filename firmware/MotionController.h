@@ -46,7 +46,7 @@ public:
 		inline static const int SLOT_MIN()     { return 0;  }
 
 		//! @brief スロット番号の最大値
-		inline static const int SLOT_MAX()     { return 99; }
+		inline static const int SLOT_MAX()     { return 89; }
 
 		//! @brief フレーム数の最小値
 		inline static const int FRAMENUM_MIN() { return 1;  }

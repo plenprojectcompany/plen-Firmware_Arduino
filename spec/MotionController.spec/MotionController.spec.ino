@@ -12,7 +12,7 @@
 
 // テストケース選択用プリプロセスマクロ
 #define _TEST_USER false //!< ユーザテストについても実行します。
-#define _TEST_HARD false //!< プロセッサに負荷のかかるテストについても実行します。
+#define _TEST_HARD true //!< プロセッサに負荷のかかるテストについても実行します。
 
 // ファイル内グローバルインスタンスの定義
 namespace
@@ -29,7 +29,7 @@ test(RandomSlot_SetHeader)
 {
 	const char SLOT = random(
 		PLEN2::MotionController::Header::SLOT_MIN(),
-		PLEN2::MotionController::Header::SLOT_MAX()
+		PLEN2::MotionController::Header::SLOT_MAX() + 1
 	);
 
 	PLEN2::MotionController::Header expected;
@@ -79,7 +79,7 @@ test(AllSlot_SetHeader)
 	#if _TEST_HARD
 		for (
 			int slot = PLEN2::MotionController::Header::SLOT_MIN();
-			slot < PLEN2::MotionController::Header::SLOT_MAX();
+			slot < (PLEN2::MotionController::Header::SLOT_MAX() + 1);
 			slot++
 		)
 		{
@@ -133,7 +133,7 @@ test(RandomSlotRandomFrame_SetFrame)
 {
 	const char SLOT = random(
 		PLEN2::MotionController::Header::SLOT_MIN(),
-		PLEN2::MotionController::Header::SLOT_MAX()
+		PLEN2::MotionController::Header::SLOT_MAX() + 1
 	);
 
 	const char NUMBER = random(PLEN2::MotionController::Header::FRAMENUM_MAX());
@@ -181,7 +181,7 @@ test(AllSlotRandomFrame_SetFrame)
 
 		for (
 			int slot = PLEN2::MotionController::Header::SLOT_MIN();
-			slot < PLEN2::MotionController::Header::SLOT_MAX();
+			slot < (PLEN2::MotionController::Header::SLOT_MAX() + 1);
 			slot++
 		)
 		{
@@ -303,7 +303,7 @@ test(RandomSlot_Dump)
 	#if _TEST_USER
 		const char SLOT = random(
 			PLEN2::MotionController::Header::SLOT_MIN(),
-			PLEN2::MotionController::Header::SLOT_MAX()
+			PLEN2::MotionController::Header::SLOT_MAX() + 1
 		);
 
 		motion_ctrl.dump(SLOT);
@@ -324,7 +324,7 @@ test(AllSlot_Dump)
 	#if _TEST_USER && _TEST_HARD
 		for (
 			int slot = PLEN2::MotionController::Header::SLOT_MIN();
-			slot < PLEN2::MotionController::Header::SLOT_MAX();
+			slot < (PLEN2::MotionController::Header::SLOT_MAX() + 1);
 			slot++
 		)
 		{

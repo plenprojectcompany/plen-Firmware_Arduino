@@ -26,7 +26,7 @@ test(RandomSlot_ReadWrite)
 	#define _RANDOMSLOT_READWRITE__BUFFER_SIZE 30
 	const int BUFFER_SIZE = _RANDOMSLOT_READWRITE__BUFFER_SIZE;
 
-	const int slot = random(PLEN2::ExternalEEPROM::SLOT_MIN(), PLEN2::ExternalEEPROM::SLOT_MAX());
+	const int slot = random(PLEN2::ExternalEEPROM::SLOT_BEGIN(), PLEN2::ExternalEEPROM::SLOT_END());
 
 
 	char expected[_RANDOMSLOT_READWRITE__BUFFER_SIZE] = { 0 };
@@ -63,7 +63,7 @@ test(AllSlot_ReadWrite)
 		const int BUFFER_SIZE = _ALLSLOT_READWRITE__BUFFER_SIZE;
 
 
-		for (int slot = PLEN2::ExternalEEPROM::SLOT_MIN(); slot < PLEN2::ExternalEEPROM::SLOT_MAX(); slot++)
+		for (int slot = PLEN2::ExternalEEPROM::SLOT_BEGIN(); slot < PLEN2::ExternalEEPROM::SLOT_END(); slot++)
 		{
 			char expected[_ALLSLOT_READWRITE__BUFFER_SIZE] = { 0 };
 			for (int index = 0; index < BUFFER_SIZE; index++)
@@ -95,7 +95,7 @@ test(RandomSlot_ReadOverflow)
 	#define _RANDOMSLOT_READOVERFLOW__BUFFER_SIZE 31
 	const int BUFFER_SIZE = _RANDOMSLOT_READOVERFLOW__BUFFER_SIZE;
 
-	const int slot = random(PLEN2::ExternalEEPROM::SLOT_MIN(), PLEN2::ExternalEEPROM::SLOT_MAX());
+	const int slot = random(PLEN2::ExternalEEPROM::SLOT_BEGIN(), PLEN2::ExternalEEPROM::SLOT_END());
 	char data[_RANDOMSLOT_READOVERFLOW__BUFFER_SIZE] = { 0 };
 
 
@@ -114,7 +114,7 @@ test(RandomSlot_WriteOverflow)
 	#define _RANDOMSLOT_WRITEOVERFLOW__BUFFER_SIZE 31
 	const int BUFFER_SIZE = _RANDOMSLOT_WRITEOVERFLOW__BUFFER_SIZE;
 
-	const int slot = random(PLEN2::ExternalEEPROM::SLOT_MIN(), PLEN2::ExternalEEPROM::SLOT_MAX());
+	const int slot = random(PLEN2::ExternalEEPROM::SLOT_BEGIN(), PLEN2::ExternalEEPROM::SLOT_END());
 	char data[_RANDOMSLOT_WRITEOVERFLOW__BUFFER_SIZE] = { 0 };
 
 
@@ -133,7 +133,7 @@ test(SlotOverflow_Read)
 	#define _SLOTOVERFLOW_READ__BUFFER_SIZE 1
 	const int BUFFER_SIZE = _SLOTOVERFLOW_READ__BUFFER_SIZE;
 
-	const int slot = PLEN2::ExternalEEPROM::SLOT_MAX();
+	const int slot = PLEN2::ExternalEEPROM::SLOT_END();
 	char data[_SLOTOVERFLOW_READ__BUFFER_SIZE] = { 0 };
 
 
@@ -152,7 +152,7 @@ test(SlotOverflow_Write)
 	#define _SLOTOVERFLOW_WRITE__BUFFER_SIZE 1
 	const int BUFFER_SIZE = _SLOTOVERFLOW_WRITE__BUFFER_SIZE;
 
-	const int slot = PLEN2::ExternalEEPROM::SLOT_MAX();
+	const int slot = PLEN2::ExternalEEPROM::SLOT_END();
 	char data[_SLOTOVERFLOW_WRITE__BUFFER_SIZE] = { 0 };
 
 

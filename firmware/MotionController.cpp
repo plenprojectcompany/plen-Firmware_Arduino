@@ -89,7 +89,7 @@ bool PLEN2::MotionController::setHeader(const Header* p_header)
 		system.outputSerial().println(F("=== in fuction : MotionController::setHeader()"));
 	#endif
 	
-	if (p_header->slot >= Header::SLOT_MAX())
+	if (p_header->slot > Header::SLOT_MAX())
 	{
 		#if _DEBUG
 			system.outputSerial().print(F(">>> bad argment : p_header->slot = "));
@@ -164,7 +164,7 @@ bool PLEN2::MotionController::getHeader(Header* p_header)
 		system.outputSerial().println(F("=== in fuction : MotionController::getHeader()"));
 	#endif
 	
-	if (p_header->slot >= Header::SLOT_MAX())
+	if (p_header->slot > Header::SLOT_MAX())
 	{
 		#if _DEBUG
 			system.outputSerial().print(F(">>> bad argment : p_header->slot = "));
@@ -228,7 +228,7 @@ bool PLEN2::MotionController::setFrame(unsigned char slot, const Frame* p_frame)
 		system.outputSerial().println(F("=== in fuction : MotionController::setFrame()"));
 	#endif
 	
-	if (slot >= Header::SLOT_MAX())
+	if (slot > Header::SLOT_MAX())
 	{
 		#if _DEBUG
 			system.outputSerial().print(F(">>> bad argment : slot = "));
@@ -303,7 +303,7 @@ bool PLEN2::MotionController::getFrame(unsigned char slot, Frame* p_frame)
 		system.outputSerial().println(F("=== in fuction : MotionController::getFrame()"));
 	#endif
 	
-	if (slot >= Header::SLOT_MAX())
+	if (slot > Header::SLOT_MAX())
 	{
 		#if _DEBUG
 			system.outputSerial().print(F(">>> bad argment : slot = "));
@@ -429,7 +429,7 @@ void PLEN2::MotionController::play(unsigned char slot)
 		return;
 	}
 
-	if (slot >= Header::SLOT_MAX())
+	if (slot > Header::SLOT_MAX())
 	{
 		#if _DEBUG
 			system.outputSerial().print(F(">>> bad argment : slot = "));
@@ -592,7 +592,7 @@ void PLEN2::MotionController::dump(unsigned char slot)
 		system.outputSerial().println(F("=== in fuction : MotionController::dump()"));
 	#endif
 
-	if (slot >= Header::SLOT_MAX())
+	if (slot > Header::SLOT_MAX())
 	{
 		#if _DEBUG
 			system.outputSerial().print(F(">>> bad argment : slot = "));
