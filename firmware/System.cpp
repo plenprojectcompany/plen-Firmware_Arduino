@@ -108,6 +108,10 @@ void PLEN2::System::dump()
 	#endif
 
 	outputSerial().println(F("{"));
+		outputSerial().print(F("\t\"device\": \""));
+		outputSerial().print(DEVICE());
+		outputSerial().println(F("\","));
+
 		outputSerial().print(F("\t\"codename\": \""));
 		outputSerial().print(CODENAME());
 		outputSerial().println(F("\","));

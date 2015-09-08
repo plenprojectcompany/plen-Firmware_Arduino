@@ -25,6 +25,9 @@ namespace PLEN2
 class PLEN2::System
 {
 private:
+	//! @brief 動作デバイス
+	inline static const char* DEVICE()             { return "PLEN2";   }
+
 	//! @brief コードネーム
 	inline static const char* CODENAME()           { return "Cytisus"; }
 

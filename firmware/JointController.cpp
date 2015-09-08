@@ -47,24 +47,24 @@ PLEN2::JointController::JointController()
 	pinMode(PLEN2::Pin::PWM_OUT_08_15(),       OUTPUT);
 	pinMode(PLEN2::Pin::PWM_OUT_16_23(),       OUTPUT);
 
-	_SETTINGS_INITIAL[0]  = JointSetting(ANGLE_MIN(), ANGLE_MAX(), 900 ); // [01] 左：肩ピッチ
-	_SETTINGS_INITIAL[1]  = JointSetting(ANGLE_MIN(), ANGLE_MAX(), 1050); // [02] 左：腿ヨー
-	_SETTINGS_INITIAL[2]  = JointSetting(ANGLE_MIN(), ANGLE_MAX(), 1250); // [03] 左：肩ロール
-	_SETTINGS_INITIAL[3]  = JointSetting(ANGLE_MIN(), ANGLE_MAX(), 800 ); // [04] 左：肘ロール
-	_SETTINGS_INITIAL[4]  = JointSetting(ANGLE_MIN(), ANGLE_MAX(), 800 ); // [05] 左：腿ロール
-	_SETTINGS_INITIAL[5]  = JointSetting(ANGLE_MIN(), ANGLE_MAX(), 850 ); // [06] 左：腿ピッチ
-	_SETTINGS_INITIAL[6]  = JointSetting(ANGLE_MIN(), ANGLE_MAX(), 1400); // [07] 左：膝ピッチ
-	_SETTINGS_INITIAL[7]  = JointSetting(ANGLE_MIN(), ANGLE_MAX(), 1200); // [08] 左：足首ピッチ
-	_SETTINGS_INITIAL[8]  = JointSetting(ANGLE_MIN(), ANGLE_MAX(), 850 ); // [09] 左：足首ロール
-	_SETTINGS_INITIAL[12] = JointSetting(ANGLE_MIN(), ANGLE_MAX(), 900 ); // [10] 右：肩ピッチ
-	_SETTINGS_INITIAL[13] = JointSetting(ANGLE_MIN(), ANGLE_MAX(), 950 ); // [11] 右：腿ヨー
-	_SETTINGS_INITIAL[14] = JointSetting(ANGLE_MIN(), ANGLE_MAX(), 550 ); // [12] 右：肩ロール
-	_SETTINGS_INITIAL[15] = JointSetting(ANGLE_MIN(), ANGLE_MAX(), 1000); // [13] 右：肘ロール
-	_SETTINGS_INITIAL[16] = JointSetting(ANGLE_MIN(), ANGLE_MAX(), 1000); // [14] 右：腿ロール
-	_SETTINGS_INITIAL[17] = JointSetting(ANGLE_MIN(), ANGLE_MAX(), 1050); // [15] 右：腿ピッチ
-	_SETTINGS_INITIAL[18] = JointSetting(ANGLE_MIN(), ANGLE_MAX(), 400 ); // [16] 右：膝ピッチ
-	_SETTINGS_INITIAL[19] = JointSetting(ANGLE_MIN(), ANGLE_MAX(), 600 ); // [17] 右：足首ピッチ
-	_SETTINGS_INITIAL[20] = JointSetting(ANGLE_MIN(), ANGLE_MAX(), 950 ); // [18] 右：足首ロール
+	_SETTINGS_INITIAL[0]  = JointSetting(ANGLE_MIN(), ANGLE_MAX(), 0   ); // [01] 左：肩ピッチ
+	_SETTINGS_INITIAL[1]  = JointSetting(ANGLE_MIN(), ANGLE_MAX(), 150 ); // [02] 左：腿ヨー
+	_SETTINGS_INITIAL[2]  = JointSetting(ANGLE_MIN(), ANGLE_MAX(), 350 ); // [03] 左：肩ロール
+	_SETTINGS_INITIAL[3]  = JointSetting(ANGLE_MIN(), ANGLE_MAX(), -100); // [04] 左：肘ロール
+	_SETTINGS_INITIAL[4]  = JointSetting(ANGLE_MIN(), ANGLE_MAX(), -100); // [05] 左：腿ロール
+	_SETTINGS_INITIAL[5]  = JointSetting(ANGLE_MIN(), ANGLE_MAX(), -50 ); // [06] 左：腿ピッチ
+	_SETTINGS_INITIAL[6]  = JointSetting(ANGLE_MIN(), ANGLE_MAX(), 500 ); // [07] 左：膝ピッチ
+	_SETTINGS_INITIAL[7]  = JointSetting(ANGLE_MIN(), ANGLE_MAX(), 300 ); // [08] 左：足首ピッチ
+	_SETTINGS_INITIAL[8]  = JointSetting(ANGLE_MIN(), ANGLE_MAX(), -50 ); // [09] 左：足首ロール
+	_SETTINGS_INITIAL[12] = JointSetting(ANGLE_MIN(), ANGLE_MAX(), 0   ); // [10] 右：肩ピッチ
+	_SETTINGS_INITIAL[13] = JointSetting(ANGLE_MIN(), ANGLE_MAX(), 50  ); // [11] 右：腿ヨー
+	_SETTINGS_INITIAL[14] = JointSetting(ANGLE_MIN(), ANGLE_MAX(), -350); // [12] 右：肩ロール
+	_SETTINGS_INITIAL[15] = JointSetting(ANGLE_MIN(), ANGLE_MAX(), 100 ); // [13] 右：肘ロール
+	_SETTINGS_INITIAL[16] = JointSetting(ANGLE_MIN(), ANGLE_MAX(), 100 ); // [14] 右：腿ロール
+	_SETTINGS_INITIAL[17] = JointSetting(ANGLE_MIN(), ANGLE_MAX(), 150 ); // [15] 右：腿ピッチ
+	_SETTINGS_INITIAL[18] = JointSetting(ANGLE_MIN(), ANGLE_MAX(), -500); // [16] 右：膝ピッチ
+	_SETTINGS_INITIAL[19] = JointSetting(ANGLE_MIN(), ANGLE_MAX(), -300); // [17] 右：足首ピッチ
+	_SETTINGS_INITIAL[20] = JointSetting(ANGLE_MIN(), ANGLE_MAX(), 50  ); // [18] 右：足首ロール
 
 	for (int joint_id = 0; joint_id < SUM(); joint_id++)
 	{
@@ -168,12 +168,11 @@ int PLEN2::JointController::getMinAngle(unsigned char joint_id)
 	if (joint_id >= SUM())
 	{
 		#if _DEBUG
-			system.outputSerial().print(F(">>> joint_id : bad argment (value : "));
-			system.outputSerial().print((int)joint_id);
-			system.outputSerial().println(F(")"));
+			system.outputSerial().print(F(">>> bad argment! : joint_id = "));
+			system.outputSerial().println((int)joint_id);
 		#endif
 
-		return -1;
+		return -32768;
 	}
 
 	return _SETTINGS[joint_id].MIN;
@@ -189,12 +188,11 @@ int PLEN2::JointController::getMaxAngle(unsigned char joint_id)
 	if (joint_id >= SUM())
 	{
 		#if _DEBUG
-			system.outputSerial().print(F(">>> joint_id : bad argment (value : "));
-			system.outputSerial().print((int)joint_id);
-			system.outputSerial().println(F(")"));
+			system.outputSerial().print(F(">>> bad argment! : joint_id = "));
+			system.outputSerial().println((int)joint_id);
 		#endif
 
-		return -1;
+		return -32768;
 	}
 
 	return _SETTINGS[joint_id].MAX;
@@ -210,19 +208,18 @@ int PLEN2::JointController::getHomeAngle(unsigned char joint_id)
 	if (joint_id >= SUM())
 	{
 		#if _DEBUG
-			system.outputSerial().print(F(">>> joint_id : bad argment (value : "));
-			system.outputSerial().print((int)joint_id);
-			system.outputSerial().println(F(")"));
+			system.outputSerial().print(F(">>> bad argment! : joint_id = "));
+			system.outputSerial().println((int)joint_id);
 		#endif
 
-		return -1;
+		return -32768;
 	}
 
 	return _SETTINGS[joint_id].HOME;
 }
 
 
-bool PLEN2::JointController::setMinAngle(unsigned char joint_id, unsigned int angle)
+bool PLEN2::JointController::setMinAngle(unsigned char joint_id, int angle)
 {
 	#if _DEBUG
 		system.outputSerial().println(F("=== in fuction : JointController::setMinAngle()"));
@@ -231,21 +228,19 @@ bool PLEN2::JointController::setMinAngle(unsigned char joint_id, unsigned int an
 	if (joint_id >= SUM())
 	{
 		#if _DEBUG
-			system.outputSerial().print(F(">>> joint_id : bad argment (value : "));
-			system.outputSerial().print((int)joint_id);
-			system.outputSerial().println(F(")"));
+			system.outputSerial().print(F(">>> bad argment! : joint_id = "));
+			system.outputSerial().println((int)joint_id);
 		#endif
 
 		return false;
 	}
 
-	if (   angle >= _SETTINGS[joint_id].MAX
-		|| angle < ANGLE_MIN())
+	if (   (angle >= _SETTINGS[joint_id].MAX)
+		|| (angle < ANGLE_MIN()) )
 	{
 		#if _DEBUG
-			system.outputSerial().print(F(">>> angle : bad argment (value : "));
-			system.outputSerial().print(angle);
-			system.outputSerial().println(F(")"));
+			system.outputSerial().print(F(">>> bad argment! : angle = "));
+			system.outputSerial().println(angle);
 		#endif
 
 		return false;
@@ -271,7 +266,7 @@ bool PLEN2::JointController::setMinAngle(unsigned char joint_id, unsigned int an
 }
 
 
-bool PLEN2::JointController::setMaxAngle(unsigned char joint_id, unsigned int angle)
+bool PLEN2::JointController::setMaxAngle(unsigned char joint_id, int angle)
 {
 	#if _DEBUG
 		system.outputSerial().println(F("=== in fuction : JointController::setMaxAngle()"));
@@ -280,21 +275,19 @@ bool PLEN2::JointController::setMaxAngle(unsigned char joint_id, unsigned int an
 	if (joint_id >= SUM())
 	{
 		#if _DEBUG
-			system.outputSerial().print(F(">>> joint_id : bad argment (value : "));
-			system.outputSerial().print((int)joint_id);
-			system.outputSerial().println(F(")"));
+			system.outputSerial().print(F(">>> bad argment! : joint_id = "));
+			system.outputSerial().println((int)joint_id);
 		#endif
 
 		return false;
 	}
 
-	if (   angle <= _SETTINGS[joint_id].MIN
-		|| angle > ANGLE_MAX())
+	if (   (angle <= _SETTINGS[joint_id].MIN)
+		|| (angle > ANGLE_MAX()) )
 	{
 		#if _DEBUG
-			system.outputSerial().print(F(">>> angle : bad argment (value : "));
-			system.outputSerial().print(angle);
-			system.outputSerial().println(F(")"));
+			system.outputSerial().print(F(">>> bad argment! : angle = "));
+			system.outputSerial().println(angle);
 		#endif
 
 		return false;
@@ -320,7 +313,7 @@ bool PLEN2::JointController::setMaxAngle(unsigned char joint_id, unsigned int an
 }
 
 
-bool PLEN2::JointController::setHomeAngle(unsigned char joint_id, unsigned int angle)
+bool PLEN2::JointController::setHomeAngle(unsigned char joint_id, int angle)
 {
 	#if _DEBUG
 		system.outputSerial().println(F("=== in fuction : JointController::setHomeAngle()"));
@@ -329,21 +322,19 @@ bool PLEN2::JointController::setHomeAngle(unsigned char joint_id, unsigned int a
 	if (joint_id >= SUM())
 	{
 		#if _DEBUG
-			system.outputSerial().print(F(">>> joint_id : bad argment (value : "));
-			system.outputSerial().print((int)joint_id);
-			system.outputSerial().println(F(")"));
+			system.outputSerial().print(F(">>> bad argment! : joint_id = "));
+			system.outputSerial().println((int)joint_id);
 		#endif
 
 		return false;
 	}
 
-	if (   angle < _SETTINGS[joint_id].MIN
-		|| angle > _SETTINGS[joint_id].MAX)
+	if (   (angle < _SETTINGS[joint_id].MIN)
+		|| (angle > _SETTINGS[joint_id].MAX) )
 	{
 		#if _DEBUG
-			system.outputSerial().print(F(">>> angle : bad argment (value : "));
-			system.outputSerial().print(angle);
-			system.outputSerial().println(F(")"));
+			system.outputSerial().print(F(">>> bad argment! : angle = "));
+			system.outputSerial().println(angle);
 		#endif
 
 		return false;
@@ -369,7 +360,7 @@ bool PLEN2::JointController::setHomeAngle(unsigned char joint_id, unsigned int a
 }
 
 
-bool PLEN2::JointController::setAngle(unsigned char joint_id, unsigned int angle)
+bool PLEN2::JointController::setAngle(unsigned char joint_id, int angle)
 {
 	#if _DEBUG_HARD
 		system.outputSerial().println(F("=== in fuction : JointController::setAngle()"));
@@ -378,9 +369,8 @@ bool PLEN2::JointController::setAngle(unsigned char joint_id, unsigned int angle
 	if (joint_id >= SUM())
 	{
 		#if _DEBUG_HARD
-			system.outputSerial().print(F(">>> joint_id : bad argment (value : "));
-			system.outputSerial().print((int)joint_id);
-			system.outputSerial().println(F(")"));
+			system.outputSerial().print(F(">>> bad argment! : joint_id = "));
+			system.outputSerial().println((int)joint_id);
 		#endif
 
 		return false;
@@ -407,15 +397,17 @@ bool PLEN2::JointController::setAngleDiff(unsigned char joint_id, int angle_diff
 	if (joint_id >= SUM())
 	{
 		#if _DEBUG_HARD
-			system.outputSerial().print(F(">>> joint_id : bad argment (value : "));
-			system.outputSerial().print((int)joint_id);
-			system.outputSerial().println(F(")"));
+			system.outputSerial().print(F(">>> bad argment! : joint_id = "));
+			system.outputSerial().println((int)joint_id);
 		#endif
 
 		return false;
 	}
 
-	unsigned int angle = constrain(angle_diff + _SETTINGS[joint_id].HOME, _SETTINGS[joint_id].MIN, _SETTINGS[joint_id].MAX);
+	unsigned int angle = constrain(
+		angle_diff + _SETTINGS[joint_id].HOME,
+		_SETTINGS[joint_id].MIN, _SETTINGS[joint_id].MAX
+	);
 
 	_pwms[joint_id] = map(
 		angle,
@@ -438,16 +430,16 @@ void PLEN2::JointController::dump()
 	for (int joint_id = 0; joint_id < SUM(); joint_id++)
 	{
 		system.outputSerial().println(F("\t\t{"));
-		system.outputSerial().print(F("\t\t\t\"joint\" : "));
+		system.outputSerial().print(F("\t\t\t\"joint\": "));
 		system.outputSerial().print(joint_id);
 		system.outputSerial().println(F(","));
-		system.outputSerial().print(F("\t\t\t\"MAX\"   : "));
+		system.outputSerial().print(F("\t\t\t\"MAX\": "));
 		system.outputSerial().print(_SETTINGS[joint_id].MAX);
 		system.outputSerial().println(F(","));
-		system.outputSerial().print(F("\t\t\t\"MIN\"   : "));
+		system.outputSerial().print(F("\t\t\t\"MIN\": "));
 		system.outputSerial().print(_SETTINGS[joint_id].MIN);
 		system.outputSerial().println(F(","));
-		system.outputSerial().print(F("\t\t\t\"HOME\"  : "));
+		system.outputSerial().print(F("\t\t\t\"HOME\": "));
 		system.outputSerial().println(_SETTINGS[joint_id].HOME);
 		system.outputSerial().print(F("\t\t}"));
 		system.outputSerial().println(F(","));
@@ -488,9 +480,6 @@ ISR(TIMER1_OVF_vect)
 		@attention
 		PWM信号が出力される前に出力先を切り替える必要があるので、
 		タイマ割り込みのなるべく早い段階で切り替え処理を行う。
-
-		@todo
-		- PORTレジスタの直接操作による高速化
 	*/
 	digitalWrite(PLEN2::Pin::MULTIPLEXER_SELECT0(), bitRead(output_select, 0));
 	digitalWrite(PLEN2::Pin::MULTIPLEXER_SELECT1(), bitRead(output_select, 1));

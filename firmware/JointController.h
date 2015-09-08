@@ -45,9 +45,9 @@ private:
 	class JointSetting
 	{
 	public:
-		unsigned int MIN;  //!< 関節角度最小値の設定
-		unsigned int MAX;  //!< 関節角度最大値の設定
-		unsigned int HOME; //!< 関節角度初期値の設定
+		int MIN;  //!< 関節角度最小値の設定
+		int MAX;  //!< 関節角度最大値の設定
+		int HOME; //!< 関節角度初期値の設定
 
 		/*!
 			@brief コンストラクタ
@@ -65,7 +65,7 @@ private:
 			@param [in] max  関節角度最大値
 			@param [in] home 関節角度初期値
 		*/
-		JointSetting(unsigned int min, unsigned int max, unsigned int home)
+		JointSetting(int min, int max, int home)
 			: MIN(min), MAX(max), HOME(home)
 		{
 			// noop.
@@ -95,13 +95,13 @@ public:
 	inline static const int PWM_NEUTRAL()            { return 652;  }
 
 	//! @brief 関節角度の最小値
-	inline static const int ANGLE_MIN()              { return 300;  }
+	inline static const int ANGLE_MIN()              { return -600; }
 
 	//! @brief 関節角度の最大値
-	inline static const int ANGLE_MAX()              { return 1500; }
+	inline static const int ANGLE_MAX()              { return 600;  }
 
 	//! @brief 関節角度の中間値
-	inline static const int ANGLE_NEUTRAL()          { return 900;  }
+	inline static const int ANGLE_NEUTRAL()          { return 0;    }
 
 	//! @brief 関節の実装個数
 	inline static const int SUM() { return _PLEN2__JOINTCONTROLLER__SUM; }
@@ -166,7 +166,7 @@ public:
 		@param [in] joint_id 角度最小値を取得したい関節を番号で指定します。
 
 		@return 関節角度最小値
-		@retval -1 **joint_id**が不正
+		@retval -32768 **joint_id**が不正
 	*/
 	int getMinAngle(unsigned char joint_id);
 	
@@ -176,7 +176,7 @@ public:
 		@param [in] joint_id 角度最大値を取得したい関節を番号で指定します。
 
 		@return 関節角度最大値
-		@retval -1 **joint_id**が不正
+		@retval -32768 **joint_id**が不正
 	*/
 	int getMaxAngle(unsigned char joint_id);
 	
@@ -186,7 +186,7 @@ public:
 		@param [in] joint_id 角度初期値を取得したい関節を番号で指定します。
 
 		@return 関節角度初期値
-		@retval -1 **joint_id**が不正
+		@retval -32768 **joint_id**が不正
 	*/
 	int getHomeAngle(unsigned char joint_id);
 
@@ -198,7 +198,7 @@ public:
 
 		@return 実行結果
 	*/
-	bool setMinAngle(unsigned char joint_id, unsigned int angle);
+	bool setMinAngle(unsigned char joint_id, int angle);
 
 	/*!
 		@brief 指定した関節の角度最大値を、指定した値に設定するメソッド
@@ -208,7 +208,7 @@ public:
 
 		@return 実行結果
 	*/
-	bool setMaxAngle(unsigned char joint_id, unsigned int angle);
+	bool setMaxAngle(unsigned char joint_id, int angle);
 
 	/*!
 		@brief 指定した関節の角度初期値を、指定した値に設定するメソッド
@@ -218,7 +218,7 @@ public:
 
 		@return 実行結果
 	*/
-	bool setHomeAngle(unsigned char joint_id, unsigned int angle);
+	bool setHomeAngle(unsigned char joint_id, int angle);
 
 	/*!
 		@brief 指定した関節の角度を、指定した値に設定するメソッド
@@ -233,13 +233,13 @@ public:
 		ユーザが指定した関節角度の最大・最小値、およびサーボモータ自体の可動範囲内に丸めた後、
 		その値を設定します。単体テストの際にはそれを考慮して、テストを記述する必要があります。
 	*/
-	bool setAngle(unsigned char joint_id, unsigned int angle);
+	bool setAngle(unsigned char joint_id, int angle);
 
 	/*!
 		@brief 指定した関節の角度を、指定した値 + その関節における初期角度に設定するメソッド
 
-		@param [in] joint_id   角度を設定したい関節を番号で指定します。
-		@param [in] angle_diff 角度差分を分解能1/10°単位で指定します。
+		@param [in] joint_id 角度を設定したい関節を番号で指定します。
+		@param [in] angle    角度差分を分解能1/10°単位で指定します。
 
 		@return 実行結果
 
@@ -248,7 +248,7 @@ public:
 		ユーザが指定した関節角度の最大・最小値、およびサーボモータ自体の可動範囲内に丸めた後、
 		その値を設定します。単体テストの際にはそれを考慮して、テストを記述する必要があります。
 	*/
-	bool setAngleDiff(unsigned char joint_id, int angle_diff);
+	bool setAngleDiff(unsigned char joint_id, int angle);
 
 	/*!
 		@brief 関節設定のダンプコマンド

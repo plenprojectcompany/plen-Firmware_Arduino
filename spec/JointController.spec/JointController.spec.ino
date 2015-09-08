@@ -14,7 +14,7 @@
 namespace {
 	PLEN2::JointController joint_ctrl;
 
-	unsigned int angle2PWM(unsigned char joint_id, unsigned int angle)
+	unsigned int angle2PWM(unsigned char joint_id, int angle)
 	{
 		angle = constrain(angle, joint_ctrl.getMinAngle(joint_id), joint_ctrl.getMaxAngle(joint_id));
 
@@ -52,13 +52,15 @@ test(RandomJoint_SetMinAngle)
 {
 	unsigned char joint_id = random(PLEN2::JointController::SUM());
 
-	unsigned int expected = (unsigned int)random(
+
+	int expected = random(
 		PLEN2::JointController::ANGLE_MIN(), joint_ctrl.getMaxAngle(joint_id)
 	);
-	
+
+
 	joint_ctrl.setMinAngle(joint_id, expected);
 	joint_ctrl.loadSettings();
-	unsigned int actual = joint_ctrl.getMinAngle(joint_id);
+	int actual = joint_ctrl.getMinAngle(joint_id);
 
 
 	assertEqual(expected, actual);
@@ -71,13 +73,14 @@ test(AllJoint_SetMinAngle)
 {
 	for (unsigned char joint_id = 0; joint_id < PLEN2::JointController::SUM(); joint_id++)
 	{
-		unsigned int expected = (unsigned int)random(
+		int expected = random(
 			PLEN2::JointController::ANGLE_MIN(), joint_ctrl.getMaxAngle(joint_id)
 		);
-		
+
+
 		joint_ctrl.setMinAngle(joint_id, expected);
 		joint_ctrl.loadSettings();
-		unsigned int actual = joint_ctrl.getMinAngle(joint_id);
+		int actual = joint_ctrl.getMinAngle(joint_id);
 
 
 		assertEqual(expected, actual);
@@ -90,14 +93,16 @@ test(AllJoint_SetMinAngle)
 test(RandomJoint_SetMaxAngle)
 {
 	unsigned char joint_id = random(PLEN2::JointController::SUM());
-	
-	unsigned int expected = (unsigned int)random(
+
+
+	int expected = random(
 		joint_ctrl.getMinAngle(joint_id) + 1, PLEN2::JointController::ANGLE_MAX() + 1
 	);
-	
+
+
 	joint_ctrl.setMaxAngle(joint_id, expected);
 	joint_ctrl.loadSettings();
-	unsigned int actual = joint_ctrl.getMaxAngle(joint_id);
+	int actual = joint_ctrl.getMaxAngle(joint_id);
 
 
 	assertEqual(expected, actual);
@@ -110,13 +115,14 @@ test(AllJoint_SetMaxAngle)
 {
 	for (unsigned char joint_id = 0; joint_id < PLEN2::JointController::SUM(); joint_id++)
 	{
-		unsigned int expected = (unsigned int)random(
+		int expected = random(
 			joint_ctrl.getMinAngle(joint_id) + 1, PLEN2::JointController::ANGLE_MAX() + 1
 		);
-		
+
+
 		joint_ctrl.setMaxAngle(joint_id, expected);
 		joint_ctrl.loadSettings();
-		unsigned int actual = joint_ctrl.getMaxAngle(joint_id);
+		int actual = joint_ctrl.getMaxAngle(joint_id);
 
 
 		assertEqual(expected, actual);
@@ -129,14 +135,16 @@ test(AllJoint_SetMaxAngle)
 test(RandomJoint_SetHomeAngle)
 {
 	unsigned char joint_id = random(PLEN2::JointController::SUM());
-	
-	unsigned int expected = (unsigned int)random(
+
+
+	int expected = random(
 		joint_ctrl.getMinAngle(joint_id), joint_ctrl.getMaxAngle(joint_id) + 1
 	);
-	
+
+
 	joint_ctrl.setHomeAngle(joint_id, expected);
 	joint_ctrl.loadSettings();
-	unsigned int actual = joint_ctrl.getHomeAngle(joint_id);
+	int actual = joint_ctrl.getHomeAngle(joint_id);
 
 
 	assertEqual(expected, actual);
@@ -149,13 +157,14 @@ test(AllJoint_SetHomeAngle)
 {
 	for (unsigned char joint_id = 0; joint_id < PLEN2::JointController::SUM(); joint_id++)
 	{
-		unsigned int expected = (unsigned int)random(
+		int expected = random(
 			joint_ctrl.getMinAngle(joint_id), joint_ctrl.getMaxAngle(joint_id) + 1
 		);
-		
+
+
 		joint_ctrl.setHomeAngle(joint_id, expected);
 		joint_ctrl.loadSettings();
-		unsigned int actual = joint_ctrl.getHomeAngle(joint_id);
+		int actual = joint_ctrl.getHomeAngle(joint_id);
 
 
 		assertEqual(expected, actual);
@@ -168,15 +177,16 @@ test(AllJoint_SetHomeAngle)
 test(RandomJoint_SetAngle)
 {
 	unsigned char joint_id = random(PLEN2::JointController::SUM());
-	
-	unsigned int expected = (unsigned int)random(
+	int angle = random(
 		joint_ctrl.getMinAngle(joint_id), joint_ctrl.getMaxAngle(joint_id) + 1
 	);
-	
-	joint_ctrl.setAngle(joint_id, expected);
-	unsigned int actual = PLEN2::JointController::_pwms[joint_id];
 
-	expected = angle2PWM(joint_id, expected);
+
+	unsigned int expected = angle2PWM(joint_id, angle);
+
+
+	joint_ctrl.setAngle(joint_id, angle);
+	unsigned int actual = PLEN2::JointController::_pwms[joint_id];
 
 
 	assertEqual(expected, actual);
@@ -189,14 +199,16 @@ test(AllJoint_SetAngle)
 {
 	for (unsigned char joint_id = 0; joint_id < PLEN2::JointController::SUM(); joint_id++)
 	{
-		unsigned int expected = (unsigned int)random(
+		int angle = random(
 			joint_ctrl.getMinAngle(joint_id), joint_ctrl.getMaxAngle(joint_id) + 1
 		);
-		
-		joint_ctrl.setAngle(joint_id, expected);
-		unsigned int actual = PLEN2::JointController::_pwms[joint_id];
 
-		expected = angle2PWM(joint_id, expected);
+
+		unsigned int expected = angle2PWM(joint_id, angle);
+
+
+		joint_ctrl.setAngle(joint_id, angle);
+		unsigned int actual = PLEN2::JointController::_pwms[joint_id];
 
 
 		assertEqual(expected, actual);
@@ -210,15 +222,17 @@ test(RandomJoint_SetAngleDiff)
 {
 	unsigned char joint_id = random(PLEN2::JointController::SUM());
 	
-	unsigned int expected = (unsigned int)random(
-		(int)joint_ctrl.getMinAngle(joint_id) - (int)joint_ctrl.getHomeAngle(joint_id),
-		(int)joint_ctrl.getMaxAngle(joint_id) - (int)joint_ctrl.getHomeAngle(joint_id) + 1
+	int angle_diff = random(
+		joint_ctrl.getMinAngle(joint_id) - joint_ctrl.getHomeAngle(joint_id),
+		joint_ctrl.getMaxAngle(joint_id) - joint_ctrl.getHomeAngle(joint_id) + 1
 	);
-	
-	joint_ctrl.setAngleDiff(joint_id, expected);
-	unsigned int actual = PLEN2::JointController::_pwms[joint_id];
 
-	expected = angleDiff2PWM(joint_id, expected);
+
+	unsigned int expected = angleDiff2PWM(joint_id, angle_diff);
+
+
+	joint_ctrl.setAngleDiff(joint_id, angle_diff);
+	unsigned int actual = PLEN2::JointController::_pwms[joint_id];
 
 
 	assertEqual(expected, actual);
@@ -231,15 +245,17 @@ test(AllJoint_SetAngleDiff)
 {
 	for (unsigned char joint_id = 0; joint_id < PLEN2::JointController::SUM(); joint_id++)
 	{
-		unsigned int expected = (unsigned int)random(
-			(int)joint_ctrl.getMinAngle(joint_id) - (int)joint_ctrl.getHomeAngle(joint_id),
-			(int)joint_ctrl.getMaxAngle(joint_id) - (int)joint_ctrl.getHomeAngle(joint_id) + 1
+		int angle_diff = random(
+			joint_ctrl.getMinAngle(joint_id) - joint_ctrl.getHomeAngle(joint_id),
+			joint_ctrl.getMaxAngle(joint_id) - joint_ctrl.getHomeAngle(joint_id) + 1
 		);
-		
-		joint_ctrl.setAngleDiff(joint_id, expected);
-		unsigned int actual = PLEN2::JointController::_pwms[joint_id];
 
-		expected = angleDiff2PWM(joint_id, expected);
+
+		unsigned int expected = angleDiff2PWM(joint_id, angle_diff);
+
+
+		joint_ctrl.setAngleDiff(joint_id, angle_diff);
+		unsigned int actual = PLEN2::JointController::_pwms[joint_id];
 
 
 		assertEqual(expected, actual);
@@ -253,9 +269,8 @@ test(JointOverflow_GetMethods)
 {
 	unsigned char joint_id = PLEN2::JointController::SUM();
 
-	int expected = -1;
+	int expected = -32768;
 	int actual;
-
 
 	actual = joint_ctrl.getMinAngle(joint_id);
 	assertEqual(expected, actual);
@@ -277,7 +292,6 @@ test(JointOverflow_SetMethods)
 
 	bool expected = false;
 	bool actual;
-
 
 	actual = joint_ctrl.setMinAngle(joint_id, angle);
 	assertEqual(expected, actual);
@@ -301,9 +315,11 @@ test(JointOverflow_SetMethods)
 test(Timer1Attached)
 {
 	unsigned char before = joint_ctrl._overflow_count;
+
+
 	unsigned long end = millis() + 1000;
 	while (millis() < end);
-	unsigned char after  = joint_ctrl._overflow_count;
+	unsigned char after = joint_ctrl._overflow_count;
 
 
 	assertNotEqual(before, after);
@@ -335,7 +351,7 @@ void setup()
 	joint_ctrl.loadSettings();
 	joint_ctrl.resetSettings();
 
-	while(!Serial); // for the Arduino Leonardo/Micro only.
+	while (!Serial); // for the Arduino Leonardo/Micro only.
 
 	Serial.println("Test started.");
 	Serial.println("=============");
