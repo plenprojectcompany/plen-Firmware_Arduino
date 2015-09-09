@@ -32,32 +32,37 @@ public:
 	class Header
 	{
 	// コンパイル対策マクロ:
-		#define _PLEN2__MOTIONCONTROLLER__HEADER__NAMELENGTH 20 //!< モーション名の長さ
-		#define _PLEN2__MOTIONCONTROLLER__HEADER__CODESIZE   3  //!< コード領域の大きさ
+		#define _PLEN2__MOTIONCONTROLLER__HEADER__NAMELENGTH 21 //!< モーション名の長さ (ただし、EOS = '\0'を予約)
 
 	public:
 		//! @brief モーション名の長さ
-		inline static const int NAME_LENGTH()  { return _PLEN2__MOTIONCONTROLLER__HEADER__NAMELENGTH; }
+		inline static const int NAME_LENGTH()     { return _PLEN2__MOTIONCONTROLLER__HEADER__NAMELENGTH - 1; }
 
-		//! @brief コード領域の大きさ
-		inline static const int CODE_SIZE()    { return _PLEN2__MOTIONCONTROLLER__HEADER__CODESIZE;   }
+		//! @brief スロット番号の開始値
+		inline static const int SLOT_BEGIN()      { return 0;  }
 
-		//! @brief スロット番号の最小値
-		inline static const int SLOT_MIN()     { return 0;  }
-
-		//! @brief スロット番号の最大値
-		inline static const int SLOT_MAX()     { return 89; }
+		//! @brief スロット番号の終了値
+		inline static const int SLOT_END()        { return 90; }
 
 		//! @brief フレーム数の最小値
-		inline static const int FRAMENUM_MIN() { return 1;  }
+		inline static const int FRAMELENGTH_MIN() { return 1;  }
 
 		//! @brief フレーム数の最大値
-		inline static const int FRAMENUM_MAX() { return 20; }
+		inline static const int FRAMELENGTH_MAX() { return 20; }
 
-		char          name[_PLEN2__MOTIONCONTROLLER__HEADER__NAMELENGTH]; //!< モーション名
-		unsigned char codes[_PLEN2__MOTIONCONTROLLER__HEADER__CODESIZE];  //!< コード領域
-		unsigned char frame_num;                                          //!< フレーム数
 		unsigned char slot;                                               //!< スロット番号
+		char          name[_PLEN2__MOTIONCONTROLLER__HEADER__NAMELENGTH]; //!< モーション名
+		unsigned char frame_length;                                       //!< フレーム長
+
+		unsigned char non_reserved_func_flags : 5; //!< ビルトイン関数未定義領域
+		unsigned char use_extra : 1;               //!< "拡張コード領域"の使用選択
+		unsigned char use_jump  : 1;               //!< "ジャンプ関数"の使用選択
+		unsigned char use_loop  : 1;               //!< "ループ関数"の使用選択
+		unsigned char loop_begin : 4;              //!< ループ開始フレームの番号
+		unsigned char loop_end   : 4;              //!< ループ終了フレームの番号
+		unsigned char loop_count;                  //!< ループ回数
+		unsigned char jump_slot;                   //!< ジャンプ先のスロット番号
+		unsigned char stop_flags[3];               //!< 停止フレームのビット配列
 	};
 
 	/*!
@@ -71,6 +76,12 @@ public:
 	class Frame
 	{
 	public:
+		//! @brief フレーム番号の開始値
+		inline static const int FRAME_BEGIN()     { return 0;  }
+
+		//! @brief フレーム番号の終了値
+		inline static const int FRAME_END()       { return 20; }
+
 		/*!
 			@brief フレーム更新間隔(ミリ秒)
 
@@ -79,9 +90,10 @@ public:
 		*/
 		inline static const int UPDATE_INTERVAL_MS() { return 32; }
 
+		unsigned char index;                                     //!< フレーム番号
 		unsigned int  transition_time_ms;                        //!< 遷移時間
 		int           joint_angle[_PLEN2__JOINTCONTROLLER__SUM]; //!< 各関節角度
-		unsigned char number;                                    //!< フレーム番号
+		unsigned char device_value[8];                           //!< 各デバイスへの出力値
 	};
 
 	/*!

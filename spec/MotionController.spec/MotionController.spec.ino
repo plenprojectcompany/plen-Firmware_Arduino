@@ -28,21 +28,13 @@ namespace
 test(RandomSlot_SetHeader)
 {
 	const char SLOT = random(
-		PLEN2::MotionController::Header::SLOT_MIN(),
-		PLEN2::MotionController::Header::SLOT_MAX() + 1
+		PLEN2::MotionController::Header::SLOT_BEGIN(),
+		PLEN2::MotionController::Header::SLOT_END()
 	);
+
 
 	PLEN2::MotionController::Header expected;
 	expected.slot = SLOT;
-	expected.frame_num = random(PLEN2::MotionController::Header::FRAMENUM_MAX());
-	for (
-		int index = 0;
-		index < PLEN2::MotionController::Header::CODE_SIZE();
-		index++
-	)
-	{
-		expected.codes[index] = random();
-	}
 	for (
 		int index = 0;
 		index < PLEN2::MotionController::Header::NAME_LENGTH();
@@ -51,6 +43,18 @@ test(RandomSlot_SetHeader)
 	{
 		expected.name[index] = random();
 	}
+	expected.frame_length = random(PLEN2::MotionController::Header::FRAMELENGTH_MIN(), PLEN2::MotionController::Header::FRAMELENGTH_MAX());
+	expected.non_reserved_func_flags = random();
+	expected.use_extra = random();
+	expected.use_jump = random();
+	expected.use_loop = random();
+	expected.loop_begin = random();
+	expected.loop_end = random();
+	expected.loop_count = random();
+	expected.jump_slot = random();
+	expected.stop_flags[0] = random();
+	expected.stop_flags[1] = random();
+	expected.stop_flags[2] = random();
 	motion_ctrl.setHeader(&expected);
 
 
@@ -78,22 +82,13 @@ test(AllSlot_SetHeader)
 {
 	#if _TEST_HARD
 		for (
-			int slot = PLEN2::MotionController::Header::SLOT_MIN();
-			slot < (PLEN2::MotionController::Header::SLOT_MAX() + 1);
+			int slot = PLEN2::MotionController::Header::SLOT_BEGIN();
+			slot < PLEN2::MotionController::Header::SLOT_END();
 			slot++
 		)
 		{
 			PLEN2::MotionController::Header expected;
 			expected.slot = slot;
-			expected.frame_num = random(PLEN2::MotionController::Header::FRAMENUM_MAX());
-			for (
-				int index = 0;
-				index < PLEN2::MotionController::Header::CODE_SIZE();
-				index++
-			)
-			{
-				expected.codes[index] = random();
-			}
 			for (
 				int index = 0;
 				index < PLEN2::MotionController::Header::NAME_LENGTH();
@@ -102,6 +97,18 @@ test(AllSlot_SetHeader)
 			{
 				expected.name[index] = random();
 			}
+			expected.frame_length = random(PLEN2::MotionController::Header::FRAMELENGTH_MIN(), PLEN2::MotionController::Header::FRAMELENGTH_MAX());
+			expected.non_reserved_func_flags = random();
+			expected.use_extra = random();
+			expected.use_jump = random();
+			expected.use_loop = random();
+			expected.loop_begin = random();
+			expected.loop_end = random();
+			expected.loop_count = random();
+			expected.jump_slot = random();
+			expected.stop_flags[0] = random();
+			expected.stop_flags[1] = random();
+			expected.stop_flags[2] = random();
 			motion_ctrl.setHeader(&expected);
 
 
@@ -132,14 +139,15 @@ test(AllSlot_SetHeader)
 test(RandomSlotRandomFrame_SetFrame)
 {
 	const char SLOT = random(
-		PLEN2::MotionController::Header::SLOT_MIN(),
-		PLEN2::MotionController::Header::SLOT_MAX() + 1
+		PLEN2::MotionController::Header::SLOT_BEGIN(),
+		PLEN2::MotionController::Header::SLOT_END()
 	);
 
-	const char NUMBER = random(PLEN2::MotionController::Header::FRAMENUM_MAX());
+	const char INDEX = random(PLEN2::MotionController::Frame::FRAME_END());
 
 
 	PLEN2::MotionController::Frame expected;
+	expected.index = INDEX;
 	expected.transition_time_ms = random();
 	for (
 		int index = 0;
@@ -149,12 +157,15 @@ test(RandomSlotRandomFrame_SetFrame)
 	{
 		expected.joint_angle[index] = random();
 	}
-	expected.number = NUMBER;
+	for (int index = 0; index < 8; index++)
+	{
+		expected.device_value[index] = random();
+	}
 	motion_ctrl.setFrame(SLOT, &expected);
 
 
 	PLEN2::MotionController::Frame actual;
-	actual.number = NUMBER;
+	actual.index = INDEX;
 	motion_ctrl.getFrame(SLOT, &actual);
 
 
@@ -176,16 +187,17 @@ test(RandomSlotRandomFrame_SetFrame)
 test(AllSlotRandomFrame_SetFrame)
 {
 	#if _TEST_HARD
-		const char NUMBER = random(PLEN2::MotionController::Header::FRAMENUM_MAX());
+		const char INDEX = random(PLEN2::MotionController::Frame::FRAME_END());
 
 
 		for (
-			int slot = PLEN2::MotionController::Header::SLOT_MIN();
-			slot < (PLEN2::MotionController::Header::SLOT_MAX() + 1);
+			int slot = PLEN2::MotionController::Header::SLOT_BEGIN();
+			slot < (PLEN2::MotionController::Header::SLOT_END());
 			slot++
 		)
 		{
 			PLEN2::MotionController::Frame expected;
+			expected.index = INDEX;
 			expected.transition_time_ms = random();
 			for (
 				int index = 0;
@@ -195,12 +207,15 @@ test(AllSlotRandomFrame_SetFrame)
 			{
 				expected.joint_angle[index] = random();
 			}
-			expected.number = NUMBER;
+			for (int index = 0; index < 8; index++)
+			{
+				expected.device_value[index] = random();
+			}
 			motion_ctrl.setFrame(slot, &expected);
 
 
 			PLEN2::MotionController::Frame actual;
-			actual.number =NUMBER;
+			actual.index =INDEX;
 			motion_ctrl.getFrame(slot, &actual);
 
 
@@ -221,16 +236,17 @@ test(AllSlotRandomFrame_SetFrame)
 }
 
 /*!
-	@brief 未定義スロットへの、各種取得メソッドのテスト
+	@brief 未定義スロットへの、各種メソッドのテスト
 */
 test(SlotOverflow_Methods)
 {
-	unsigned char SLOT = PLEN2::MotionController::Header::SLOT_MAX() + 1;
+	unsigned char SLOT = PLEN2::MotionController::Header::SLOT_END();
 	PLEN2::MotionController::Header header;
 	header.slot = SLOT;
-	header.frame_num = 1;
+	header.frame_length = 1;
 	PLEN2::MotionController::Frame frame;
-	frame.number = 0;
+	frame.index = 0;
+
 
 	bool expected = false;
 	bool actual;
@@ -250,16 +266,17 @@ test(SlotOverflow_Methods)
 }
 
 /*!
-	@brief 未定義スロットへの、各種設定メソッドのテスト
+	@brief 異常フレーム数に対する、各種メソッドのテスト
 */
-test(FrameNumOverflow_Methods)
+test(FrameLengthOverflow_Methods)
 {
-	unsigned char FRAMENUM = PLEN2::MotionController::Header::FRAMENUM_MAX() + 1;
+	unsigned char FRAMELENGTH = PLEN2::MotionController::Header::FRAMELENGTH_MAX() + 1;
 	PLEN2::MotionController::Header header;
-	header.frame_num = FRAMENUM;
+	header.frame_length = FRAMELENGTH;
 	header.slot = 0;
 	PLEN2::MotionController::Frame frame;
-	frame.number = FRAMENUM;
+	frame.index = FRAMELENGTH;
+
 
 	bool expected = false;
 	bool actual;
@@ -276,14 +293,15 @@ test(FrameNumOverflow_Methods)
 }
 
 /*!
-	@brief 未定義スロットへの、各種設定メソッドのテスト
+	@brief 異常フレーム数に対する、各種メソッドのテスト
 */
-test(FrameNumUnderflow_Methods)
+test(FrameLengthUnderflow_Methods)
 {
-	unsigned char FRAMENUM = PLEN2::MotionController::Header::FRAMENUM_MIN() - 1;
+	unsigned char FRAMELENGTH = PLEN2::MotionController::Header::FRAMELENGTH_MIN() - 1;
 	PLEN2::MotionController::Header header;
-	header.frame_num = FRAMENUM;
+	header.frame_length = FRAMELENGTH;
 	header.slot = 0;
+
 
 	bool expected = false;
 	bool actual;
@@ -302,8 +320,8 @@ test(RandomSlot_Dump)
 {
 	#if _TEST_USER
 		const char SLOT = random(
-			PLEN2::MotionController::Header::SLOT_MIN(),
-			PLEN2::MotionController::Header::SLOT_MAX() + 1
+			PLEN2::MotionController::Header::SLOT_BEGIN(),
+			PLEN2::MotionController::Header::SLOT_END()
 		);
 
 		motion_ctrl.dump(SLOT);
@@ -323,8 +341,8 @@ test(AllSlot_Dump)
 {
 	#if _TEST_USER && _TEST_HARD
 		for (
-			int slot = PLEN2::MotionController::Header::SLOT_MIN();
-			slot < (PLEN2::MotionController::Header::SLOT_MAX() + 1);
+			int slot = PLEN2::MotionController::Header::SLOT_BEGIN();
+			slot < (PLEN2::MotionController::Header::SLOT_END());
 			slot++
 		)
 		{
