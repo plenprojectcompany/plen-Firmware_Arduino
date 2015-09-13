@@ -14,6 +14,7 @@ namespace {
 void setup()
 {
 	joint_ctrl.loadSettings();
+	joint_ctrl.resetSettings();
 }
 
 void loop()
@@ -22,7 +23,7 @@ void loop()
 	{
 		switch (system.USBSerial().read())
 		{
-			case 'p':
+			case 'm':
 			{
 				if (pwm != 1023)
 				{
@@ -32,7 +33,7 @@ void loop()
 				break;
 			}
 
-			case 'm':
+			case 'p':
 			{
 				if (pwm != 0)
 				{
@@ -51,7 +52,10 @@ void loop()
 		}
 
 		system.USBSerial().print(F("output : "));
-		system.USBSerial().println(pwm);
+		system.USBSerial().print(1023 - pwm);
+		system.USBSerial().print(F(" (internal = "));
+		system.USBSerial().print(pwm);
+		system.USBSerial().println(F(")"));
 
 		joint_ctrl._pwms[0] = pwm;
 	}

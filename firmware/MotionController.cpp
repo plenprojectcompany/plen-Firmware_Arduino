@@ -678,16 +678,15 @@ void PLEN2::MotionController::dump(unsigned char slot)
 						system.outputSerial().println(F(","));
 
 						system.outputSerial().print(F("\t\t\t\t\t\"value\": "));
-						system.outputSerial().print(frame.joint_angle[device_index]);
-						system.outputSerial().println(F(","));
+						system.outputSerial().println(frame.joint_angle[device_index]);
 
 					if ((device_index + 1) == JointController::SUM())
 					{
-					system.outputSerial().println(F("\t\t\t\t},"));
+					system.outputSerial().println(F("\t\t\t\t}"));
 					}
 					else
 					{
-					system.outputSerial().println(F("\t\t\t\t}"));
+					system.outputSerial().println(F("\t\t\t\t},"));
 					}
 				}
 

@@ -79,12 +79,12 @@ loop_begin:
 
 		Purser::buffer[Purser::position++] = system.USBSerial().read();
 
-		if (Purser::position == 6)
+		if (Purser::position == 5)
 		{
 			if (strncasecmp(Purser::buffer, "$mp", 3) == 0)
 			{
-				// motion_ctrl.dump(atoi(Purser::buffer + 1));
-				motion_ctrl.play(strtol(Purser::buffer + 3, NULL, BASE));
+				motion_ctrl.dump(atoi(Purser::buffer + 3));
+				// motion_ctrl.play(strtol(Purser::buffer + 3, NULL, BASE));
 			}
 			
 			Purser::position = 0;
