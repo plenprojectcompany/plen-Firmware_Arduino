@@ -1,5 +1,5 @@
 ﻿/*
-	Copyright (c) 2015.
+	Copyright (c) 2015,
 	- Kazuyuki TAKASE - https://github.com/Guvalif
 	- PLEN Project Company Ltd. - http://plen.jp
 
@@ -44,7 +44,7 @@ void PLEN2::loop()
 	{
 		if (motion_ctrl.frameUpdatable())
 		{
-			motion_ctrl.frameUpdata();
+			motion_ctrl.frameUpdate();
 		}
 
 		if (motion_ctrl.frameUpdateFinished())
