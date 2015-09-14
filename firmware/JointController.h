@@ -251,7 +251,7 @@ public:
 	bool setAngleDiff(unsigned char joint_id, int angle);
 
 	/*!
-		@brief 関節設定のダンプコマンド
+		@brief 関節設定のダンプメソッド
 	*/
 	void dump();
 };

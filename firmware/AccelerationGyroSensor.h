@@ -102,6 +102,11 @@ public:
 		取得される値は、sampling() 実行時の値をキャッシュしたものです。
 	*/
 	int getGyroYaw();
+
+	/*!
+		@brief 各種センサ値のダンプメソッド
+	*/
+	void dump();
 };
 
 #endif // _PLEN2__ACCELERATION_GYRO_SENSOR_H_
