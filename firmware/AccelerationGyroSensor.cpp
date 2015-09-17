@@ -125,6 +125,10 @@ int PLEN2::AccelerationGyroSensor::getGyroYaw()
 
 void PLEN2::AccelerationGyroSensor::dump()
 {
+	#if _DEBUG
+		system.outputSerial().println(F("=== in fuction : AccelerationGyroSensor::dump()"));
+	#endif
+
 	sampling();
 
 	system.outputSerial().println(F("{"));

@@ -57,11 +57,11 @@ PLEN2::JointController::JointController()
 	_SETTINGS_INITIAL[7]  = JointSetting(ANGLE_MIN(), ANGLE_MAX(), 300 ); // [08] 左：足首ピッチ
 	_SETTINGS_INITIAL[8]  = JointSetting(ANGLE_MIN(), ANGLE_MAX(), -50 ); // [09] 左：足首ロール
 	_SETTINGS_INITIAL[12] = JointSetting(ANGLE_MIN(), ANGLE_MAX(), 0   ); // [10] 右：肩ピッチ
-	_SETTINGS_INITIAL[13] = JointSetting(ANGLE_MIN(), ANGLE_MAX(), 50  ); // [11] 右：腿ヨー
+	_SETTINGS_INITIAL[13] = JointSetting(ANGLE_MIN(), ANGLE_MAX(), -150); // [11] 右：腿ヨー
 	_SETTINGS_INITIAL[14] = JointSetting(ANGLE_MIN(), ANGLE_MAX(), -350); // [12] 右：肩ロール
 	_SETTINGS_INITIAL[15] = JointSetting(ANGLE_MIN(), ANGLE_MAX(), 100 ); // [13] 右：肘ロール
 	_SETTINGS_INITIAL[16] = JointSetting(ANGLE_MIN(), ANGLE_MAX(), 100 ); // [14] 右：腿ロール
-	_SETTINGS_INITIAL[17] = JointSetting(ANGLE_MIN(), ANGLE_MAX(), 150 ); // [15] 右：腿ピッチ
+	_SETTINGS_INITIAL[17] = JointSetting(ANGLE_MIN(), ANGLE_MAX(), 50  ); // [15] 右：腿ピッチ
 	_SETTINGS_INITIAL[18] = JointSetting(ANGLE_MIN(), ANGLE_MAX(), -500); // [16] 右：膝ピッチ
 	_SETTINGS_INITIAL[19] = JointSetting(ANGLE_MIN(), ANGLE_MAX(), -300); // [17] 右：足首ピッチ
 	_SETTINGS_INITIAL[20] = JointSetting(ANGLE_MIN(), ANGLE_MAX(), 50  ); // [18] 右：足首ロール
