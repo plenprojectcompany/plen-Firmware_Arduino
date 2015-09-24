@@ -8,10 +8,9 @@
 #ifndef _PLEN2__MOTION_CONTROLLER_H_
 #define _PLEN2__MOTION_CONTROLLER_H_
 
-#include "JointController.h"
-
 namespace PLEN2
 {
+	class JointController;
 	class MotionController;
 }
 

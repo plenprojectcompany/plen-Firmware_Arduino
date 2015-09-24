@@ -14,6 +14,7 @@
 // 独自ライブラリ関連
 #include "System.h"
 #include "ExternalEEPROM.h"
+#include "JointController.h"
 #include "MotionController.h"
 
 

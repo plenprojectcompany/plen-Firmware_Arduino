@@ -13,7 +13,9 @@
 #include <Wire.h>
 
 // 独自ライブラリ関連
-#include "System.h"
+#if _DEBUG
+	#include "System.h"
+#endif
 #include "ExternalEEPROM.h"
 
 
