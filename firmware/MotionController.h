@@ -11,6 +11,10 @@
 namespace PLEN2
 {
 	class JointController;
+	#ifdef _PLEN2__INTERPRETER_H_
+		class Interpreter;
+	#endif
+
 	class MotionController;
 }
 
@@ -19,6 +23,10 @@ namespace PLEN2
 */
 class PLEN2::MotionController
 {
+#ifdef _PLEN2__INTERPRETER_H_
+	friend class Interpreter;
+#endif
+
 public:
 	/*!
 		@brief モーションヘッダ構造体

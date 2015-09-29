@@ -1,18 +1,26 @@
+#include "System.h"
+
+
+namespace
+{
+	PLEN2::System system;
+}
+
+
 void setup()
 {
-	Serial.begin(2000000);
-	Serial1.begin(2000000);
+	// noop.
 }
 
 void loop()
 {
-	if (Serial1.available())
+	if (system.USBSerial().available())
 	{
-		Serial.write(Serial1.read());
+		system.USBSerial().write(system.USBSerial().read());
 	}
 
-	if (Serial.available())
+	if (system.BLESerial().available())
 	{
-		Serial.write(Serial.read());
+		system.USBSerial().write(system.BLESerial().read());
 	}
 }

@@ -7,7 +7,7 @@
 	(See also : http://opensource.org/licenses/mit-license.php)
 */
 
-#include <ArduinoJSON.h>
+// #include <ArduinoJSON.h>
 
 // 独自ライブラリ関連
 #include "Purser.h"

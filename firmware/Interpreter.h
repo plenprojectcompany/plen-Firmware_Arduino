@@ -8,17 +8,11 @@
 #ifndef _PLEN2__INTERPRETER_H_
 #define _PLEN2__INTERPRETER_H_
 
-#include "MotionController.h"
-
 
 namespace PLEN2
 {
 	class Interpreter;
-
-	class MotionController
-	{
-		friend class Interpreter;
-	};
+	class MotionController;
 }
 
 class PLEN2::Interpreter
@@ -36,6 +30,9 @@ public:
 		unsigned char slot;       //!< モーションスロットの指定
 		unsigned char loop_count; //!< ループ回数の指定
 	};
+
+	//! @brief キューサイズ
+	inline static const int QUEUE_SIZE() { return _PLEN2__INTERPRETER__QUEUESIZE; }
 
 
 	/*!
@@ -75,11 +72,10 @@ public:
 
 
 private:
-	//! @brief キュー位置の上限
-	inline static const int QUEUE_END() { return _PLEN2__INTERPRETER__QUEUESIZE; }
-
 	Code _code_queue[_PLEN2__INTERPRETER__QUEUESIZE]; //!< コードインスタンスバッファ
-	unsigned char _queue_index; //!< 
+	unsigned char _queue_begin; //!< キューの先頭位置
+	unsigned char _queue_end;   //!< キューの最後尾
+	MotionController* _p_motion_ctrl; //!< モーションコントローラインスタンスへのポインタ
 };
 
 #endif // _PLEN2__INTERPRETER_H_

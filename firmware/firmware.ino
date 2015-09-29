@@ -24,9 +24,9 @@
 namespace
 {
 	PLEN2::AccelerationGyroSensor sensor;
-	PLEN2::Interpreter            interpreter;
 	PLEN2::JointController        joint_ctrl;
 	PLEN2::MotionController       motion_ctrl(joint_controller);
+	PLEN2::Interpreter            interpreter(motion_ctrl);
 	PLEN2::Purser                 purser;
 	PLEN2::System                 system;
 }
@@ -73,7 +73,14 @@ void loop()
 			}
 			else
 			{
-				motion_ctrl.stop();
+				if (interpreter.ready())
+				{
+					interpreter.popCode();
+				}
+				else
+				{
+					motion_ctrl.stop();
+				}
 			}
 		}
 	}
