@@ -11,6 +11,7 @@
 
 #include "System.h"
 #include "Interpreter.h"
+#include "JointController.h"
 #include "MotionController.h"
 
 #define _DEBUG false
