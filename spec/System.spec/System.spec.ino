@@ -1,7 +1,7 @@
 #line 2 "System.spec.ino"
 
 
-// 独自ライブラリ関連
+// 独自ライブラリ
 #include <ArduinoUnit.h>
 #include "System.h"
 

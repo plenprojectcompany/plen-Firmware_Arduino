@@ -28,7 +28,7 @@ namespace
 			return true;
 		}
 
-		virtual int  end() = 0;
+		virtual int end() = 0;
 	};
 
 	class SetterToken : public AbstractToken

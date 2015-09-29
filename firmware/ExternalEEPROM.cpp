@@ -7,20 +7,17 @@
 	(See also : http://opensource.org/licenses/mit-license.php)
 */
 
+#define _DEBUG false
 
-// Arduinoライブラリ関連
+// Arduinoライブラリ
 #include "Arduino.h"
 #include <Wire.h>
 
-// 独自ライブラリ関連
+// 独自ライブラリ
 #if _DEBUG
 	#include "System.h"
 #endif
 #include "ExternalEEPROM.h"
-
-
-// マクロの定義
-#define _DEBUG false
 
 
 namespace {

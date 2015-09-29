@@ -21,14 +21,14 @@ namespace PLEN2
 */
 class PLEN2::AccelerationGyroSensor
 {
-// コンパイル対策マクロ
+// macro:
 	#define _PLEN2__ACCELERATION_GYRO_SENSOR__BUFFER_LENGTH 6 //!< センサ値バッファ長
 
 private:
 	//! @brief センサ値バッファ長
 	inline static const int BUFFER_LENGTH() { return _PLEN2__ACCELERATION_GYRO_SENSOR__BUFFER_LENGTH; }
 
-	int _value[_PLEN2__ACCELERATION_GYRO_SENSOR__BUFFER_LENGTH]; //!< センサ値バッファ
+	int m_values[_PLEN2__ACCELERATION_GYRO_SENSOR__BUFFER_LENGTH]; //!< センサ値バッファ
 
 public:
 	/*!
@@ -40,6 +40,9 @@ public:
 		@attention
 		バスを介してデータの送受信を行うため、内部で割り込みと通信待ちのロックが発生します。
 		そのため、コンストラクタ内や割り込みベクタ内での使用は推奨されません。
+		<br><br>
+		電力供給のタイミングやファームウェアの立上げタイミングが"サーボ基盤"→"頭基板"なため、
+		電源投入の早い段階で本メソッドを実行すると、通信タイミングがずれるためフリーズします。
 	*/
 	void sampling();
 

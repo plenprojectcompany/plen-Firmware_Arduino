@@ -7,8 +7,10 @@
 	(See also : http://opensource.org/licenses/mit-license.php)
 */
 
+// Arduinoライブラリ
 #include "Arduino.h"
 
+// 独自ライブラリ
 #include "Pin.h"
 #include "System.h"
 #include "AccelerationGyroSensor.h"
@@ -41,12 +43,20 @@ void PLEN2::AccelerationGyroSensor::sampling()
 		system.outputSerial().println(F("=== in fuction : AccelerationGyroSensor::sampling()"));
 	#endif
 
+	/*!
+		@note
+		Pin::RS485_TXD()をHIGHにすることで、データの流れを"サーボ基盤"→"頭基板"と変更する。
+		頭基板のシリアルに任意のデータを送ると、2byte, ビッグエンディアンのバイト列で各
+		センサ値を返却してくる。
+
+		これを受信するために、データの流れを即座に"頭基板"→"サーボ基盤"と変更する必要がある。
+	*/
 	digitalWrite(Pin::RS485_TXD(), HIGH);
 	system.BLESerial().write('<');
 
 	digitalWrite(Pin::RS485_TXD(), LOW);
 	char  read_count = 0;
-	char* filler = (char*)_value;
+	char* filler = (char*)m_values;
 
 	while (true)
 	{
@@ -57,11 +67,12 @@ void PLEN2::AccelerationGyroSensor::sampling()
 
 		if (read_count == (BUFFER_LENGTH() * sizeof(int)))
 		{
+			// @attention '\n'の読み飛ばしのために必須
 			system.BLESerial().read();
 
 			for (int index = 0; index < BUFFER_LENGTH(); index++)
 			{
-				endianCast(_value[index]);
+				endianCast(m_values[index]);
 			}
 
 			break;
@@ -75,7 +86,7 @@ int PLEN2::AccelerationGyroSensor::getAccelerationX()
 		system.outputSerial().println(F("=== in fuction : AccelerationGyroSensor::getAccelerationX()"));
 	#endif
 
-	return _value[0];
+	return m_values[0];
 }
 
 int PLEN2::AccelerationGyroSensor::getAccelerationY()
@@ -84,7 +95,7 @@ int PLEN2::AccelerationGyroSensor::getAccelerationY()
 		system.outputSerial().println(F("=== in fuction : AccelerationGyroSensor::getAccelerationY()"));
 	#endif
 
-	return _value[1];
+	return m_values[1];
 }
 
 int PLEN2::AccelerationGyroSensor::getAccelerationZ()
@@ -93,7 +104,7 @@ int PLEN2::AccelerationGyroSensor::getAccelerationZ()
 		system.outputSerial().println(F("=== in fuction : AccelerationGyroSensor::getAccelerationZ()"));
 	#endif
 
-	return _value[2];
+	return m_values[2];
 }
 
 int PLEN2::AccelerationGyroSensor::getGyroRoll()
@@ -102,7 +113,7 @@ int PLEN2::AccelerationGyroSensor::getGyroRoll()
 		system.outputSerial().println(F("=== in fuction : AccelerationGyroSensor::getGyroRoll()"));
 	#endif
 
-	return _value[3];
+	return m_values[3];
 }
 
 int PLEN2::AccelerationGyroSensor::getGyroPitch()
@@ -111,7 +122,7 @@ int PLEN2::AccelerationGyroSensor::getGyroPitch()
 		system.outputSerial().println(F("=== in fuction : AccelerationGyroSensor::getGyroPitch()"));
 	#endif
 
-	return _value[4];
+	return m_values[4];
 }
 
 int PLEN2::AccelerationGyroSensor::getGyroYaw()
@@ -120,7 +131,7 @@ int PLEN2::AccelerationGyroSensor::getGyroYaw()
 		system.outputSerial().println(F("=== in fuction : AccelerationGyroSensor::getGyroYaw()"));
 	#endif
 
-	return _value[5];
+	return m_values[5];
 }
 
 void PLEN2::AccelerationGyroSensor::dump()

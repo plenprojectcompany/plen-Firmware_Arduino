@@ -1,4 +1,10 @@
 {
-	"build": true,
-	"test": true
+	"build": {
+		"status": true,
+		"last": "2015/09/30"
+	},
+	"test": {
+		"status": false,
+		"last": ""
+	}
 }

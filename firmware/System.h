@@ -40,8 +40,8 @@ private:
 	//! @brief BLEシリアルインタフェースの通信速度
 	inline static const long  BLESERIAL_BAUDRATE() { return 2000000L;  }
 
-	static Stream* _p_input_serial;  //!< 入力シリアルインスタンスのポインタ
-	static Stream* _p_output_serial; //!< 出力シリアルインスタンスのポインタ
+	static Stream* m_input_serial_ptr;  //!< 入力シリアルインスタンスのポインタ
+	static Stream* m_output_serial_ptr; //!< 出力シリアルインスタンスのポインタ
 
 public:
 	//! @brief MCU内EEPROMのサイズ

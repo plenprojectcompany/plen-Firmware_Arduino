@@ -7,12 +7,11 @@
 	(See also : http://opensource.org/licenses/mit-license.php)
 */
 
-
-// Arduinoライブラリ関連
+// Arduinoライブラリ
 #include "Arduino.h"
 #include <EEPROM.h>
 
-// 独自ライブラリ関連
+// 独自ライブラリ
 #include "Pin.h"
 #include "System.h"
 #include "JointController.h"
@@ -28,14 +27,15 @@
 
 
 // ファイル内グローバルインスタンスの定義
-namespace {
+namespace
+{
 	PLEN2::System system;
 }
 
 
-volatile unsigned char PLEN2::JointController::_overflow_count;
-volatile bool PLEN2::JointController::_1cycle_finished = false;
-unsigned int PLEN2::JointController::_pwms[_PLEN2__JOINTCONTROLLER__SUM];
+volatile unsigned char PLEN2::JointController::m_overflow_count;
+volatile bool PLEN2::JointController::m_1cycle_finished = false;
+unsigned int PLEN2::JointController::m_pwms[_PLEN2__JOINTCONTROLLER__SUM];
 
 
 PLEN2::JointController::JointController()
@@ -47,29 +47,29 @@ PLEN2::JointController::JointController()
 	pinMode(PLEN2::Pin::PWM_OUT_08_15(),       OUTPUT);
 	pinMode(PLEN2::Pin::PWM_OUT_16_23(),       OUTPUT);
 
-	_SETTINGS_INITIAL[0]  = JointSetting(ANGLE_MIN(), ANGLE_MAX(), 0   ); // [01] 左：肩ピッチ
-	_SETTINGS_INITIAL[1]  = JointSetting(ANGLE_MIN(), ANGLE_MAX(), 150 ); // [02] 左：腿ヨー
-	_SETTINGS_INITIAL[2]  = JointSetting(ANGLE_MIN(), ANGLE_MAX(), 350 ); // [03] 左：肩ロール
-	_SETTINGS_INITIAL[3]  = JointSetting(ANGLE_MIN(), ANGLE_MAX(), -100); // [04] 左：肘ロール
-	_SETTINGS_INITIAL[4]  = JointSetting(ANGLE_MIN(), ANGLE_MAX(), -100); // [05] 左：腿ロール
-	_SETTINGS_INITIAL[5]  = JointSetting(ANGLE_MIN(), ANGLE_MAX(), -50 ); // [06] 左：腿ピッチ
-	_SETTINGS_INITIAL[6]  = JointSetting(ANGLE_MIN(), ANGLE_MAX(), 500 ); // [07] 左：膝ピッチ
-	_SETTINGS_INITIAL[7]  = JointSetting(ANGLE_MIN(), ANGLE_MAX(), 300 ); // [08] 左：足首ピッチ
-	_SETTINGS_INITIAL[8]  = JointSetting(ANGLE_MIN(), ANGLE_MAX(), -50 ); // [09] 左：足首ロール
-	_SETTINGS_INITIAL[12] = JointSetting(ANGLE_MIN(), ANGLE_MAX(), 0   ); // [10] 右：肩ピッチ
-	_SETTINGS_INITIAL[13] = JointSetting(ANGLE_MIN(), ANGLE_MAX(), -150); // [11] 右：腿ヨー
-	_SETTINGS_INITIAL[14] = JointSetting(ANGLE_MIN(), ANGLE_MAX(), -350); // [12] 右：肩ロール
-	_SETTINGS_INITIAL[15] = JointSetting(ANGLE_MIN(), ANGLE_MAX(), 100 ); // [13] 右：肘ロール
-	_SETTINGS_INITIAL[16] = JointSetting(ANGLE_MIN(), ANGLE_MAX(), 100 ); // [14] 右：腿ロール
-	_SETTINGS_INITIAL[17] = JointSetting(ANGLE_MIN(), ANGLE_MAX(), 50  ); // [15] 右：腿ピッチ
-	_SETTINGS_INITIAL[18] = JointSetting(ANGLE_MIN(), ANGLE_MAX(), -500); // [16] 右：膝ピッチ
-	_SETTINGS_INITIAL[19] = JointSetting(ANGLE_MIN(), ANGLE_MAX(), -300); // [17] 右：足首ピッチ
-	_SETTINGS_INITIAL[20] = JointSetting(ANGLE_MIN(), ANGLE_MAX(), 50  ); // [18] 右：足首ロール
+	m_SETTINGS_INITIAL[0]  = JointSetting(ANGLE_MIN(), ANGLE_MAX(), 0   ); // [01] 左：肩ピッチ
+	m_SETTINGS_INITIAL[1]  = JointSetting(ANGLE_MIN(), ANGLE_MAX(), 150 ); // [02] 左：腿ヨー
+	m_SETTINGS_INITIAL[2]  = JointSetting(ANGLE_MIN(), ANGLE_MAX(), 350 ); // [03] 左：肩ロール
+	m_SETTINGS_INITIAL[3]  = JointSetting(ANGLE_MIN(), ANGLE_MAX(), -100); // [04] 左：肘ロール
+	m_SETTINGS_INITIAL[4]  = JointSetting(ANGLE_MIN(), ANGLE_MAX(), -100); // [05] 左：腿ロール
+	m_SETTINGS_INITIAL[5]  = JointSetting(ANGLE_MIN(), ANGLE_MAX(), -50 ); // [06] 左：腿ピッチ
+	m_SETTINGS_INITIAL[6]  = JointSetting(ANGLE_MIN(), ANGLE_MAX(), 500 ); // [07] 左：膝ピッチ
+	m_SETTINGS_INITIAL[7]  = JointSetting(ANGLE_MIN(), ANGLE_MAX(), 300 ); // [08] 左：足首ピッチ
+	m_SETTINGS_INITIAL[8]  = JointSetting(ANGLE_MIN(), ANGLE_MAX(), -50 ); // [09] 左：足首ロール
+	m_SETTINGS_INITIAL[12] = JointSetting(ANGLE_MIN(), ANGLE_MAX(), 0   ); // [10] 右：肩ピッチ
+	m_SETTINGS_INITIAL[13] = JointSetting(ANGLE_MIN(), ANGLE_MAX(), -150); // [11] 右：腿ヨー
+	m_SETTINGS_INITIAL[14] = JointSetting(ANGLE_MIN(), ANGLE_MAX(), -350); // [12] 右：肩ロール
+	m_SETTINGS_INITIAL[15] = JointSetting(ANGLE_MIN(), ANGLE_MAX(), 100 ); // [13] 右：肘ロール
+	m_SETTINGS_INITIAL[16] = JointSetting(ANGLE_MIN(), ANGLE_MAX(), 100 ); // [14] 右：腿ロール
+	m_SETTINGS_INITIAL[17] = JointSetting(ANGLE_MIN(), ANGLE_MAX(), 50  ); // [15] 右：腿ピッチ
+	m_SETTINGS_INITIAL[18] = JointSetting(ANGLE_MIN(), ANGLE_MAX(), -500); // [16] 右：膝ピッチ
+	m_SETTINGS_INITIAL[19] = JointSetting(ANGLE_MIN(), ANGLE_MAX(), -300); // [17] 右：足首ピッチ
+	m_SETTINGS_INITIAL[20] = JointSetting(ANGLE_MIN(), ANGLE_MAX(), 50  ); // [18] 右：足首ロール
 
 	for (int joint_id = 0; joint_id < SUM(); joint_id++)
 	{
-		_SETTINGS[joint_id] = _SETTINGS_INITIAL[joint_id];
-		setAngle(joint_id, _SETTINGS[joint_id].HOME);
+		m_SETTINGS[joint_id] = m_SETTINGS_INITIAL[joint_id];
+		setAngle(joint_id, m_SETTINGS[joint_id].HOME);
 	}
 }
 
@@ -80,14 +80,14 @@ void PLEN2::JointController::loadSettings()
 		system.outputSerial().println(F("=== in fuction : JointController::loadSettings()"));
 	#endif
 
-	unsigned char* filler = (unsigned char*)_SETTINGS;
+	unsigned char* filler = (unsigned char*)m_SETTINGS;
 	
 	if (EEPROM.read(FLAG_ADDRESS()) != FLAG_VALUE())
 	{
 		EEPROM.write(FLAG_ADDRESS(), FLAG_VALUE());
 		delay(5);
 
-		for (int index = 0; index < sizeof(_SETTINGS); index++)
+		for (int index = 0; index < sizeof(m_SETTINGS); index++)
 		{
 			EEPROM.write(SETTINGS_BEGIN_ADDRESS() + index, filler[index]);
 			delay(5);
@@ -95,7 +95,7 @@ void PLEN2::JointController::loadSettings()
 	}
 	else
 	{
-		for (int index = 0; index < sizeof(_SETTINGS); index++)
+		for (int index = 0; index < sizeof(m_SETTINGS); index++)
 		{
 			filler[index] = EEPROM.read(SETTINGS_BEGIN_ADDRESS() + index);
 		}
@@ -103,7 +103,7 @@ void PLEN2::JointController::loadSettings()
 
 	for (int joint_id = 0; joint_id < SUM(); joint_id++)
 	{
-		setAngle(joint_id, _SETTINGS[joint_id].HOME);
+		setAngle(joint_id, m_SETTINGS[joint_id].HOME);
 	}
 
 	/*
@@ -129,7 +129,7 @@ void PLEN2::JointController::loadSettings()
 	TIFR1 = _BV(OCF1A) | _BV(OCF1B) | _BV(OCF1C) | _BV(TOV1); // 割り込みフラグをクリア
 
 	sei();
-	
+
 	TIMSK1 = _BV(TOIE1);
 }
 
@@ -140,12 +140,12 @@ void PLEN2::JointController::resetSettings()
 		system.outputSerial().println(F("=== in fuction : JointController::resetSettings()"));
 	#endif
 
-	unsigned char* filler = (unsigned char*)_SETTINGS_INITIAL;
+	unsigned char* filler = (unsigned char*)m_SETTINGS_INITIAL;
 
 	EEPROM.write(FLAG_ADDRESS(), FLAG_VALUE());
 	delay(5);
 
-	for (int index = 0; index < sizeof(_SETTINGS_INITIAL); index++)
+	for (int index = 0; index < sizeof(m_SETTINGS_INITIAL); index++)
 	{
 		EEPROM.write(SETTINGS_BEGIN_ADDRESS() + index, filler[index]);
 		delay(5);
@@ -153,8 +153,8 @@ void PLEN2::JointController::resetSettings()
 
 	for (int joint_id = 0; joint_id < SUM(); joint_id++)
 	{
-		_SETTINGS[joint_id] = _SETTINGS_INITIAL[joint_id];
-		setAngle(joint_id, _SETTINGS[joint_id].HOME);
+		m_SETTINGS[joint_id] = m_SETTINGS_INITIAL[joint_id];
+		setAngle(joint_id, m_SETTINGS[joint_id].HOME);
 	}
 }
 
@@ -175,7 +175,7 @@ int PLEN2::JointController::getMinAngle(unsigned char joint_id)
 		return -32768;
 	}
 
-	return _SETTINGS[joint_id].MIN;
+	return m_SETTINGS[joint_id].MIN;
 }
 
 
@@ -195,7 +195,7 @@ int PLEN2::JointController::getMaxAngle(unsigned char joint_id)
 		return -32768;
 	}
 
-	return _SETTINGS[joint_id].MAX;
+	return m_SETTINGS[joint_id].MAX;
 }
 
 
@@ -215,7 +215,7 @@ int PLEN2::JointController::getHomeAngle(unsigned char joint_id)
 		return -32768;
 	}
 
-	return _SETTINGS[joint_id].HOME;
+	return m_SETTINGS[joint_id].HOME;
 }
 
 
@@ -235,7 +235,7 @@ bool PLEN2::JointController::setMinAngle(unsigned char joint_id, int angle)
 		return false;
 	}
 
-	if (   (angle >= _SETTINGS[joint_id].MAX)
+	if (   (angle >= m_SETTINGS[joint_id].MAX)
 		|| (angle < ANGLE_MIN()) )
 	{
 		#if _DEBUG
@@ -246,12 +246,12 @@ bool PLEN2::JointController::setMinAngle(unsigned char joint_id, int angle)
 		return false;
 	}
 
-	_SETTINGS[joint_id].MIN = angle;
+	m_SETTINGS[joint_id].MIN = angle;
 
-	unsigned char* filler = (unsigned char*)&(_SETTINGS[joint_id].MIN);
-	int address_offset = (int)filler - (int)_SETTINGS;
+	unsigned char* filler = (unsigned char*)&(m_SETTINGS[joint_id].MIN);
+	int address_offset = (int)filler - (int)m_SETTINGS;
 
-	for (int index = 0; index < sizeof(_SETTINGS[joint_id].MIN); index++)
+	for (int index = 0; index < sizeof(m_SETTINGS[joint_id].MIN); index++)
 	{
 		EEPROM.write(SETTINGS_BEGIN_ADDRESS() + address_offset + index, filler[index]);
 		delay(5);
@@ -282,7 +282,7 @@ bool PLEN2::JointController::setMaxAngle(unsigned char joint_id, int angle)
 		return false;
 	}
 
-	if (   (angle <= _SETTINGS[joint_id].MIN)
+	if (   (angle <= m_SETTINGS[joint_id].MIN)
 		|| (angle > ANGLE_MAX()) )
 	{
 		#if _DEBUG
@@ -293,12 +293,12 @@ bool PLEN2::JointController::setMaxAngle(unsigned char joint_id, int angle)
 		return false;
 	}
 
-	_SETTINGS[joint_id].MAX = angle;
+	m_SETTINGS[joint_id].MAX = angle;
 
-	unsigned char* filler = (unsigned char*)&(_SETTINGS[joint_id].MAX);
-	int address_offset = (int)filler - (int)_SETTINGS;
+	unsigned char* filler = (unsigned char*)&(m_SETTINGS[joint_id].MAX);
+	int address_offset = (int)filler - (int)m_SETTINGS;
 
-	for (int index = 0; index < sizeof(_SETTINGS[joint_id].MAX); index++)
+	for (int index = 0; index < sizeof(m_SETTINGS[joint_id].MAX); index++)
 	{
 		EEPROM.write(SETTINGS_BEGIN_ADDRESS() + address_offset + index, filler[index]);
 		delay(5);
@@ -329,8 +329,8 @@ bool PLEN2::JointController::setHomeAngle(unsigned char joint_id, int angle)
 		return false;
 	}
 
-	if (   (angle < _SETTINGS[joint_id].MIN)
-		|| (angle > _SETTINGS[joint_id].MAX) )
+	if (   (angle < m_SETTINGS[joint_id].MIN)
+		|| (angle > m_SETTINGS[joint_id].MAX) )
 	{
 		#if _DEBUG
 			system.outputSerial().print(F(">>> bad argment! : angle = "));
@@ -340,12 +340,12 @@ bool PLEN2::JointController::setHomeAngle(unsigned char joint_id, int angle)
 		return false;
 	}
 
-	_SETTINGS[joint_id].HOME = angle;
+	m_SETTINGS[joint_id].HOME = angle;
 
-	unsigned char* filler = (unsigned char*)&(_SETTINGS[joint_id].HOME);
-	int address_offset = (int)filler - (int)_SETTINGS;
+	unsigned char* filler = (unsigned char*)&(m_SETTINGS[joint_id].HOME);
+	int address_offset = (int)filler - (int)m_SETTINGS;
 
-	for (int index = 0; index < sizeof(_SETTINGS[joint_id].HOME); index++)
+	for (int index = 0; index < sizeof(m_SETTINGS[joint_id].HOME); index++)
 	{
 		EEPROM.write(SETTINGS_BEGIN_ADDRESS() + address_offset + index, filler[index]);
 		delay(5);
@@ -376,9 +376,9 @@ bool PLEN2::JointController::setAngle(unsigned char joint_id, int angle)
 		return false;
 	}
 
-	angle = constrain(angle, _SETTINGS[joint_id].MIN, _SETTINGS[joint_id].MAX);
+	angle = constrain(angle, m_SETTINGS[joint_id].MIN, m_SETTINGS[joint_id].MAX);
 
-	_pwms[joint_id] = map(
+	m_pwms[joint_id] = map(
 		angle,
 		PLEN2::JointController::ANGLE_MIN(), PLEN2::JointController::ANGLE_MAX(),
 		PLEN2::JointController::PWM_MIN(),   PLEN2::JointController::PWM_MAX()
@@ -405,11 +405,11 @@ bool PLEN2::JointController::setAngleDiff(unsigned char joint_id, int angle_diff
 	}
 
 	unsigned int angle = constrain(
-		angle_diff + _SETTINGS[joint_id].HOME,
-		_SETTINGS[joint_id].MIN, _SETTINGS[joint_id].MAX
+		angle_diff + m_SETTINGS[joint_id].HOME,
+		m_SETTINGS[joint_id].MIN, m_SETTINGS[joint_id].MAX
 	);
 
-	_pwms[joint_id] = map(
+	m_pwms[joint_id] = map(
 		angle,
 		PLEN2::JointController::ANGLE_MIN(), PLEN2::JointController::ANGLE_MAX(),
 		PLEN2::JointController::PWM_MIN(),   PLEN2::JointController::PWM_MAX()
@@ -434,13 +434,13 @@ void PLEN2::JointController::dump()
 		system.outputSerial().print(joint_id);
 		system.outputSerial().println(F(","));
 		system.outputSerial().print(F("\t\t\t\"MAX\": "));
-		system.outputSerial().print(_SETTINGS[joint_id].MAX);
+		system.outputSerial().print(m_SETTINGS[joint_id].MAX);
 		system.outputSerial().println(F(","));
 		system.outputSerial().print(F("\t\t\t\"MIN\": "));
-		system.outputSerial().print(_SETTINGS[joint_id].MIN);
+		system.outputSerial().print(m_SETTINGS[joint_id].MIN);
 		system.outputSerial().println(F(","));
 		system.outputSerial().print(F("\t\t\t\"HOME\": "));
-		system.outputSerial().println(_SETTINGS[joint_id].HOME);
+		system.outputSerial().println(m_SETTINGS[joint_id].HOME);
 		system.outputSerial().print(F("\t\t}"));
 		system.outputSerial().println(F(","));
 	}
@@ -485,21 +485,21 @@ ISR(TIMER1_OVF_vect)
 	digitalWrite(PLEN2::Pin::MULTIPLEXER_SELECT1(), bitRead(output_select, 1));
 	digitalWrite(PLEN2::Pin::MULTIPLEXER_SELECT2(), bitRead(output_select, 2));
 
-	_PLEN2__JOINTCONTROLLER__PWM_OUT_00_07_REGISTER = PLEN2::JointController::_pwms[
+	_PLEN2__JOINTCONTROLLER__PWM_OUT_00_07_REGISTER = PLEN2::JointController::m_pwms[
 		joint_select + 0 * PLEN2::JointController::Multiplexer::SELECTABLE_NUM()
 	];
 	
-	_PLEN2__JOINTCONTROLLER__PWM_OUT_08_15_REGISTER = PLEN2::JointController::_pwms[
+	_PLEN2__JOINTCONTROLLER__PWM_OUT_08_15_REGISTER = PLEN2::JointController::m_pwms[
 		joint_select + 1 * PLEN2::JointController::Multiplexer::SELECTABLE_NUM()
 	];
 	
-	_PLEN2__JOINTCONTROLLER__PWM_OUT_16_23_REGISTER = PLEN2::JointController::_pwms[
+	_PLEN2__JOINTCONTROLLER__PWM_OUT_16_23_REGISTER = PLEN2::JointController::m_pwms[
 		joint_select + 2 * PLEN2::JointController::Multiplexer::SELECTABLE_NUM()
 	];
 
 	++output_select &= (PLEN2::JointController::Multiplexer::SELECTABLE_NUM() - 1);
 	++joint_select  &= (PLEN2::JointController::Multiplexer::SELECTABLE_NUM() - 1);
 
-	PLEN2::JointController::_overflow_count++;
-	(joint_select == 0)? (PLEN2::JointController::_1cycle_finished = true) : 0;
+	PLEN2::JointController::m_overflow_count++;
+	(joint_select == 0)? (PLEN2::JointController::m_1cycle_finished = true) : false;
 }

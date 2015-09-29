@@ -8,7 +8,7 @@
 */
 
 
-// 独自ライブラリ関連
+// 独自ライブラリ
 #include "Pin.h"
 #include "System.h"
 
@@ -20,14 +20,14 @@
 #define _PLEN2__SYSTEM__BLESERIAL Serial1
 
 
-Stream* PLEN2::System::_p_input_serial;
-Stream* PLEN2::System::_p_output_serial;
+Stream* PLEN2::System::m_input_serial_ptr;
+Stream* PLEN2::System::m_output_serial_ptr;
 
 
 PLEN2::System::System()
 {
-	_p_input_serial  = &_PLEN2__SYSTEM__BLESERIAL;
-	_p_output_serial = &_PLEN2__SYSTEM__USBSERIAL;
+	m_input_serial_ptr  = &_PLEN2__SYSTEM__BLESERIAL;
+	m_output_serial_ptr = &_PLEN2__SYSTEM__USBSERIAL;
 
 	_PLEN2__SYSTEM__BLESERIAL.begin(BLESERIAL_BAUDRATE());
 	_PLEN2__SYSTEM__USBSERIAL.begin(USBSERIAL_BAUDRATE());
@@ -54,13 +54,13 @@ Stream& PLEN2::System::BLESerial()
 
 Stream& PLEN2::System::inputSerial()
 {
-	return *_p_input_serial;
+	return *m_input_serial_ptr;
 }
 
 
 Stream& PLEN2::System::outputSerial()
 {
-	return *_p_output_serial;
+	return *m_output_serial_ptr;
 }
 
 
@@ -70,13 +70,13 @@ void PLEN2::System::toggleInputSerial()
 		outputSerial().println(F("=== in fuction : System::toggleInputSerial()"));
 	#endif
 
-	if (_p_input_serial == &_PLEN2__SYSTEM__BLESERIAL)
+	if (m_input_serial_ptr == &_PLEN2__SYSTEM__BLESERIAL)
 	{
-		_p_input_serial = &_PLEN2__SYSTEM__USBSERIAL;
+		m_input_serial_ptr = &_PLEN2__SYSTEM__USBSERIAL;
 	}
 	else
 	{
-		_p_input_serial = &_PLEN2__SYSTEM__BLESERIAL;
+		m_input_serial_ptr = &_PLEN2__SYSTEM__BLESERIAL;
 	}
 }
 

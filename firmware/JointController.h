@@ -26,7 +26,7 @@ namespace PLEN2
 */
 class PLEN2::JointController
 {
-// コンパイル対策マクロ:
+// macro:
 	#define _PLEN2__JOINTCONTROLLER__SUM 24 //!< 関節の実装個数
 
 private:
@@ -34,7 +34,7 @@ private:
 	inline static const int FLAG_ADDRESS()           { return 0;    }
 	
 	//! @brief 初期化フラグの値
-	inline static const int FLAG_VALUE()             { return 0;    }
+	inline static const int FLAG_VALUE()             { return 1;    }
 	
 	//! @brief 関節設定の保持アドレス
 	inline static const int SETTINGS_BEGIN_ADDRESS() { return 1;    }
@@ -53,7 +53,9 @@ private:
 			@brief コンストラクタ
 		*/
 		JointSetting()
-			: MIN(ANGLE_MIN()), MAX(ANGLE_MAX()), HOME(ANGLE_NEUTRAL())
+			: MIN(ANGLE_MIN())
+			, MAX(ANGLE_MAX())
+			, HOME(ANGLE_NEUTRAL())
 		{
 			// noop.
 		}
@@ -66,14 +68,16 @@ private:
 			@param [in] home 関節角度初期値
 		*/
 		JointSetting(int min, int max, int home)
-			: MIN(min), MAX(max), HOME(home)
+			: MIN(min)
+			, MAX(max)
+			, HOME(home)
 		{
 			// noop.
 		}
 	};
 
-	JointSetting _SETTINGS_INITIAL[_PLEN2__JOINTCONTROLLER__SUM]; //!< 関節設定初期値の管理インスタンス
-	JointSetting _SETTINGS[_PLEN2__JOINTCONTROLLER__SUM];         //!< 関節設定の管理インスタンス
+	JointSetting m_SETTINGS_INITIAL[_PLEN2__JOINTCONTROLLER__SUM]; //!< 関節設定初期値の管理インスタンス
+	JointSetting m_SETTINGS[_PLEN2__JOINTCONTROLLER__SUM];         //!< 関節設定の管理インスタンス
 
 public:
 	class Multiplexer {
@@ -86,22 +90,22 @@ public:
 	};
 	
 	//! @brief パルス幅変調波の最小値
-	inline static const int PWM_MIN()                { return 493;  }
+	inline static const int PWM_MIN()       { return 493;  }
 
 	//! @brief パルス幅変調波の最大値
-	inline static const int PWM_MAX()                { return 810;  }
+	inline static const int PWM_MAX()       { return 810;  }
 
 	//! @brief パルス幅変調波の中間値
-	inline static const int PWM_NEUTRAL()            { return 652;  }
+	inline static const int PWM_NEUTRAL()   { return 652;  }
 
 	//! @brief 関節角度の最小値
-	inline static const int ANGLE_MIN()              { return -600; }
+	inline static const int ANGLE_MIN()     { return -600; }
 
 	//! @brief 関節角度の最大値
-	inline static const int ANGLE_MAX()              { return 600;  }
+	inline static const int ANGLE_MAX()     { return 600;  }
 
 	//! @brief 関節角度の中間値
-	inline static const int ANGLE_NEUTRAL()          { return 0;    }
+	inline static const int ANGLE_NEUTRAL() { return 0;    }
 
 	//! @brief 関節の実装個数
 	inline static const int SUM() { return _PLEN2__JOINTCONTROLLER__SUM; }
@@ -113,7 +117,7 @@ public:
 		本来はprivateにされるべき変数です。タイマ1 オーバーフロー割り込みベクタから
 		参照するためにpublicにされているので、基本的に外部からはこの変数を参照しないでください。
 	*/
-	volatile static unsigned char _overflow_count;
+	volatile static unsigned char m_overflow_count;
 
 	/*!
 		@brief PWM出力処理，1サイクルの終了判定変数
@@ -122,7 +126,7 @@ public:
 		本来はprivateにされるべき変数です。タイマ1 オーバーフロー割り込みベクタから
 		参照するためにpublicにされているので、基本的に外部からはこの変数を参照しないでください。
 	*/
-	volatile static bool _1cycle_finished;
+	volatile static bool m_1cycle_finished;
 
 	/*!
 		@brief パルス幅変調波，出力用配列
@@ -131,7 +135,7 @@ public:
 		本来はprivateにされるべき変数です。タイマ1 オーバーフロー割り込みベクタから
 		参照するためにpublicにされているので、基本的に外部からはこの変数を参照しないでください。
 	*/
-	static unsigned int _pwms[_PLEN2__JOINTCONTROLLER__SUM];
+	static unsigned int m_pwms[_PLEN2__JOINTCONTROLLER__SUM];
 
 	/*!
 		@brief コンストラクタ

@@ -186,7 +186,7 @@ test(RandomJoint_SetAngle)
 
 
 	joint_ctrl.setAngle(joint_id, angle);
-	unsigned int actual = PLEN2::JointController::_pwms[joint_id];
+	unsigned int actual = PLEN2::JointController::m_pwms[joint_id];
 
 
 	assertEqual(expected, actual);
@@ -208,7 +208,7 @@ test(AllJoint_SetAngle)
 
 
 		joint_ctrl.setAngle(joint_id, angle);
-		unsigned int actual = PLEN2::JointController::_pwms[joint_id];
+		unsigned int actual = PLEN2::JointController::m_pwms[joint_id];
 
 
 		assertEqual(expected, actual);
@@ -232,7 +232,7 @@ test(RandomJoint_SetAngleDiff)
 
 
 	joint_ctrl.setAngleDiff(joint_id, angle_diff);
-	unsigned int actual = PLEN2::JointController::_pwms[joint_id];
+	unsigned int actual = PLEN2::JointController::m_pwms[joint_id];
 
 
 	assertEqual(expected, actual);
@@ -255,7 +255,7 @@ test(AllJoint_SetAngleDiff)
 
 
 		joint_ctrl.setAngleDiff(joint_id, angle_diff);
-		unsigned int actual = PLEN2::JointController::_pwms[joint_id];
+		unsigned int actual = PLEN2::JointController::m_pwms[joint_id];
 
 
 		assertEqual(expected, actual);
@@ -314,12 +314,12 @@ test(JointOverflow_SetMethods)
 */
 test(Timer1Attached)
 {
-	unsigned char before = joint_ctrl._overflow_count;
+	unsigned char before = joint_ctrl.m_overflow_count;
 
 
 	unsigned long end = millis() + 1000;
 	while (millis() < end);
-	unsigned char after = joint_ctrl._overflow_count;
+	unsigned char after = joint_ctrl.m_overflow_count;
 
 
 	assertNotEqual(before, after);

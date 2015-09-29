@@ -17,8 +17,14 @@ namespace PLEN2
 
 class PLEN2::Interpreter
 {
-// コンパイル対策マクロ:
-	#define _PLEN2__INTERPRETER__QUEUESIZE 64 //!< コードキューの大きさ
+// macro:
+	/*!
+		@brief コードキューバッファの大きさ
+
+		@attention
+		高速に処理をするために、値として2^Nが定義される必要があります。
+	*/
+	#define _PLEN2__INTERPRETER__QUEUESIZE 64
 
 public:
 	/*!
@@ -48,13 +54,21 @@ public:
 		@param [in] code コードインスタンス
 
 		@return 実行結果
+		@retval true  コードキューへのプッシュに成功
+		@retval false コードキューオーバーフロー
 	*/
 	bool pushCode(const Code& code);
 
 	/*!
-		@brief 先頭のコードを実行するメソッド
+		@brief キューの先頭コードを実行するメソッド
 
 		@return 実行結果
+		@retval true  コードキューのポップに成功(※実行にも成功しているとは限りません。)
+		@retval false コードキューが空
+
+		@attention
+		内部の処理の流れとして、"スロットの再生"→"ヘッダの書き換え"を行います。
+		通常のモーション再生と並行する場合、シーケンス構造によっては思わぬ動作をすることがあります。
 	*/
 	bool popCode();
 
@@ -72,10 +86,10 @@ public:
 
 
 private:
-	Code _code_queue[_PLEN2__INTERPRETER__QUEUESIZE]; //!< コードインスタンスバッファ
-	unsigned char _queue_begin; //!< キューの先頭位置
-	unsigned char _queue_end;   //!< キューの最後尾
-	MotionController* _p_motion_ctrl; //!< モーションコントローラインスタンスへのポインタ
+	Code m_code_queue[_PLEN2__INTERPRETER__QUEUESIZE]; //!< コードキューバッファ
+	unsigned char m_queue_begin; //!< キューの先頭位置
+	unsigned char m_queue_end;   //!< キューの最後尾
+	MotionController* m_motion_ctrl_ptr; //!< モーションコントローラインスタンスへのポインタ
 };
 
 #endif // _PLEN2__INTERPRETER_H_

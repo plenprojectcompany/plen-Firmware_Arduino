@@ -38,7 +38,7 @@ public:
 	*/
 	class Header
 	{
-	// コンパイル対策マクロ:
+	// macro:
 		#define _PLEN2__MOTIONCONTROLLER__HEADER__NAMELENGTH 21 //!< モーション名の長さ (ただし、EOS = '\0'を予約)
 
 	public:
@@ -113,40 +113,40 @@ public:
 	/*!
 		@brief モーションヘッダを外部EEPROMへ書き込むメソッド
 
-		@param [in] p_header モーションヘッダインスタンスのポインタ
+		@param [in] header_ptr モーションヘッダインスタンスのポインタ
 
 		@return 実行結果
 	*/
-	bool setHeader(const Header* p_header);
+	bool setHeader(const Header* header_ptr);
 
 	/*!
 		@brief モーションヘッダを外部EEPROMから読み込むメソッド
 
-		@param [in, out] p_header モーションヘッダインスタンスのポインタ
+		@param [in, out] header_ptr モーションヘッダインスタンスのポインタ
 
 		@return 実行結果
 	*/
-	bool getHeader(Header* p_header);
+	bool getHeader(Header* header_ptr);
 
 	/*!
 		@brief モーションフレームを外部EEPROMへ書き込むメソッド
 
-		@param [in] slot    モーション番号
-		@param [in] p_frame モーションフレームインスタンスのポインタ
+		@param [in] slot      モーション番号
+		@param [in] frame_ptr モーションフレームインスタンスのポインタ
 
 		@return 実行結果
 	*/
-	bool setFrame(unsigned char slot, const Frame* p_frame);
+	bool setFrame(unsigned char slot, const Frame* frame_ptr);
 
 	/*!
 		@brief モーションフレームを外部EEPROMから読み込むメソッド
 
-		@param [in]      slot    モーション番号
-		@param [in, out] p_frame モーションフレームインスタンスのポインタ
+		@param [in]      slot      モーション番号
+		@param [in, out] frame_ptr モーションフレームインスタンスのポインタ
 
 		@return 実行結果
 	*/
-	bool getFrame(unsigned char slot, Frame* p_frame);
+	bool getFrame(unsigned char slot, Frame* frame_ptr);
 
 	/*!
 		@brief モーションが再生中かを判定するメソッド
@@ -214,7 +214,7 @@ public:
 	*/
 	void dump(unsigned char slot);
 
-// コンパイル対策マクロ
+// macro:
 	#define _PLEN2__MOTION_CONTROLLER__FRAMEBUFFER_LENGTH 2 //!< フレームバッファ長
 
 private:
@@ -227,18 +227,18 @@ private:
 	void frameBuffering();
 
 
-	JointController* _p_joint_ctrl;  //!< 関節管理インスタンスのポインタ
-	
-	unsigned char _transition_count; //!< 遷移回数
-	bool          _playing;          //!< モーションを再生中であるか否かの論理
+	JointController* m_joint_ctrl_ptr; //!< 関節管理インスタンスのポインタ
 
-	Header _header; //!< ヘッダインスタンス
-	Frame  _buffer[_PLEN2__MOTION_CONTROLLER__FRAMEBUFFER_LENGTH]; //!< フレームインスタンスバッファ
-	Frame* _p_frame_now;  //!< 現在フレームへのポインタ
-	Frame* _p_frame_next; //!< 次点フレームへのポインタ
+	unsigned char m_transition_count; //!< 遷移回数
+	bool          m_playing;          //!< モーションを再生中であるか否かの論理
 
-	long _now_fixed_points[_PLEN2__JOINTCONTROLLER__SUM];  //!< 現在値計算用固定小数点バッファ
-	long _diff_fixed_points[_PLEN2__JOINTCONTROLLER__SUM]; //!< 差分計算用固定小数点バッファ
+	Header m_header; //!< ヘッダインスタンス
+	Frame  m_buffer[_PLEN2__MOTION_CONTROLLER__FRAMEBUFFER_LENGTH]; //!< フレームインスタンスバッファ
+	Frame* m_frame_ptr_now;  //!< 現在フレームへのポインタ
+	Frame* m_frame_ptr_next; //!< 次点フレームへのポインタ
+
+	long m_now_fixed_points[_PLEN2__JOINTCONTROLLER__SUM];  //!< 現在値計算用固定小数点バッファ
+	long m_diff_fixed_points[_PLEN2__JOINTCONTROLLER__SUM]; //!< 差分計算用固定小数点バッファ
 };
 
 #endif // _PLEN2__MOTION_CONTROLLER_H_
