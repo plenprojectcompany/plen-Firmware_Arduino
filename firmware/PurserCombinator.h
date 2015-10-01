@@ -1,6 +1,6 @@
 /*!
 	@file      PurserCombinator.h
-	@brief     コマンドラインの解析クラスを提供します。
+	@brief     PLEN2におけるコマンドラインの解析クラスを提供します。
 	@author    Kazuyuki TAKASE
 	@copyright The MIT License - http://opensource.org/licenses/mit-license.php
 */
@@ -10,8 +10,12 @@
 
 namespace PLEN2
 {
-	class AbstractPurser;
 	class PurserCombinator;
+}
+
+namespace Utility
+{
+	class AbstractPurser;
 }
 
 /*!
@@ -19,6 +23,9 @@ namespace PLEN2
 */
 class PLEN2::PurserCombinator
 {
+// friend:
+	friend bool USER_DEFINED_EVENT_HANDLER(PurserCombinator* combinator_ptr);
+
 private:
 	typedef enum
 	{
@@ -57,8 +64,9 @@ private:
 	};
 
 	Buffer m_buffer;
-	State  m_state;
-	AbstractPurser* m_purser[STATE_EOE];
+	State m_state;
+	unsigned char m_store_length;
+	Utility::AbstractPurser* m_purser[STATE_EOE];
 
 	void m_abort();
 
