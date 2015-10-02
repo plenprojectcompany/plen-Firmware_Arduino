@@ -22,13 +22,16 @@ namespace PLEN2
 class PLEN2::AccelerationGyroSensor
 {
 // macro:
-	#define _PLEN2__ACCELERATION_GYRO_SENSOR__BUFFER_LENGTH 6 //!< センサ値バッファ長
+	#define _PLEN2__ACCELERATION_GYRO_SENSOR__SUM 6
 
 private:
-	//! @brief センサ値バッファ長
-	inline static const int BUFFER_LENGTH() { return _PLEN2__ACCELERATION_GYRO_SENSOR__BUFFER_LENGTH; }
+	//! @brief センサの総数
+	inline static const int SUM()
+	{
+		return _PLEN2__ACCELERATION_GYRO_SENSOR__SUM;
+	}
 
-	int m_values[_PLEN2__ACCELERATION_GYRO_SENSOR__BUFFER_LENGTH]; //!< センサ値バッファ
+	int m_values[_PLEN2__ACCELERATION_GYRO_SENSOR__SUM];
 
 public:
 	/*!
@@ -54,7 +57,7 @@ public:
 		@attention
 		取得される値は、sampling() 実行時の値をキャッシュしたものです。
 	*/
-	int getAccelerationX();
+	int getAccX();
 
 	/*!
 		@brief Y軸の加速度を取得するメソッド
@@ -64,7 +67,7 @@ public:
 		@attention
 		取得される値は、sampling() 実行時の値をキャッシュしたものです。
 	*/
-	int getAccelerationY();
+	int getAccY();
 
 	/*!
 		@brief Z軸の加速度を取得するメソッド
@@ -74,7 +77,7 @@ public:
 		@attention
 		取得される値は、sampling() 実行時の値をキャッシュしたものです。
 	*/
-	int getAccelerationZ();
+	int getAccZ();
 
 	/*!
 		@brief ロール軸(X軸に関する回転軸)の角速度を取得するメソッド
@@ -107,7 +110,20 @@ public:
 	int getGyroYaw();
 
 	/*!
-		@brief 各種センサ値のダンプメソッド
+		@brief サンプリングを行った後、各種センサ値をダンプするメソッド
+
+		@note
+		以下のような書式のJSON文字列を出力します。
+		@code
+		{
+			"Acc X": <integer>,
+			"Acc Y": <integer>,
+			"Acc Z": <integer>,
+			"Gyro Roll": <integer>,
+			"Gyro Pitch": <integer>,
+			"Gyro Yaw": <integer>
+		}
+		@endcode
 	*/
 	void dump();
 };

@@ -20,24 +20,24 @@ namespace PLEN2
 	Atmega32u4では、ひとつのタイマでPWM信号を最大3ラインまで出力可能です。
 	1ラインに8出力のマルチプレクサを接続することで、計24個までのサーボモータを制御可能です。
 	<br><br>
-	PLEN2で用いるサーボモータの許容最小パルス幅は0.78[msec]，許容最大パルス幅は2.18[msec]と、
-	それぞれ実測値として確認されています。また、その際の可動範囲は130[deg]となります。
-	ただし、本実装では個体差を考慮して少なめに見積もっています。
+	PLEN2で用いるサーボモータの許容最小パルス幅は約0.86[msec]，許容最大パルス幅は約2.12[msec]と、
+	それぞれ実測値として確認されています。また、その際の可動範囲は約130[deg]となります。
+	ただし、本実装では個体差を考慮して少なめの可動範囲約120[deg]に見積もっています。
 */
 class PLEN2::JointController
 {
 // macro:
-	#define _PLEN2__JOINTCONTROLLER__SUM 24 //!< 関節の実装個数
+	#define _PLEN2__JOINTCONTROLLER__SUM 24
 
 private:
 	//! @brief 初期化フラグの保持アドレス
-	inline static const int FLAG_ADDRESS()           { return 0;    }
+	inline static const int FLAG_ADDRESS()           { return 0; }
 	
 	//! @brief 初期化フラグの値
-	inline static const int FLAG_VALUE()             { return 1;    }
+	inline static const int FLAG_VALUE()             { return 1; }
 	
 	//! @brief 関節設定の保持アドレス
-	inline static const int SETTINGS_BEGIN_ADDRESS() { return 1;    }
+	inline static const int SETTINGS_BEGIN_ADDRESS() { return 1; }
 
 	/*!
 		@brief 関節設定の管理クラス
@@ -76,10 +76,17 @@ private:
 		}
 	};
 
-	JointSetting m_SETTINGS_INITIAL[_PLEN2__JOINTCONTROLLER__SUM]; //!< 関節設定初期値の管理インスタンス
-	JointSetting m_SETTINGS[_PLEN2__JOINTCONTROLLER__SUM];         //!< 関節設定の管理インスタンス
+	JointSetting m_SETTINGS_INITIAL[_PLEN2__JOINTCONTROLLER__SUM];
+	JointSetting m_SETTINGS[_PLEN2__JOINTCONTROLLER__SUM];
 
 public:
+	/*!
+		@brief マルチプレクサの仕様の管理
+
+		@note
+		以下のメソッドは、本来はclass名に対応したnamespace内に実装されるべきですが、
+		C++の仕様ではそのような構文が許容されないため、class内に実装されています。
+	*/
 	class Multiplexer {
 	public:
 		//! @brief マルチプレクサの実装個数
@@ -150,7 +157,7 @@ public:
 
 		@attention
 		本来はコンストラクタ内で呼び出すべき処理ですが、
-		AVR MCUではコンストラクタ内で割り込みが発生した際、プログラムが強制的に停止するようです。
+		AVR MCUではコンストラクタ内で割り込みが発生した際、プログラムが強制的に停止します。
 		<br><br>
 		本メソッドは、内部でシリアル通信と内部EEPROMへの読み書きを行うため、
 		その際に割り込みが発生します。そのため、コンストラクタ内には本メソッドを記述できません。
@@ -256,6 +263,22 @@ public:
 
 	/*!
 		@brief 関節設定のダンプメソッド
+
+		@note
+		以下のような書式のJSON文字列を出力します。
+		@code
+		{
+			"settings": [
+				{
+					"joint": <integer>,
+					"MAX": <integer>,
+					"MIN": <integer>,
+					"HOME": <integer>
+				},
+				...
+			]
+		}
+		@endcode
 	*/
 	void dump();
 };

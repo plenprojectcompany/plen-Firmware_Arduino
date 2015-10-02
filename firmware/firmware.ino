@@ -1,4 +1,4 @@
-﻿/*
+/*
 	Copyright (c) 2015,
 	- Kazuyuki TAKASE - https://github.com/Guvalif
 	- PLEN Project Company Ltd. - http://plen.jp
@@ -17,6 +17,7 @@
 #include "Interpreter.h"
 #include "JointController.h"
 #include "MotionController.h"
+#include "Purser.h"
 #include "PurserCombinator.h"
 #include "System.h"
 
@@ -25,10 +26,19 @@ namespace
 {
 	PLEN2::AccelerationGyroSensor sensor;
 	PLEN2::JointController        joint_ctrl;
-	PLEN2::MotionController       motion_ctrl(joint_controller);
+	PLEN2::MotionController       motion_ctrl(joint_ctrl);
 	PLEN2::Interpreter            interpreter(motion_ctrl);
 	PLEN2::PurserCombinator       combinator;
 	PLEN2::System                 system;
+}
+
+
+namespace PLEN2
+{
+	bool USER_DEFINED_EVENT_HANDLER(PurserCombinator* combinator_ptr)
+	{
+		return true;
+	}
 }
 
 
@@ -87,23 +97,27 @@ void loop()
 
 	if (system.USBSerial().available())
 	{
-		combinator.readByte(system.USBSerial().available());
+		combinator.readByte(system.USBSerial().read());
 
 		if (combinator.accept())
 		{
-			combinator.execEventHandler();
-			combinator.transition();
+			if (PLEN2::USER_DEFINED_EVENT_HANDLER(&combinator))
+			{
+				combinator.transition();
+			}
 		}
 	}
 
 	if (system.BLESerial().available())
 	{
-		combinator.readByte(system.BLESerial().available());
+		combinator.readByte(system.BLESerial().read());
 
 		if (combinator.accept())
 		{
-			combinator.execEventHandler();
-			combinator.transition();
+			if (PLEN2::USER_DEFINED_EVENT_HANDLER(&combinator))
+			{
+				combinator.transition();
+			}
 		}
 	}
 }

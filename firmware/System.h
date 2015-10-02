@@ -40,8 +40,8 @@ private:
 	//! @brief BLEシリアルインタフェースの通信速度
 	inline static const long  BLESERIAL_BAUDRATE() { return 2000000L;  }
 
-	static Stream* m_input_serial_ptr;  //!< 入力シリアルインスタンスのポインタ
-	static Stream* m_output_serial_ptr; //!< 出力シリアルインスタンスのポインタ
+	static Stream* m_input_serial_ptr;
+	static Stream* m_output_serial_ptr;
 
 public:
 	//! @brief MCU内EEPROMのサイズ
@@ -87,6 +87,9 @@ public:
 
 	/*!
 		@brief 入力シリアルインスタンスの切り替えメソッド
+
+		@attention
+		次期バーションでは廃止予定です。
 	*/
 	void toggleInputSerial();
 
@@ -97,11 +100,25 @@ public:
 
 	/*!
 		@brief タイマ1割り込みの禁止メソッド
+
+		@attention
+		多くのサーボモータでは、突然PWM信号が遮断されると意図しない角度に回転してしまいます。
+		そのため、単純にサーボモータの動きを止めるためにこのメソッドを使うことは推奨されません。
 	*/
 	void timer1Detach();
 
 	/*!
 		@brief システム構成のダンプメソッド
+
+		@note
+		以下のような書式のJSON文字列を出力します。
+		@code
+		{
+			"device": <string>,
+			"codename": <string>,
+			"version": <string>
+		}
+		@endcode
 	*/
 	void dump();
 };

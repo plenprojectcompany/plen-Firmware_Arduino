@@ -13,13 +13,14 @@
 #include "System.h"
 
 
-// マクロの定義
+// マクロ定義
 #define _DEBUG false
 
 #define _PLEN2__SYSTEM__USBSERIAL Serial
 #define _PLEN2__SYSTEM__BLESERIAL Serial1
 
 
+// 静的メンバインスタンスの実態定義
 Stream* PLEN2::System::m_input_serial_ptr;
 Stream* PLEN2::System::m_output_serial_ptr;
 
@@ -64,6 +65,7 @@ Stream& PLEN2::System::outputSerial()
 }
 
 
+//! @attention [[deprecated]]
 void PLEN2::System::toggleInputSerial()
 {
 	#if _DEBUG

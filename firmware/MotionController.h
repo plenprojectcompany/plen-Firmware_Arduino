@@ -39,7 +39,12 @@ public:
 	class Header
 	{
 	// macro:
-		#define _PLEN2__MOTIONCONTROLLER__HEADER__NAMELENGTH 21 //!< モーション名の長さ (ただし、EOS = '\0'を予約)
+		/*!
+			@brief モーション名の長さ
+
+			ただし、EOS = '\0'と見なすため、正味の長さは20文字までです。
+		*/
+		#define _PLEN2__MOTIONCONTROLLER__HEADER__NAMELENGTH 21
 
 	public:
 		//! @brief モーション名の長さ
@@ -61,13 +66,13 @@ public:
 		char          name[_PLEN2__MOTIONCONTROLLER__HEADER__NAMELENGTH]; //!< モーション名
 		unsigned char frame_length;                                       //!< フレーム長
 
-		unsigned char non_reserved_func_flags : 5; //!< ビルトイン関数未定義領域
+		unsigned char non_reserved_func_flags : 5; //!< 未定義領域 (今後のアップデートのために予約)
 		unsigned char use_extra : 1;               //!< "拡張コード領域"の使用選択
 		unsigned char use_jump  : 1;               //!< "ジャンプ関数"の使用選択
 		unsigned char use_loop  : 1;               //!< "ループ関数"の使用選択
 		unsigned char loop_begin : 4;              //!< ループ開始フレームの番号
 		unsigned char loop_end   : 4;              //!< ループ終了フレームの番号
-		unsigned char loop_count;                  //!< ループ回数
+		unsigned char loop_count;                  //!< ループ回数 (255は∞と見なす)
 		unsigned char jump_slot;                   //!< ジャンプ先のスロット番号
 		unsigned char stop_flags[3];               //!< 停止フレームのビット配列
 	};
@@ -84,10 +89,10 @@ public:
 	{
 	public:
 		//! @brief フレーム番号の開始値
-		inline static const int FRAME_BEGIN()     { return 0;  }
+		inline static const int FRAME_BEGIN() { return 0;  }
 
 		//! @brief フレーム番号の終了値
-		inline static const int FRAME_END()       { return 20; }
+		inline static const int FRAME_END()   { return 20; }
 
 		/*!
 			@brief フレーム更新間隔(ミリ秒)
@@ -211,15 +216,23 @@ public:
 		@brief モーションのダンプをJSON形式で行うメソッド
 
 		@param [in] slot モーション番号
+
+		@note
+		motion.jsonと同様な形式のJSON文字列を出力します。
+		ただし、"device"に対応する値は<string>ではなく、device_map.jsonで
+		定義されているような生IDの<ineteger>です。
 	*/
 	void dump(unsigned char slot);
 
 // macro:
-	#define _PLEN2__MOTION_CONTROLLER__FRAMEBUFFER_LENGTH 2 //!< フレームバッファ長
+	#define _PLEN2__MOTION_CONTROLLER__FRAMEBUFFER_LENGTH 2
 
 private:
 	//! @brief フレームバッファ長
-	inline static const int FRAMEBUFFER_LENGTH() { return _PLEN2__MOTION_CONTROLLER__FRAMEBUFFER_LENGTH; }
+	inline static const int FRAMEBUFFER_LENGTH()
+	{
+		return _PLEN2__MOTION_CONTROLLER__FRAMEBUFFER_LENGTH;
+	}
 
 	/*!
 		@brief モーションフレームのバッファリングを行うメソッド
@@ -227,18 +240,18 @@ private:
 	void frameBuffering();
 
 
-	JointController* m_joint_ctrl_ptr; //!< 関節管理インスタンスのポインタ
+	JointController* m_joint_ctrl_ptr;
 
-	unsigned char m_transition_count; //!< 遷移回数
-	bool          m_playing;          //!< モーションを再生中であるか否かの論理
+	unsigned char m_transition_count;
+	bool          m_playing;
 
-	Header m_header; //!< ヘッダインスタンス
-	Frame  m_buffer[_PLEN2__MOTION_CONTROLLER__FRAMEBUFFER_LENGTH]; //!< フレームインスタンスバッファ
-	Frame* m_frame_ptr_now;  //!< 現在フレームへのポインタ
-	Frame* m_frame_ptr_next; //!< 次点フレームへのポインタ
+	Header m_header;
+	Frame  m_buffer[_PLEN2__MOTION_CONTROLLER__FRAMEBUFFER_LENGTH];
+	Frame* m_frame_ptr_now;
+	Frame* m_frame_ptr_next;
 
-	long m_now_fixed_points[_PLEN2__JOINTCONTROLLER__SUM];  //!< 現在値計算用固定小数点バッファ
-	long m_diff_fixed_points[_PLEN2__JOINTCONTROLLER__SUM]; //!< 差分計算用固定小数点バッファ
+	long m_now_fixed_points[_PLEN2__JOINTCONTROLLER__SUM];
+	long m_diff_fixed_points[_PLEN2__JOINTCONTROLLER__SUM];
 };
 
 #endif // _PLEN2__MOTION_CONTROLLER_H_

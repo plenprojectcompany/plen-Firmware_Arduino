@@ -40,8 +40,8 @@ namespace
 		"AD", // ANGLE DIFF
 		"AN", // ANGLE
 		"HP", // HOME POSITION
-		"MP", // PLAY MOTION, @todo "PM"に変更し、deprecatedにする。
-		"MS", // STOP MOTION, @todo "SM"に変更し、deprecatedにする。
+		"MP", // PLAY MOTION, @todo "PM"に変更し、[[deprecated]]にする。
+		"MS", // STOP MOTION, @todo "SM"に変更し、[[deprecated]]にする。
 		"PM", // PLAY MOTION
 		"SM"  // STOP MOTION
 	};
@@ -58,7 +58,7 @@ namespace
 
 	const char* SETTER_SYMBOL[] = {
 		"HO", // HOME ANGLE
-		"IN", // INSTALL MOTION, @todo "MF", "MH"に分割し、deprecatedにする。
+		"IN", // INSTALL MOTION, @todo "MF", "MH"に分割し、[[deprecated]]にする。
 		"JS", // JOINT SETTINGS
 		"MA", // MAX ANGLE
 		"MF", // MOTION FRAME
@@ -173,20 +173,16 @@ void PLEN2::PurserCombinator::transition()
 
 		case COMMAND_INCOMING:
 		{
-			#if _DEBUG
-				m_state = ARGUMENTS_INCOMING;
-				m_store_length = 4;
-			#endif
+			m_state = ARGUMENTS_INCOMING;
+			m_store_length = 4;
 
 			break;
 		}
 
 		case ARGUMENTS_INCOMING:
 		{
-			#if _DEBUG
-				m_state = READY;
-				m_store_length = 1;
-			#endif
+			m_state = READY;
+			m_store_length = 1;
 
 			break;
 		}

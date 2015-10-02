@@ -65,6 +65,16 @@ public:
 	CharGroupPurser(const char* accept_chars);
 	virtual ~CharGroupPurser();
 
+	/*!
+		@brief パースを行うメソッド
+
+		@note
+		現在の実装では、与えられた文字列の先頭に対してのみパースを行います。
+		すなわち、/^[accept_chars]/であるかを検証します。
+		<br><br>
+		/^[accept_chars]+$/であるかを検証する挙動に変えたい場合は、
+		直接ソースコードを編集してください。
+	*/
 	virtual bool purse(const char* input);
 };
 

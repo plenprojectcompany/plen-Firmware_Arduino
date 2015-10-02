@@ -15,6 +15,13 @@ namespace PLEN2
 	class MotionController;
 }
 
+/*!
+	@brief コードインタプリタの管理クラス
+
+	@attention
+	このクラスはMotionControllerのprivateメンバにも影響を与えるため、
+	シーケンス構造によっては、各種メソッドの実行によって思わぬ動作をすることがあります。
+*/
 class PLEN2::Interpreter
 {
 // macro:
@@ -24,11 +31,11 @@ class PLEN2::Interpreter
 		@attention
 		高速に処理をするために、値として2^Nが定義される必要があります。
 	*/
-	#define _PLEN2__INTERPRETER__QUEUESIZE 64
+	#define _PLEN2__INTERPRETER__QUEUE_SIZE 64
 
 public:
 	/*!
-		@brief コードオブジェクト
+		@brief コード構造体
 	*/
 	class Code
 	{
@@ -38,13 +45,13 @@ public:
 	};
 
 	//! @brief キューサイズ
-	inline static const int QUEUE_SIZE() { return _PLEN2__INTERPRETER__QUEUESIZE; }
+	inline static const int QUEUE_SIZE() { return _PLEN2__INTERPRETER__QUEUE_SIZE; }
 
 
 	/*!
 		@brief コンストラクタ
 
-		@param [in, out] モーションコントローラインスタンス
+		@param [in, out] motion_ctrl モーションコントローラインスタンス
 	*/
 	Interpreter(MotionController& motion_ctrl);
 
@@ -86,10 +93,10 @@ public:
 
 
 private:
-	Code m_code_queue[_PLEN2__INTERPRETER__QUEUESIZE]; //!< コードキューバッファ
-	unsigned char m_queue_begin; //!< キューの先頭位置
-	unsigned char m_queue_end;   //!< キューの最後尾
-	MotionController* m_motion_ctrl_ptr; //!< モーションコントローラインスタンスへのポインタ
+	Code m_code_queue[_PLEN2__INTERPRETER__QUEUE_SIZE];
+	unsigned char m_queue_begin;
+	unsigned char m_queue_end;
+	MotionController* m_motion_ctrl_ptr;
 };
 
 #endif // _PLEN2__INTERPRETER_H_

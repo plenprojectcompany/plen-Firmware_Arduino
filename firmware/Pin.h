@@ -19,6 +19,7 @@ namespace PLEN2
 
 		@note
 		PLEN2の回路図も併せてご参照ください。
+		→ https://github.com/plenproject/plen__baseboard
 		
 		@sa
 		Arduino Microのピンマッピング → http://arduino.cc/en/Hacking/PinMapping32u4

@@ -24,9 +24,9 @@ test(GravityAxisX)
 			acc_gyro.sampling();
 			delay(50);
 
-			int acc_x = abs(acc_gyro.getAccelerationX());
-			int acc_y = abs(acc_gyro.getAccelerationY());
-			int acc_z = abs(acc_gyro.getAccelerationZ());
+			int acc_x = abs(acc_gyro.getAccX());
+			int acc_y = abs(acc_gyro.getAccY());
+			int acc_z = abs(acc_gyro.getAccZ());
 
 			if (acc_x > acc_y && acc_x > acc_z)
 			{
@@ -51,9 +51,9 @@ test(GravityAxisY)
 			acc_gyro.sampling();
 			delay(50);
 
-			int acc_x = abs(acc_gyro.getAccelerationX());
-			int acc_y = abs(acc_gyro.getAccelerationY());
-			int acc_z = abs(acc_gyro.getAccelerationZ());
+			int acc_x = abs(acc_gyro.getAccX());
+			int acc_y = abs(acc_gyro.getAccY());
+			int acc_z = abs(acc_gyro.getAccZ());
 
 			if (acc_y > acc_z && acc_y > acc_x)
 			{
@@ -78,9 +78,9 @@ test(GravityAxisZ)
 			acc_gyro.sampling();
 			delay(50);
 
-			int acc_x = abs(acc_gyro.getAccelerationX());
-			int acc_y = abs(acc_gyro.getAccelerationY());
-			int acc_z = abs(acc_gyro.getAccelerationZ());
+			int acc_x = abs(acc_gyro.getAccX());
+			int acc_y = abs(acc_gyro.getAccY());
+			int acc_z = abs(acc_gyro.getAccZ());
 
 			if (acc_z > acc_x && acc_z > acc_y)
 			{

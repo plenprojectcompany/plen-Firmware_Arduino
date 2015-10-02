@@ -33,6 +33,7 @@ namespace
 }
 
 
+// staticインスタンスの実態定義
 volatile unsigned char PLEN2::JointController::m_overflow_count;
 volatile bool PLEN2::JointController::m_1cycle_finished = false;
 unsigned int PLEN2::JointController::m_pwms[_PLEN2__JOINTCONTROLLER__SUM];
@@ -449,14 +450,14 @@ void PLEN2::JointController::dump()
 }
 
 
-/*!
+/*
 	@brief タイマ1 オーバーフロー割り込みベクタ
 
 	@note
 	実行タイミングはTCNT1がオーバーフローしたときです。
 	PLEN2の場合では、16[MHz]に64分周をかけ、かつ10bitのカウンタを使用するので、
 	(16,000,000 / (64 * 1,024))^-1 * 1,000 = 4.096[msec]ごとに割り込まれます。
-	<br><br>
+
 	この4.096[msec]という値は、サーボモータのPWM信号許容入力間隔に対して
 	十分に小さな値です。そこで、各サーボモータに対して割り込み8回に1回の割合で
 	PWM信号を入力し、割り込み毎に出力先のサーボモータを切り替えることで、
@@ -465,7 +466,7 @@ void PLEN2::JointController::dump()
 	@attention
 	内部で変更される変数は、基本的にvolatile修飾子をつけるのが無難です。
 	コンパイラでの最適化による、わかりづらいバグを防ぐことができます。
-	<br><br>
+
 	AVRマイコンではPWM信号の出力がダブルバッファリングによって制御されるため、
 	PWM信号の出力値を関節値の参照先より1つ先読みする必要があります。
 	この操作を怠った場合、複数のサーボモータ制御は意図しない挙動をするので、
@@ -476,7 +477,7 @@ ISR(TIMER1_OVF_vect)
 	volatile static unsigned char output_select = 0;
 	volatile static unsigned char joint_select  = 1; // @attention ダブルバッファリングを考慮して1つ先読み
 
-	/*!
+	/*
 		@attention
 		PWM信号が出力される前に出力先を切り替える必要があるので、
 		タイマ割り込みのなるべく早い段階で切り替え処理を行う。
@@ -497,8 +498,8 @@ ISR(TIMER1_OVF_vect)
 		joint_select + 2 * PLEN2::JointController::Multiplexer::SELECTABLE_NUM()
 	];
 
-	++output_select &= (PLEN2::JointController::Multiplexer::SELECTABLE_NUM() - 1);
-	++joint_select  &= (PLEN2::JointController::Multiplexer::SELECTABLE_NUM() - 1);
+	(++output_select) &= (PLEN2::JointController::Multiplexer::SELECTABLE_NUM() - 1);
+	(++joint_select)  &= (PLEN2::JointController::Multiplexer::SELECTABLE_NUM() - 1);
 
 	PLEN2::JointController::m_overflow_count++;
 	(joint_select == 0)? (PLEN2::JointController::m_1cycle_finished = true) : false;

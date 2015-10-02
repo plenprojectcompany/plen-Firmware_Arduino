@@ -22,6 +22,15 @@ namespace
 {
 	PLEN2::System system;
 
+	enum {
+		ACC_X,
+		ACC_Y,
+		ACC_Z,
+		GYRO_ROLL,
+		GYRO_PITCH,
+		GYRO_YAW
+	};
+
 	template<typename T>
 	void endianCast(T& value)
 	{
@@ -46,8 +55,8 @@ void PLEN2::AccelerationGyroSensor::sampling()
 	/*!
 		@note
 		Pin::RS485_TXD()をHIGHにすることで、データの流れを"サーボ基盤"→"頭基板"と変更する。
-		頭基板のシリアルに任意のデータを送ると、2byte, ビッグエンディアンのバイト列で各
-		センサ値を返却してくる。
+		頭基板のシリアルに任意のデータを送ると、2byte, ビッグエンディアンのバイト列で
+		各センサ値を返却してくる。
 
 		これを受信するために、データの流れを即座に"頭基板"→"サーボ基盤"と変更する必要がある。
 	*/
@@ -65,12 +74,12 @@ void PLEN2::AccelerationGyroSensor::sampling()
 			filler[read_count++] = system.BLESerial().read();
 		}
 
-		if (read_count == (BUFFER_LENGTH() * sizeof(int)))
+		if (read_count == (SUM() * sizeof(int)))
 		{
 			// @attention '\n'の読み飛ばしのために必須
 			system.BLESerial().read();
 
-			for (int index = 0; index < BUFFER_LENGTH(); index++)
+			for (int index = 0; index < SUM(); index++)
 			{
 				endianCast(m_values[index]);
 			}
@@ -80,31 +89,31 @@ void PLEN2::AccelerationGyroSensor::sampling()
 	}
 }
 
-int PLEN2::AccelerationGyroSensor::getAccelerationX()
+int PLEN2::AccelerationGyroSensor::getAccX()
 {
 	#if _DEBUG
-		system.outputSerial().println(F("=== in fuction : AccelerationGyroSensor::getAccelerationX()"));
+		system.outputSerial().println(F("=== in fuction : AccelerationGyroSensor::getAccX()"));
 	#endif
 
-	return m_values[0];
+	return m_values[ACC_X];
 }
 
-int PLEN2::AccelerationGyroSensor::getAccelerationY()
+int PLEN2::AccelerationGyroSensor::getAccY()
 {
 	#if _DEBUG
-		system.outputSerial().println(F("=== in fuction : AccelerationGyroSensor::getAccelerationY()"));
+		system.outputSerial().println(F("=== in fuction : AccelerationGyroSensor::getAccY()"));
 	#endif
 
-	return m_values[1];
+	return m_values[ACC_Y];
 }
 
-int PLEN2::AccelerationGyroSensor::getAccelerationZ()
+int PLEN2::AccelerationGyroSensor::getAccZ()
 {
 	#if _DEBUG
-		system.outputSerial().println(F("=== in fuction : AccelerationGyroSensor::getAccelerationZ()"));
+		system.outputSerial().println(F("=== in fuction : AccelerationGyroSensor::getAccZ()"));
 	#endif
 
-	return m_values[2];
+	return m_values[ACC_Z];
 }
 
 int PLEN2::AccelerationGyroSensor::getGyroRoll()
@@ -113,7 +122,7 @@ int PLEN2::AccelerationGyroSensor::getGyroRoll()
 		system.outputSerial().println(F("=== in fuction : AccelerationGyroSensor::getGyroRoll()"));
 	#endif
 
-	return m_values[3];
+	return m_values[GYRO_ROLL];
 }
 
 int PLEN2::AccelerationGyroSensor::getGyroPitch()
@@ -122,7 +131,7 @@ int PLEN2::AccelerationGyroSensor::getGyroPitch()
 		system.outputSerial().println(F("=== in fuction : AccelerationGyroSensor::getGyroPitch()"));
 	#endif
 
-	return m_values[4];
+	return m_values[GYRO_PITCH];
 }
 
 int PLEN2::AccelerationGyroSensor::getGyroYaw()
@@ -131,7 +140,7 @@ int PLEN2::AccelerationGyroSensor::getGyroYaw()
 		system.outputSerial().println(F("=== in fuction : AccelerationGyroSensor::getGyroYaw()"));
 	#endif
 
-	return m_values[5];
+	return m_values[GYRO_YAW];
 }
 
 void PLEN2::AccelerationGyroSensor::dump()
@@ -144,28 +153,28 @@ void PLEN2::AccelerationGyroSensor::dump()
 
 	system.outputSerial().println(F("{"));
 
-	system.outputSerial().print(F("\t\"Acc X\": "));
-	system.outputSerial().print(getAccelerationX());
-	system.outputSerial().println(F(","));
+		system.outputSerial().print(F("\t\"Acc X\": "));
+		system.outputSerial().print(getAccX());
+		system.outputSerial().println(F(","));
 
-	system.outputSerial().print(F("\t\"Acc Y\": "));
-	system.outputSerial().print(getAccelerationY());
-	system.outputSerial().println(F(","));
+		system.outputSerial().print(F("\t\"Acc Y\": "));
+		system.outputSerial().print(getAccY());
+		system.outputSerial().println(F(","));
 
-	system.outputSerial().print(F("\t\"Acc Z\": "));
-	system.outputSerial().print(getAccelerationZ());
-	system.outputSerial().println(F(","));
+		system.outputSerial().print(F("\t\"Acc Z\": "));
+		system.outputSerial().print(getAccZ());
+		system.outputSerial().println(F(","));
 
-	system.outputSerial().print(F("\t\"Gyro Roll\": "));
-	system.outputSerial().print(getGyroRoll());
-	system.outputSerial().println(F(","));
+		system.outputSerial().print(F("\t\"Gyro Roll\": "));
+		system.outputSerial().print(getGyroRoll());
+		system.outputSerial().println(F(","));
 
-	system.outputSerial().print(F("\t\"Gyro Pitch\": "));
-	system.outputSerial().print(getGyroPitch());
-	system.outputSerial().println(F(","));
+		system.outputSerial().print(F("\t\"Gyro Pitch\": "));
+		system.outputSerial().print(getGyroPitch());
+		system.outputSerial().println(F(","));
 
-	system.outputSerial().print(F("\t\"Gyro Yaw\": "));
-	system.outputSerial().println(getGyroYaw());
+		system.outputSerial().print(F("\t\"Gyro Yaw\": "));
+		system.outputSerial().println(getGyroYaw());
 
 	system.outputSerial().println(F("}"));
 }
