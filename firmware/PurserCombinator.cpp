@@ -216,14 +216,17 @@ void PLEN2::PurserCombinator::transition()
 			m_state = ARGUMENTS_INCOMING;
 			m_purser[ARGUMENTS_INCOMING] = &args_purser;
 
+			// コマンドラインに関する部分特殊化
 			if (m_purser[READY]->index() == 2 /* := Setter */)
 			{
+				// インストールコマンドを受理した場合、モーションヘッダ書き込みコマンドへ書き換える。
 				if (m_purser[COMMAND_INCOMING]->index() == 1 /* := INSTALL MOTION */)
 				{
 					m_purser[COMMAND_INCOMING]->purse("MH");
 					m_installing = true;
 				}
 
+				// モーションヘッダ書き込みコマンドを受理した場合、コマンドラインの制約を解除する。
 				if (m_purser[COMMAND_INCOMING]->index() == 5 /* := MOTION HEADER */)
 				{
 					m_purser[ARGUMENTS_INCOMING] = &nil_purser;
@@ -235,6 +238,7 @@ void PLEN2::PurserCombinator::transition()
 
 			m_store_length = ARGS_STORE_LENGTH[header_id][cmd_id];
 
+			// 以下の条件が満たされる場合、コマンドラインの引数部は存在しないためREADY状態へ遷移する。
 			if (m_store_length == 0)
 			{
 				m_state = READY;
@@ -246,21 +250,8 @@ void PLEN2::PurserCombinator::transition()
 
 		case ARGUMENTS_INCOMING:
 		{
-			if (m_installing)
-			{
-				m_purser[ARGUMENTS_INCOMING] = &args_purser;
-				m_purser[COMMAND_INCOMING]->purse("MF");
-
-				unsigned char header_id = m_purser[READY]->index();
-				unsigned char cmd_id    = m_purser[COMMAND_INCOMING]->index();
-
-				m_store_length = ARGS_STORE_LENGTH[header_id][cmd_id];
-			}
-			else
-			{
-				m_state = READY;
-				m_store_length = 1;
-			}
+			m_state = READY;
+			m_store_length = 1;
 
 			break;
 		}

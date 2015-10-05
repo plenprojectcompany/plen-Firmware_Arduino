@@ -22,7 +22,7 @@
 #include "System.h"
 
 // デバッグマクロ
-#define _DEBUG true
+#define _DEBUG false
 
 
 namespace
@@ -34,174 +34,182 @@ namespace
 	PLEN2::Interpreter            interpreter(motion_ctrl);
 	PLEN2::System                 system;
 
-	// イベントハンドラ
-	void angleDiff()
-	{
-		#if _DEBUG
-			system.outputSerial().println(F("# in event handler : angleDiff()"));
-		#endif
-	}
 
-	void angle()
-	{
-		#if _DEBUG
-			system.outputSerial().println(F("# in event handler : angle()"));
-		#endif
-	}
-
-	void homePosition()
-	{
-		#if _DEBUG
-			system.outputSerial().println(F("# in event handler : homePosition()"));
-		#endif
-	}
-
-	void playMotion()
-	{
-		#if _DEBUG
-			system.outputSerial().println(F("# in event handler : playMotion()"));
-		#endif
-	}
-
-	void stopMotion()
-	{
-		#if _DEBUG
-			system.outputSerial().println(F("# in event handler : stopMotion()"));
-		#endif
-	}
-
-	void popCode()
-	{
-		#if _DEBUG
-			system.outputSerial().println(F("# in event handler : popCode()"));
-		#endif
-	}
-
-	void pushCode()
-	{
-		#if _DEBUG
-			system.outputSerial().println(F("# in event handler : pushCode()"));
-		#endif
-	}
-
-	void resetInterpreter()
-	{
-		#if _DEBUG
-			system.outputSerial().println(F("# in event handler : resetInterpreter()"));
-		#endif
-	}
-
-	void setHomeAngle()
-	{
-		#if _DEBUG
-			system.outputSerial().println(F("# in event handler : setHomeAngle()"));
-		#endif
-	}
-
-	void setJointSettings()
-	{
-		#if _DEBUG
-			system.outputSerial().println(F("# in event handler : setJointSettings()"));
-		#endif
-	}
-
-	void setMaxAngle()
-	{
-		#if _DEBUG
-			system.outputSerial().println(F("# in event handler : setMaxAngle()"));
-		#endif
-	}
-
-	void setMotionFrame()
-	{
-		#if _DEBUG
-			system.outputSerial().println(F("# in event handler : setMotionFrame()"));
-		#endif
-	}
-
-	void setMotionHeader()
-	{
-		#if _DEBUG
-			system.outputSerial().println(F("# in event handler : setMotionHeader()"));
-		#endif
-	}
-
-	void setMinAngle()
-	{
-		#if _DEBUG
-			system.outputSerial().println(F("# in event handler : setMinAngle()"));
-		#endif
-	}
-
-	void getJointSettings()
-	{
-		#if _DEBUG
-			system.outputSerial().println(F("# in event handler : getJointSettings()"));
-		#endif
-
-		joint_ctrl.dump();
-	}
-
-	void getMotion()
-	{
-		#if _DEBUG
-			system.outputSerial().println(F("# in event handler : getMotion()"));
-		#endif
-	}
-
-	void getVersionInformation()
-	{
-		#if _DEBUG
-			system.outputSerial().println(F("# in event handler : getVersionInformation()"));
-		#endif
-
-		system.dump();
-	}
-
-	void (*CONTROLLER_EVENT_HANDLER[])() = {
-		angleDiff,
-		angle,
-		homePosition,
-		playMotion,
-		stopMotion,
-		playMotion,
-		stopMotion
-	};
-
-	void (*INTERPRETER_EVENT_HANDLER[])() = {
-		popCode,
-		pushCode,
-		resetInterpreter
-	};
-
-	void (*SETTER_EVENT_HANDLER[])() = {
-		setHomeAngle,
-		setMotionHeader, // sanity check.
-		setJointSettings,
-		setMaxAngle,
-		setMotionFrame,
-		setMotionHeader,
-		setMinAngle
-	};
-
-	void (*GETTER_EVENT_HANDLER[])() = {
-		getJointSettings,
-		getMotion,
-		getVersionInformation
-	};
-
-	void (**EVENT_HANDLER[])() = {
-		CONTROLLER_EVENT_HANDLER,
-		INTERPRETER_EVENT_HANDLER,
-		SETTER_EVENT_HANDLER,
-		GETTER_EVENT_HANDLER
-	};
-
+	// アプリケーションインスタンス
 	class Application : public PLEN2::PurserCombinator
 	{
 	private:
-		PLEN2::MotionController::Header m_header;
-		PLEN2::MotionController::Frame  m_frame;
+		static bool (Application::*CONTROLLER_EVENT_HANDLER[])();
+		static bool (Application::*INTERPRETER_EVENT_HANDLER[])();
+		static bool (Application::*SETTER_EVENT_HANDLER[])();
+		static bool (Application::*GETTER_EVENT_HANDLER[])();
+
+		static bool (Application::**EVENT_HANDLER[])();
+
+		PLEN2::MotionController::Header m_header_tmp;
+		PLEN2::MotionController::Frame  m_frame_tmp;
+
+		bool angleDiff()
+		{
+			#if _DEBUG
+				system.outputSerial().println(F("# in event handler : Application::angleDiff()"));
+			#endif
+		}
+
+		bool angle()
+		{
+			#if _DEBUG
+				system.outputSerial().println(F("# in event handler : Application::angle()"));
+			#endif
+		}
+
+		bool homePosition()
+		{
+			#if _DEBUG
+				system.outputSerial().println(F("# in event handler : Application::homePosition()"));
+			#endif
+
+			joint_ctrl.loadSettings();
+		}
+
+		bool playMotion()
+		{
+			#if _DEBUG
+				system.outputSerial().println(F("# in event handler : Application::playMotion()"));
+			#endif
+		}
+
+		bool stopMotion()
+		{
+			#if _DEBUG
+				system.outputSerial().println(F("# in event handler : Application::stopMotion()"));
+			#endif
+		}
+
+		bool popCode()
+		{
+			#if _DEBUG
+				system.outputSerial().println(F("# in event handler : Application::popCode()"));
+			#endif
+
+			interpreter.popCode();
+		}
+
+		bool pushCode()
+		{
+			#if _DEBUG
+				system.outputSerial().println(F("# in event handler : Application::pushCode()"));
+			#endif
+		}
+
+		bool resetInterpreter()
+		{
+			#if _DEBUG
+				system.outputSerial().println(F("# in event handler : Application::resetInterpreter()"));
+			#endif
+
+			interpreter.reset();
+		}
+
+		bool setHomeAngle()
+		{
+			#if _DEBUG
+				system.outputSerial().println(F("# in event handler : Application::setHomeAngle()"));
+			#endif
+		}
+
+		bool setJointSettings()
+		{
+			#if _DEBUG
+				system.outputSerial().println(F("# in event handler : Application::setJointSettings()"));
+			#endif
+
+			joint_ctrl.resetSettings();
+		}
+
+		bool setMaxAngle()
+		{
+			#if _DEBUG
+				system.outputSerial().println(F("# in event handler : Application::setMaxAngle()"));
+			#endif
+		}
+
+		bool setMotionFrame()
+		{
+			#if _DEBUG
+				system.outputSerial().println(F("# in event handler : Application::setMotionFrame()"));
+			#endif
+
+			if (m_installing == true)
+			{
+				readByte('>');
+				accept();
+				transition();
+
+				readByte('m');
+				readByte('f');
+				accept();
+				transition();
+
+				readByte('0');
+				readByte('0');
+				readByte('0');
+				readByte('0');
+			}
+		}
+
+		bool setMotionHeader()
+		{
+			#if _DEBUG
+				system.outputSerial().println(F("# in event handler : Application::setMotionHeader()"));
+			#endif
+
+			if (m_installing == true)
+			{
+				readByte('>');
+				accept();
+				transition();
+
+				readByte('m');
+				readByte('f');
+				accept();
+				transition();
+			}
+		}
+
+		bool setMinAngle()
+		{
+			#if _DEBUG
+				system.outputSerial().println(F("# in event handler : Application::setMinAngle()"));
+			#endif
+		}
+
+		bool getJointSettings()
+		{
+			#if _DEBUG
+				system.outputSerial().println(F("# in event handler : Application::getJointSettings()"));
+			#endif
+
+			joint_ctrl.dump();
+		}
+
+		bool getMotion()
+		{
+			#if _DEBUG
+				system.outputSerial().println(F("# in event handler : Application::getMotion()"));
+			#endif
+
+			motion_ctrl.dump(0);
+		}
+
+		bool getVersionInformation()
+		{
+			#if _DEBUG
+				system.outputSerial().println(F("# in event handler : Application::getVersionInformation()"));
+			#endif
+
+			system.dump();
+		}
 
 	public:
 		virtual void afterFook()
@@ -215,11 +223,48 @@ namespace
 				unsigned char header_id = m_purser[READY]->index();
 				unsigned char cmd_id    = m_purser[COMMAND_INCOMING]->index();
 
-				EVENT_HANDLER[header_id][cmd_id]();
+				(this->*EVENT_HANDLER[header_id][cmd_id])();
 			}
-
-			if (m_state == )
 		}
+	};
+
+	bool (Application::*Application::CONTROLLER_EVENT_HANDLER[])() = {
+		&Application::angleDiff,
+		&Application::angle,
+		&Application::homePosition,
+		&Application::playMotion,
+		&Application::stopMotion,
+		&Application::playMotion,
+		&Application::stopMotion
+	};
+
+	bool (Application::*Application::INTERPRETER_EVENT_HANDLER[])() = {
+		&Application::popCode,
+		&Application::pushCode,
+		&Application::resetInterpreter
+	};
+
+	bool (Application::*Application::SETTER_EVENT_HANDLER[])() = {
+		&Application::setHomeAngle,
+		&Application::setMotionHeader, // sanity check.
+		&Application::setJointSettings,
+		&Application::setMaxAngle,
+		&Application::setMotionFrame,
+		&Application::setMotionHeader,
+		&Application::setMinAngle
+	};
+
+	bool (Application::*Application::GETTER_EVENT_HANDLER[])() = {
+		&Application::getJointSettings,
+		&Application::getMotion,
+		&Application::getVersionInformation
+	};
+
+	bool (Application::**Application::EVENT_HANDLER[])() = {
+		Application::CONTROLLER_EVENT_HANDLER,
+		Application::INTERPRETER_EVENT_HANDLER,
+		Application::SETTER_EVENT_HANDLER,
+		Application::GETTER_EVENT_HANDLER
 	};
 
 	Application combinator;
@@ -237,13 +282,6 @@ namespace
 */
 void setup()
 {
-	#if _DEBUG
-		while (!Serial);
-
-		Serial.println("Debug started.");
-		Serial.println("==============");
-	#endif
-
 	joint_ctrl.loadSettings();
 }
 
