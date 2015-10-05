@@ -1,9 +1,0 @@
-{
-	"root": "../../firmware/",
-	"import": [
-		"Pin",
-		"System",
-		"Purser",
-		"PurserCombinator"
-	]
-}

@@ -1,5 +1,6 @@
 /*!
 	@file      firmware.h
+	@brief     mainpageのmarkdownファイルです。
 	@author    Kazuyuki TAKASE
 	@copyright The MIT License - http://opensource.org/licenses/mit-license.php
 */

@@ -24,7 +24,7 @@ namespace Utility
 class Utility::AbstractPurser
 {
 protected:
-	int m_index;
+	char m_index;
 
 	AbstractPurser();
 
@@ -32,7 +32,7 @@ public:
 	virtual ~AbstractPurser();
 
 	virtual bool purse(const char* input) = 0;
-	virtual int index();
+	virtual const char& index();
 };
 
 
@@ -90,10 +90,10 @@ class Utility::StringGroupPurser : public Utility::AbstractPurser
 {
 private:
 	const char** m_accept_strs;
-	const int    m_size;
+	const unsigned char m_size;
 
 public:
-	StringGroupPurser(const char* accept_strs[], const int size);
+	StringGroupPurser(const char* accept_strs[], const unsigned char size);
 	virtual ~StringGroupPurser();
 	
 	virtual bool purse(const char* input);

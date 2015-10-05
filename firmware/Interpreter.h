@@ -31,7 +31,7 @@ class PLEN2::Interpreter
 		@attention
 		高速に処理をするために、値として2^Nが定義される必要があります。
 	*/
-	#define _PLEN2__INTERPRETER__QUEUE_SIZE 64
+	#define _PLEN2__INTERPRETER__QUEUE_SIZE 32
 
 public:
 	/*!

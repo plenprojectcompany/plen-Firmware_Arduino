@@ -57,7 +57,7 @@ public:
 		@attention
 		取得される値は、sampling() 実行時の値をキャッシュしたものです。
 	*/
-	int getAccX();
+	const int& getAccX();
 
 	/*!
 		@brief Y軸の加速度を取得するメソッド
@@ -67,7 +67,7 @@ public:
 		@attention
 		取得される値は、sampling() 実行時の値をキャッシュしたものです。
 	*/
-	int getAccY();
+	const int& getAccY();
 
 	/*!
 		@brief Z軸の加速度を取得するメソッド
@@ -77,7 +77,7 @@ public:
 		@attention
 		取得される値は、sampling() 実行時の値をキャッシュしたものです。
 	*/
-	int getAccZ();
+	const int& getAccZ();
 
 	/*!
 		@brief ロール軸(X軸に関する回転軸)の角速度を取得するメソッド
@@ -87,7 +87,7 @@ public:
 		@attention
 		取得される値は、sampling() 実行時の値をキャッシュしたものです。
 	*/
-	int getGyroRoll();
+	const int& getGyroRoll();
 
 	/*!
 		@brief ピッチ軸(Y軸に関する回転軸)の角速度を取得するメソッド
@@ -97,7 +97,7 @@ public:
 		@attention
 		取得される値は、sampling() 実行時の値をキャッシュしたものです。
 	*/
-	int getGyroPitch();
+	const int& getGyroPitch();
 
 	/*!
 		@brief ヨー軸(Z軸に関する回転軸)の角速度を取得するメソッド
@@ -107,7 +107,7 @@ public:
 		@attention
 		取得される値は、sampling() 実行時の値をキャッシュしたものです。
 	*/
-	int getGyroYaw();
+	const int& getGyroYaw();
 
 	/*!
 		@brief サンプリングを行った後、各種センサ値をダンプするメソッド

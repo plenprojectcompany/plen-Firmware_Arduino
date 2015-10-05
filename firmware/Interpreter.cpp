@@ -98,6 +98,7 @@ bool PLEN2::Interpreter::popCode()
 		m_motion_ctrl_ptr->m_header.use_loop = 0;
 	}
 
+	m_motion_ctrl_ptr->m_header.use_jump = 0;
 	m_motion_ctrl_ptr->m_header.loop_count = doing.loop_count;
 
 	return true;
@@ -120,4 +121,5 @@ void PLEN2::Interpreter::reset()
 
 	m_queue_begin = 0;
 	m_queue_end   = 0;
+	m_motion_ctrl_ptr->stop();
 }

@@ -49,7 +49,10 @@ int PLEN2::ExternalEEPROM::readSlot(
 	)
 	{
 		#if _DEBUG
-			system.outputSerial().println(F(">>> error : bad argument!"));
+			system.outputSerial().print(F(">>> bad argument! : slot = "));
+			system.outputSerial().print(slot);
+			system.outputSerial().print(F(", or read_size = "));
+			system.outputSerial().println(read_size);
 		#endif
 
 		return -1;
@@ -65,9 +68,9 @@ int PLEN2::ExternalEEPROM::readSlot(
 	}
 
 	#if _DEBUG
-		system.outputSerial().print(F(">>> slave_address : "));
+		system.outputSerial().print(F(">>> slave_address = "));
 		system.outputSerial().println(slave_address, HEX);
-		system.outputSerial().print(F(">>> data_address : "));
+		system.outputSerial().print(F(">>> data_address = "));
 		system.outputSerial().println(data_address, HEX);
 	#endif
 
@@ -115,7 +118,10 @@ int PLEN2::ExternalEEPROM::writeSlot(
 	)
 	{
 		#if _DEBUG
-			system.outputSerial().println(F(">>> error : bad argument!"));
+			system.outputSerial().print(F(">>> bad argument! : slot = "));
+			system.outputSerial().print(slot);
+			system.outputSerial().print(F(", or write_size = "));
+			system.outputSerial().println(write_size);
 		#endif
 		
 		return -1;

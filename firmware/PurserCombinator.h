@@ -23,10 +23,7 @@ namespace Utility
 */
 class PLEN2::PurserCombinator
 {
-// friend:
-	friend bool USER_DEFINED_EVENT_HANDLER(PurserCombinator* combinator_ptr);
-
-private:
+protected:
 	typedef enum
 	{
 		READY, // same as HEADER_INCOMING
@@ -39,17 +36,18 @@ private:
 	{
 	// macro:
 		/*!
-			@brief バッファサイズ
-
 			@note
 			バッファサイズは最低限、BLEのペイロード長(20byte)以上必要です。
 			また、高速に処理を行うため2^Nを要求します。
 		*/
-		#define _PLEN2__PURSER_COMBINATOR__BUFFER__LENGTH 32
+		#define _PLEN2__PURSER_COMBINATOR__BUFFER__LENGTH 128
 
 	public:
 		//! @brief バッファ長
-		inline static const int LENGTH() { return _PLEN2__PURSER_COMBINATOR__BUFFER__LENGTH; }
+		inline static const int LENGTH()
+		{
+			return _PLEN2__PURSER_COMBINATOR__BUFFER__LENGTH;
+		}
 
 		char data[_PLEN2__PURSER_COMBINATOR__BUFFER__LENGTH];
 		unsigned char position;
@@ -67,6 +65,7 @@ private:
 	Buffer m_buffer;
 	State m_state;
 	unsigned char m_store_length;
+	bool m_installing;
 	Utility::AbstractPurser* m_purser[STATE_EOE];
 
 	/*!
@@ -75,10 +74,9 @@ private:
 	void m_abort();
 
 public:
-	/*!
-		@brief コンストラクタ
-	*/
 	PurserCombinator();
+
+	virtual ~PurserCombinator() {}
 
 	/*!
 		@brief 1文字を読み込み、リングバッファに格納するメソッド
@@ -96,12 +94,22 @@ public:
 		@brief パーサの内部状態遷移メソッド
 
 		@note
-		通常は USER_DEFINED_EVENT_HANDLER() にこのメソッドの処理も委譲します。
+		USER_DEFINED_EVENT_HANDLER() にこのメソッドの処理を委譲することも可能です。
 
 		@sa
-		firmware.ino 内，loop() 関数も併せてご参照ください。
+		firmware.ino 内，loop() 関数の処理も併せてご参照ください。
 	*/
 	void transition();
+
+	/*!
+		@brief transition() 実行前に呼び出される、ユーザ定義フック
+	*/
+	virtual void beforeFook();
+
+	/*!
+		@brief transition() 実行後に呼び出される、ユーザ定義フック
+	*/
+	virtual void afterFook();
 };
 
 #endif // _PLEN2__PURSER_COMBINATOR_H_

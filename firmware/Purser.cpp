@@ -34,7 +34,7 @@ AbstractPurser::~AbstractPurser()
 	// noop.
 }
 
-int AbstractPurser::index()
+const char& AbstractPurser::index()
 {
 	return m_index;
 }
@@ -97,7 +97,7 @@ bool CharGroupPurser::purse(const char* input)
 /*!
 	@brief 与えられた文字列グループのみ受理するパーサクラス
 */
-StringGroupPurser::StringGroupPurser(const char* accept_strs[], const int size)
+StringGroupPurser::StringGroupPurser(const char* accept_strs[], const unsigned char size)
 	: m_accept_strs(accept_strs)
 	, m_size(size)
 {

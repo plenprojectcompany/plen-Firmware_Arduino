@@ -17,37 +17,6 @@ namespace
 
 
 /*!
-	@brief System::toggleInputSerial()を1回実行するテスト
-
-	当該メソッドの実行前後で、取得されるインスタンスが異なることを確認します。
-*/
-test(ToggleInputSerial)
-{
-	Stream* before = &(system.inputSerial());
-	system.toggleInputSerial();
-	Stream* after  = &(system.inputSerial());
-
-
-	assertTrue(before != after);
-}
-
-/*!
-	@brief System::toggleInputSerial()を2回実行するテスト
-
-	当該メソッドの実行前後で、取得されるインスタンスが同一なことを確認します。
-*/
-test(ToggleInputSerial_x2)
-{
-	Stream* before = &(system.inputSerial());
-	system.toggleInputSerial();
-	system.toggleInputSerial();
-	Stream* after  = &(system.inputSerial());
-
-
-	assertTrue(before == after);
-}
-
-/*!
 	@brief 入力シリアルインスタンスの同一性のテスト
 
 	異なるSystemインスタンス間で、取得される入力シリアルインスタンスが
