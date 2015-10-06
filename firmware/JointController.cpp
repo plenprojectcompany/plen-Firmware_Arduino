@@ -443,7 +443,15 @@ void PLEN2::JointController::dump()
 		system.outputSerial().print(F("\t\t\t\"HOME\": "));
 		system.outputSerial().println(m_SETTINGS[joint_id].HOME);
 		system.outputSerial().print(F("\t\t}"));
-		system.outputSerial().println(F(","));
+
+		if (joint_id != (SUM() - 1))
+		{
+			system.outputSerial().println(F(","));
+		}
+		else
+		{
+			system.outputSerial().write('\n');
+		}
 	}
 	system.outputSerial().println(F("\t]"));
 	system.outputSerial().println(F("}"));

@@ -7,6 +7,8 @@
 	(See also : http://opensource.org/licenses/mit-license.php)
 */
 
+// 標準ライブラリ
+#include <string.h>
 
 // Arduinoライブラリ
 #include <EEPROM.h>
@@ -21,8 +23,61 @@
 #include "PurserCombinator.h"
 #include "System.h"
 
-// デバッグマクロ
+// マクロ
 #define _DEBUG false
+
+
+namespace Utility
+{
+	/*!
+		@brief 16進文字配列をunisigned intに変換するメソッド
+
+		@param [in] bytes 文字配列バッファへのポインタ
+		@param [in] size  文字配列長
+	*/
+	unsigned int hexbytes2uint(const char* bytes, unsigned char size)
+	{
+		unsigned int result = 0;
+
+		for (unsigned char index = 0; index < size; index++)
+		{
+			unsigned int placeholder = bytes[index];
+
+			if (placeholder >= 'a') placeholder -= ('a' - 10);
+			if (placeholder >= 'A') placeholder -= ('A' - 10);
+			if (placeholder >= '0') placeholder -= '0';
+
+			unsigned int base = 1 << ((size - index - 1) * 4);
+
+			result += placeholder * base;
+		}
+
+		return result;
+	}
+
+	/*!
+		@brief 16進文字配列をintに変換するメソッド
+
+		@note
+		16進文字配列をビット表現に変換した後、最上位ビットを符号部と見なす変換を行います。
+
+		@param [in] bytes 文字配列バッファへのポインタ
+		@param [in] size  文字配列長
+	*/
+	int hexbytes2int(const char* bytes, unsigned char size)
+	{
+		unsigned int temp = hexbytes2uint(bytes, size);
+		temp <<= (((sizeof(int) * 2) - size) * 4);
+
+		int result = temp;
+		bool negative = (temp < 0);
+
+		result >>= (((sizeof(int) * 2) - size) * 4);
+		if (negative) result |= (0xffff << size);
+
+		return result;
+	}
+}
 
 
 namespace
@@ -39,176 +94,394 @@ namespace
 	class Application : public PLEN2::PurserCombinator
 	{
 	private:
-		static bool (Application::*CONTROLLER_EVENT_HANDLER[])();
-		static bool (Application::*INTERPRETER_EVENT_HANDLER[])();
-		static bool (Application::*SETTER_EVENT_HANDLER[])();
-		static bool (Application::*GETTER_EVENT_HANDLER[])();
+		static void (Application::*CONTROLLER_EVENT_HANDLER[])();
+		static void (Application::*INTERPRETER_EVENT_HANDLER[])();
+		static void (Application::*SETTER_EVENT_HANDLER[])();
+		static void (Application::*GETTER_EVENT_HANDLER[])();
 
-		static bool (Application::**EVENT_HANDLER[])();
+		static void (Application::**EVENT_HANDLER[])();
 
 		PLEN2::MotionController::Header m_header_tmp;
 		PLEN2::MotionController::Frame  m_frame_tmp;
+		PLEN2::Interpreter::Code        m_code_tmp;
 
-		bool angleDiff()
+		void angleDiff()
 		{
 			#if _DEBUG
 				system.outputSerial().println(F("# in event handler : Application::angleDiff()"));
+
+				system.outputSerial().print(F("> joint_id : "));
+				system.outputSerial().println(Utility::hexbytes2uint(m_buffer.data, 2));
+
+				system.outputSerial().print(F("> angle_diff : "));
+				system.outputSerial().println(Utility::hexbytes2int(m_buffer.data + 2, 3));
+			#endif
+
+			#if !_DEBUG
+				joint_ctrl.setAngleDiff(
+					Utility::hexbytes2uint(m_buffer.data, 2),
+					Utility::hexbytes2int(m_buffer.data + 2, 3)
+				);
 			#endif
 		}
 
-		bool angle()
+		void angle()
 		{
 			#if _DEBUG
 				system.outputSerial().println(F("# in event handler : Application::angle()"));
+
+				system.outputSerial().print(F("> joint_id : "));
+				system.outputSerial().println(Utility::hexbytes2uint(m_buffer.data, 2));
+
+				system.outputSerial().print(F("> angle : "));
+				system.outputSerial().println(Utility::hexbytes2int(m_buffer.data + 2, 3));
+			#endif
+
+			#if !_DEBUG
+				joint_ctrl.setAngle(
+					Utility::hexbytes2uint(m_buffer.data, 2),
+					Utility::hexbytes2int(m_buffer.data + 2, 3)
+				);
 			#endif
 		}
 
-		bool homePosition()
+		void homePosition()
 		{
 			#if _DEBUG
 				system.outputSerial().println(F("# in event handler : Application::homePosition()"));
 			#endif
 
-			joint_ctrl.loadSettings();
-		}
-
-		bool playMotion()
-		{
-			#if _DEBUG
-				system.outputSerial().println(F("# in event handler : Application::playMotion()"));
+			#if !_DEBUG
+				joint_ctrl.loadSettings();
 			#endif
 		}
 
-		bool stopMotion()
+		void playMotion()
+		{
+			#if _DEBUG
+				system.outputSerial().println(F("# in event handler : Application::playMotion()"));
+
+				system.outputSerial().print(F("> slot : "));
+				system.outputSerial().println(Utility::hexbytes2uint(m_buffer.data, 2));
+			#endif
+
+			#if !_DEBUG
+				motion_ctrl.play(
+					Utility::hexbytes2uint(m_buffer.data, 2)
+				);
+			#endif
+		}
+
+		void stopMotion()
 		{
 			#if _DEBUG
 				system.outputSerial().println(F("# in event handler : Application::stopMotion()"));
 			#endif
+
+			#if !_DEBUG
+				motion_ctrl.stopping();
+			#endif
 		}
 
-		bool popCode()
+		void popCode()
 		{
 			#if _DEBUG
 				system.outputSerial().println(F("# in event handler : Application::popCode()"));
 			#endif
 
-			interpreter.popCode();
-		}
-
-		bool pushCode()
-		{
-			#if _DEBUG
-				system.outputSerial().println(F("# in event handler : Application::pushCode()"));
+			#if !_DEBUG
+				interpreter.popCode();
 			#endif
 		}
 
-		bool resetInterpreter()
+		void pushCode()
+		{
+			#if _DEBUG
+				system.outputSerial().println(F("# in event handler : Application::pushCode()"));
+
+				system.outputSerial().print(F("> slot : "));
+				system.outputSerial().println(Utility::hexbytes2uint(m_buffer.data, 2));
+
+				system.outputSerial().print(F("> loop_count : "));
+				system.outputSerial().println(Utility::hexbytes2uint(m_buffer.data + 2, 2));
+			#endif
+
+			#if !_DEBUG
+				m_code_tmp.slot       = Utility::hexbytes2uint(m_buffer.data, 2);
+				m_code_tmp.loop_count = Utility::hexbytes2uint(m_buffer.data + 2, 2);
+
+				interpreter.pushCode(m_code_tmp);
+			#endif
+		}
+
+		void resetInterpreter()
 		{
 			#if _DEBUG
 				system.outputSerial().println(F("# in event handler : Application::resetInterpreter()"));
 			#endif
 
-			interpreter.reset();
-		}
-
-		bool setHomeAngle()
-		{
-			#if _DEBUG
-				system.outputSerial().println(F("# in event handler : Application::setHomeAngle()"));
+			#if !_DEBUG
+				interpreter.reset();
 			#endif
 		}
 
-		bool setJointSettings()
+		void setHomeAngle()
+		{
+			#if _DEBUG
+				system.outputSerial().println(F("# in event handler : Application::setHomeAngle()"));
+
+				system.outputSerial().print(F("> joint_id : "));
+				system.outputSerial().println(Utility::hexbytes2uint(m_buffer.data, 2));
+
+				system.outputSerial().print(F("> angle : "));
+				system.outputSerial().println(Utility::hexbytes2int(m_buffer.data + 2, 3));
+			#endif
+
+			#if !_DEBUG
+				joint_ctrl.setHomeAngle(
+					Utility::hexbytes2uint(m_buffer.data, 2),
+					Utility::hexbytes2int(m_buffer.data + 2, 3)
+				);
+			#endif
+		}
+
+		void setJointSettings()
 		{
 			#if _DEBUG
 				system.outputSerial().println(F("# in event handler : Application::setJointSettings()"));
 			#endif
 
-			joint_ctrl.resetSettings();
+			#if !_DEBUG
+				joint_ctrl.resetSettings();
+			#endif
 		}
 
-		bool setMaxAngle()
+		void setMaxAngle()
 		{
 			#if _DEBUG
 				system.outputSerial().println(F("# in event handler : Application::setMaxAngle()"));
+
+				system.outputSerial().print(F("> joint_id : "));
+				system.outputSerial().println(Utility::hexbytes2uint(m_buffer.data, 2));
+
+				system.outputSerial().print(F("> angle : "));
+				system.outputSerial().println(Utility::hexbytes2int(m_buffer.data + 2, 3));
+			#endif
+
+			#if !_DEBUG
+				joint_ctrl.setMaxAngle(
+					Utility::hexbytes2uint(m_buffer.data, 2),
+					Utility::hexbytes2int(m_buffer.data + 2, 3)
+				);
 			#endif
 		}
 
-		bool setMotionFrame()
+		void setMotionFrame()
 		{
 			#if _DEBUG
 				system.outputSerial().println(F("# in event handler : Application::setMotionFrame()"));
+
+				system.outputSerial().print(F("> slot : "));
+				system.outputSerial().println(Utility::hexbytes2uint(m_buffer.data, 2));
+
+				system.outputSerial().print(F("> frame_id : "));
+				system.outputSerial().println(Utility::hexbytes2uint(m_buffer.data + 2, 2));
+
+				system.outputSerial().print(F("> transition_time_ms : "));
+				system.outputSerial().println(Utility::hexbytes2uint(m_buffer.data + 4, 4));
+
+				for (int device_id = 0; device_id < joint_ctrl.SUM(); device_id++)
+				{
+					system.outputSerial().print(F("> output["));
+					system.outputSerial().print(device_id);
+					system.outputSerial().print(F("] : "));
+					system.outputSerial().println(Utility::hexbytes2int(m_buffer.data + 8 + device_id * 4, 4));
+				}
 			#endif
 
-			if (m_installing == true)
-			{
-				readByte('>');
-				accept();
-				transition();
+			#if !_DEBUG
+				m_frame_tmp.transition_time_ms = Utility::hexbytes2uint(m_buffer.data + 4, 4);
 
-				readByte('m');
-				readByte('f');
-				accept();
-				transition();
+				for (int device_id = 0; device_id < joint_ctrl.SUM(); device_id++)
+				{
+					m_frame_tmp.joint_angle[device_id] = Utility::hexbytes2int(m_buffer.data + 8 + device_id * 4, 4);
+				}
 
-				readByte('0');
-				readByte('0');
-				readByte('0');
-				readByte('0');
-			}
+				if (m_installing == true)
+				{
+					if (m_frame_tmp.index < m_header_tmp.frame_length)
+					{
+						motion_ctrl.setFrame(m_header_tmp.slot, &m_frame_tmp);
+						m_frame_tmp.index++;
+					}
+
+					if (m_frame_tmp.index == m_header_tmp.frame_length)
+					{
+						m_installing = false;
+					}
+					else
+					{
+						readByte('>');
+						accept();
+						transition();
+
+						readByte('m');
+						readByte('f');
+						accept();
+						transition();
+
+						readByte('0'); // dummy
+						readByte('0'); // dummy
+						readByte('0'); // dummy
+						readByte('0'); // dummy
+					}
+				}
+				else
+				{
+					m_frame_tmp.index = Utility::hexbytes2uint(m_buffer.data + 2, 2);
+					motion_ctrl.setFrame(Utility::hexbytes2uint(m_buffer.data, 2), &m_frame_tmp);
+				}
+			#endif
 		}
 
-		bool setMotionHeader()
+		void setMotionHeader()
 		{
+			strncpy(m_header_tmp.name, m_buffer.data + 2, 20);
+			m_header_tmp.name[20] = '\0';
+			m_buffer.data[2] = '\0';
+
+			if (   !(m_purser[ARGUMENTS_INCOMING]->purse(m_buffer.data))
+				|| !(m_purser[ARGUMENTS_INCOMING]->purse(m_buffer.data + 22)) )
+			{
+				return;
+			}
+
+
 			#if _DEBUG
 				system.outputSerial().println(F("# in event handler : Application::setMotionHeader()"));
+
+				system.outputSerial().print(F("> slot : "));
+				system.outputSerial().println(Utility::hexbytes2uint(m_buffer.data, 2));
+
+				system.outputSerial().print(F("> name : "));
+				system.outputSerial().println(m_header_tmp.name);
+
+				system.outputSerial().print(F("> func : "));
+				system.outputSerial().println(Utility::hexbytes2uint(m_buffer.data + 22, 2));
+
+				system.outputSerial().print(F("> arg0 : "));
+				system.outputSerial().println(Utility::hexbytes2uint(m_buffer.data + 24, 2));
+
+				system.outputSerial().print(F("> arg1 : "));
+				system.outputSerial().println(Utility::hexbytes2uint(m_buffer.data + 26, 2));
+
+				system.outputSerial().print(F("> frame_length : "));
+				system.outputSerial().println(Utility::hexbytes2uint(m_buffer.data + 28, 2));
 			#endif
 
-			if (m_installing == true)
-			{
-				readByte('>');
-				accept();
-				transition();
+			#if !_DEBUG
+				m_header_tmp.slot = Utility::hexbytes2uint(m_buffer.data, 2);
+				m_header_tmp.frame_length = Utility::hexbytes2uint(m_buffer.data + 28, 2);
 
-				readByte('m');
-				readByte('f');
-				accept();
-				transition();
-			}
+				switch (Utility::hexbytes2uint(m_buffer.data + 22, 2))
+				{
+					case 1:
+					{
+						m_header_tmp.use_loop   = 1;
+						m_header_tmp.loop_begin = Utility::hexbytes2uint(m_buffer.data + 24, 2);
+						m_header_tmp.loop_end   = Utility::hexbytes2uint(m_buffer.data + 26, 2);
+
+						break;
+					}
+
+					case 2:
+					{
+						m_header_tmp.use_jump  = 1;
+						m_header_tmp.jump_slot = Utility::hexbytes2uint(m_buffer.data + 24, 2);
+
+						break;
+					}
+				}
+
+				motion_ctrl.setHeader(&m_header_tmp);
+
+				if (m_installing == true)
+				{
+					readByte('>');
+					accept();
+					transition();
+
+					readByte('m');
+					readByte('f');
+					accept();
+					transition();
+
+					readByte('0'); // dummy
+					readByte('0'); // dummy
+					readByte('0'); // dummy
+					readByte('0'); // dummy
+
+					m_frame_tmp.index = 0;
+				}
+			#endif
 		}
 
-		bool setMinAngle()
+		void setMinAngle()
 		{
 			#if _DEBUG
 				system.outputSerial().println(F("# in event handler : Application::setMinAngle()"));
+
+				system.outputSerial().print(F("> joint_id : "));
+				system.outputSerial().println(Utility::hexbytes2uint(m_buffer.data, 2));
+
+				system.outputSerial().print(F("> angle : "));
+				system.outputSerial().println(Utility::hexbytes2int(m_buffer.data + 2, 3));
+			#endif
+
+			#if !_DEBUG
+				joint_ctrl.setMinAngle(
+					Utility::hexbytes2uint(m_buffer.data, 2),
+					Utility::hexbytes2int(m_buffer.data + 2, 3)
+				);
 			#endif
 		}
 
-		bool getJointSettings()
+		void getJointSettings()
 		{
 			#if _DEBUG
 				system.outputSerial().println(F("# in event handler : Application::getJointSettings()"));
 			#endif
 
-			joint_ctrl.dump();
+			#if !_DEBUG
+				joint_ctrl.dump();
+			#endif
 		}
 
-		bool getMotion()
+		void getMotion()
 		{
 			#if _DEBUG
 				system.outputSerial().println(F("# in event handler : Application::getMotion()"));
+
+				system.outputSerial().print(F("> slot : "));
+				system.outputSerial().println(Utility::hexbytes2uint(m_buffer.data, 2));
 			#endif
 
-			motion_ctrl.dump(0);
+			#if !_DEBUG
+				motion_ctrl.dump(
+					Utility::hexbytes2uint(m_buffer.data, 2)
+				);
+			#endif
 		}
 
-		bool getVersionInformation()
+		void getVersionInformation()
 		{
 			#if _DEBUG
 				system.outputSerial().println(F("# in event handler : Application::getVersionInformation()"));
 			#endif
 
-			system.dump();
+			#if !_DEBUG
+				system.dump();
+			#endif
 		}
 
 	public:
@@ -228,7 +501,7 @@ namespace
 		}
 	};
 
-	bool (Application::*Application::CONTROLLER_EVENT_HANDLER[])() = {
+	void (Application::*Application::CONTROLLER_EVENT_HANDLER[])() = {
 		&Application::angleDiff,
 		&Application::angle,
 		&Application::homePosition,
@@ -238,13 +511,13 @@ namespace
 		&Application::stopMotion
 	};
 
-	bool (Application::*Application::INTERPRETER_EVENT_HANDLER[])() = {
+	void (Application::*Application::INTERPRETER_EVENT_HANDLER[])() = {
 		&Application::popCode,
 		&Application::pushCode,
 		&Application::resetInterpreter
 	};
 
-	bool (Application::*Application::SETTER_EVENT_HANDLER[])() = {
+	void (Application::*Application::SETTER_EVENT_HANDLER[])() = {
 		&Application::setHomeAngle,
 		&Application::setMotionHeader, // sanity check.
 		&Application::setJointSettings,
@@ -254,20 +527,20 @@ namespace
 		&Application::setMinAngle
 	};
 
-	bool (Application::*Application::GETTER_EVENT_HANDLER[])() = {
+	void (Application::*Application::GETTER_EVENT_HANDLER[])() = {
 		&Application::getJointSettings,
 		&Application::getMotion,
 		&Application::getVersionInformation
 	};
 
-	bool (Application::**Application::EVENT_HANDLER[])() = {
+	void (Application::**Application::EVENT_HANDLER[])() = {
 		Application::CONTROLLER_EVENT_HANDLER,
 		Application::INTERPRETER_EVENT_HANDLER,
 		Application::SETTER_EVENT_HANDLER,
 		Application::GETTER_EVENT_HANDLER
 	};
 
-	Application combinator;
+	Application app_ctrl;
 }
 
 
@@ -326,22 +599,22 @@ void loop()
 
 	if (system.USBSerial().available())
 	{
-		combinator.readByte(system.USBSerial().read());
+		app_ctrl.readByte(system.USBSerial().read());
 
-		if (combinator.accept())
+		if (app_ctrl.accept())
 		{
-			combinator.transition();
+			app_ctrl.transition();
 
 		}
 	}
 
 	if (system.BLESerial().available())
 	{
-		combinator.readByte(system.BLESerial().read());
+		app_ctrl.readByte(system.BLESerial().read());
 
-		if (combinator.accept())
+		if (app_ctrl.accept())
 		{
-			combinator.transition();
+			app_ctrl.transition();
 		}
 	}
 }

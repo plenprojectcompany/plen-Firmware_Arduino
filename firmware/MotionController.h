@@ -62,6 +62,23 @@ public:
 		//! @brief フレーム数の最大値
 		inline static const int FRAMELENGTH_MAX() { return 20; }
 
+		Header()
+		{
+			slot                = 0;
+			name[0]             = '\0';
+			name[NAME_LENGTH()] = '\0';
+			frame_length        = 1;
+			use_extra           = 0;
+			use_jump            = 0;
+			use_loop            = 0;
+			loop_begin          = 0;
+			loop_end            = 0;
+			loop_count          = 255;
+			stop_flags[0]       = 255;
+			stop_flags[1]       = 255;
+			stop_flags[2]       = 255;
+		}
+
 		unsigned char slot;                                               //!< スロット番号
 		char          name[_PLEN2__MOTIONCONTROLLER__HEADER__NAMELENGTH]; //!< モーション名
 		unsigned char frame_length;                                       //!< フレーム長

@@ -214,7 +214,6 @@ void PLEN2::PurserCombinator::transition()
 		case COMMAND_INCOMING:
 		{
 			m_state = ARGUMENTS_INCOMING;
-			m_purser[ARGUMENTS_INCOMING] = &args_purser;
 
 			// コマンドラインに関する部分特殊化
 			if (m_purser[READY]->index() == 2 /* := Setter */)
@@ -251,6 +250,7 @@ void PLEN2::PurserCombinator::transition()
 		case ARGUMENTS_INCOMING:
 		{
 			m_state = READY;
+			m_purser[ARGUMENTS_INCOMING] = &args_purser;
 			m_store_length = 1;
 
 			break;

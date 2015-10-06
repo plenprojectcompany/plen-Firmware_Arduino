@@ -249,8 +249,8 @@ public:
 	/*!
 		@brief 指定した関節の角度を、指定した値 + その関節における初期角度に設定するメソッド
 
-		@param [in] joint_id 角度を設定したい関節を番号で指定します。
-		@param [in] angle    角度差分を分解能1/10°単位で指定します。
+		@param [in] joint_id   角度を設定したい関節を番号で指定します。
+		@param [in] angle_diff 角度差分を分解能1/10°単位で指定します。
 
 		@return 実行結果
 
@@ -259,7 +259,7 @@ public:
 		ユーザが指定した関節角度の最大・最小値、およびサーボモータ自体の可動範囲内に丸めた後、
 		その値を設定します。単体テストの際にはそれを考慮して、テストを記述する必要があります。
 	*/
-	bool setAngleDiff(unsigned char joint_id, int angle);
+	bool setAngleDiff(unsigned char joint_id, int angle_diff);
 
 	/*!
 		@brief 関節設定のダンプメソッド

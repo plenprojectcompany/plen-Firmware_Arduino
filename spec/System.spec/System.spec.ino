@@ -19,8 +19,7 @@ namespace
 /*!
 	@brief 入力シリアルインスタンスの同一性のテスト
 
-	異なるSystemインスタンス間で、取得される入力シリアルインスタンスが
-	同一なことを確認します。
+	異なるSystemインスタンス間で、取得される入力シリアルインスタンスが同一なことを確認します。
 */
 test(InputSerial_Identical)
 {
@@ -34,8 +33,7 @@ test(InputSerial_Identical)
 /*!
 	@brief 出力シリアルインスタンスの同一性のテスト
 
-	異なるSystemインスタンス間で、取得される出力シリアルインスタンスが
-	同一なことを確認します。
+	異なるSystemインスタンス間で、取得される出力シリアルインスタンスが同一なことを確認します。
 */
 test(OutputSerial_Identical)
 {
