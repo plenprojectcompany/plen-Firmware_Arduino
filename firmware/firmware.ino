@@ -385,6 +385,14 @@ namespace
 
 				switch (Utility::hexbytes2uint(m_buffer.data + 22, 2))
 				{
+					case 0:
+					{
+						m_header_tmp.use_loop = 0;
+						m_header_tmp.use_jump = 0;
+
+						break;
+					}
+
 					case 1:
 					{
 						m_header_tmp.use_loop   = 1;

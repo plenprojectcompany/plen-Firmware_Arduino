@@ -408,8 +408,8 @@ bool PLEN2::MotionController::nextFrameLoadable()
 		system.outputSerial().println(F("=== in fuction : MotionController::nextFrameLoadable()"));
 	#endif
 
-	if (   (m_header.use_loop != 0)
-		|| (m_header.use_jump != 0) )
+	if (   (m_header.use_loop == 1)
+		|| (m_header.use_jump == 1) )
 	{
 		return true;
 	}
@@ -469,11 +469,7 @@ void PLEN2::MotionController::stopping()
 		system.outputSerial().println(F("=== in fuction : MotionController::stopping()"));
 	#endif
 
-	if (m_header.loop_count == 255)
-	{
-		m_header.use_loop = 0;
-	}
-
+	m_header.use_loop = 0;
 	m_header.use_jump = 0;
 }
 
@@ -555,7 +551,10 @@ void PLEN2::MotionController::loadNextFrame()
 			getFrame(m_header.slot, m_frame_ptr_next);
 		}
 
-		goto update_process;
+		if (m_header.use_loop != 0)
+		{
+			goto update_process;
+		}
 	}
 
 	if (m_header.use_jump == 1)
