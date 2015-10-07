@@ -405,7 +405,7 @@ bool PLEN2::JointController::setAngleDiff(unsigned char joint_id, int angle_diff
 		return false;
 	}
 
-	unsigned int angle = constrain(
+	int angle = constrain(
 		angle_diff + m_SETTINGS[joint_id].HOME,
 		m_SETTINGS[joint_id].MIN, m_SETTINGS[joint_id].MAX
 	);

@@ -388,6 +388,7 @@ namespace
 					case 1:
 					{
 						m_header_tmp.use_loop   = 1;
+						m_header_tmp.use_jump   = 0;
 						m_header_tmp.loop_begin = Utility::hexbytes2uint(m_buffer.data + 24, 2);
 						m_header_tmp.loop_end   = Utility::hexbytes2uint(m_buffer.data + 26, 2);
 
@@ -396,6 +397,7 @@ namespace
 
 					case 2:
 					{
+						m_header_tmp.use_loop  = 0;
 						m_header_tmp.use_jump  = 1;
 						m_header_tmp.jump_slot = Utility::hexbytes2uint(m_buffer.data + 24, 2);
 

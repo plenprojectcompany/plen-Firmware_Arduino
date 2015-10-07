@@ -629,26 +629,34 @@ void PLEN2::MotionController::dump(unsigned char slot)
 
 			if (header.use_loop == 1)
 			{
-			system.outputSerial().println(F("\t\t\"func\": \"loop\","));
-			system.outputSerial().print(F("\t\t\"args\": ["));
+			system.outputSerial().println(F("\t\t{"));
 
-				system.outputSerial().print((int)header.loop_begin);
-				system.outputSerial().print(F(", "));
-				system.outputSerial().print((int)header.loop_end);
-				system.outputSerial().print(F(", "));
-				system.outputSerial().print((int)header.loop_count);
+				system.outputSerial().println(F("\t\t\t\"func\": \"loop\","));
+				system.outputSerial().print(F("\t\t\t\"args\": ["));
 
-			system.outputSerial().println(F("]"));
+					system.outputSerial().print((int)header.loop_begin);
+					system.outputSerial().print(F(", "));
+					system.outputSerial().print((int)header.loop_end);
+					system.outputSerial().print(F(", "));
+					system.outputSerial().print((int)header.loop_count);
+
+				system.outputSerial().println(F("]"));
+
+			system.outputSerial().println(F("\t\t}"));
 			}
 
 			if (header.use_jump == 1)
 			{
-			system.outputSerial().println(F("\t\t\"func\": \"jump\","));
-			system.outputSerial().print(F("\t\t\"args\": ["));
+			system.outputSerial().println(F("\t\t{"));
 
-				system.outputSerial().print((int)header.jump_slot);
+				system.outputSerial().println(F("\t\t\t\"func\": \"jump\","));
+				system.outputSerial().print(F("\t\t\t\"args\": ["));
 
-			system.outputSerial().println(F("]"));
+					system.outputSerial().print((int)header.jump_slot);
+
+				system.outputSerial().println(F("]"));
+
+			system.outputSerial().println(F("\t\t}"));
 			}
 
 		system.outputSerial().println(F("\t],"));
