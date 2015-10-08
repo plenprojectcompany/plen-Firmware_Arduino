@@ -595,13 +595,11 @@ void loop()
 			}
 			else
 			{
+				motion_ctrl.stop();
+
 				if (interpreter.ready())
 				{
 					interpreter.popCode();
-				}
-				else
-				{
-					motion_ctrl.stop();
 				}
 			}
 		}

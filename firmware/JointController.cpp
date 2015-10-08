@@ -41,12 +41,12 @@ unsigned int PLEN2::JointController::m_pwms[_PLEN2__JOINTCONTROLLER__SUM];
 
 PLEN2::JointController::JointController()
 {
-	pinMode(PLEN2::Pin::MULTIPLEXER_SELECT0(), OUTPUT);
-	pinMode(PLEN2::Pin::MULTIPLEXER_SELECT1(), OUTPUT);
-	pinMode(PLEN2::Pin::MULTIPLEXER_SELECT2(), OUTPUT);
-	pinMode(PLEN2::Pin::PWM_OUT_00_07(),       OUTPUT);
-	pinMode(PLEN2::Pin::PWM_OUT_08_15(),       OUTPUT);
-	pinMode(PLEN2::Pin::PWM_OUT_16_23(),       OUTPUT);
+	pinMode(Pin::MULTIPLEXER_SELECT0(), OUTPUT);
+	pinMode(Pin::MULTIPLEXER_SELECT1(), OUTPUT);
+	pinMode(Pin::MULTIPLEXER_SELECT2(), OUTPUT);
+	pinMode(Pin::PWM_OUT_00_07(),       OUTPUT);
+	pinMode(Pin::PWM_OUT_08_15(),       OUTPUT);
+	pinMode(Pin::PWM_OUT_16_23(),       OUTPUT);
 
 	m_SETTINGS_INITIAL[0]  = JointSetting(ANGLE_MIN(), ANGLE_MAX(), 0   ); // [01] 左：肩ピッチ
 	m_SETTINGS_INITIAL[1]  = JointSetting(ANGLE_MIN(), ANGLE_MAX(), 150 ); // [02] 左：腿ヨー
@@ -450,7 +450,7 @@ void PLEN2::JointController::dump()
 		}
 		else
 		{
-			system.outputSerial().write('\n');
+			system.outputSerial().println("");
 		}
 	}
 	system.outputSerial().println(F("\t]"));
