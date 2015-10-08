@@ -34,7 +34,7 @@ private:
 	inline static const int FLAG_ADDRESS()           { return 0; }
 	
 	//! @brief 初期化フラグの値
-	inline static const int FLAG_VALUE()             { return 1; }
+	inline static const int FLAG_VALUE()             { return 2; }
 	
 	//! @brief 関節設定の保持アドレス
 	inline static const int SETTINGS_BEGIN_ADDRESS() { return 1; }
