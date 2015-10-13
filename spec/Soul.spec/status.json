@@ -1,0 +1,10 @@
+{
+	"build": {
+		"status": false,
+		"last": ""
+	},
+	"test": {
+		"status": false,
+		"last": ""
+	}
+}

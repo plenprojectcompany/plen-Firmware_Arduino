@@ -19,8 +19,10 @@
 #include "Interpreter.h"
 #include "JointController.h"
 #include "MotionController.h"
+#include "Pin.h"
 #include "Purser.h"
 #include "PurserCombinator.h"
+#include "Soul.h"
 #include "System.h"
 
 // マクロ
@@ -93,6 +95,7 @@ namespace
 	PLEN2::MotionController       motion_ctrl(joint_ctrl);
 	PLEN2::Interpreter            interpreter(motion_ctrl);
 	PLEN2::System                 system;
+	PLEN2::Soul                   soul(sensor, motion_ctrl);
 
 
 	// アプリケーションインスタンス
@@ -513,6 +516,8 @@ namespace
 
 				(this->*EVENT_HANDLER[header_id][cmd_id])();
 			}
+
+			soul.userActionInputed();
 		}
 	};
 
@@ -570,6 +575,8 @@ namespace
 */
 void setup()
 {
+	randomSeed(analogRead(PLEN2::Pin::RANDOM_DEVCIE_IN()));
+
 	joint_ctrl.loadSettings();
 }
 
@@ -630,4 +637,7 @@ void loop()
 			app_ctrl.transition();
 		}
 	}
+
+	soul.logging();
+	soul.action();
 }

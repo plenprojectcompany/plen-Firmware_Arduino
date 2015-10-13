@@ -7,7 +7,7 @@
 	(See also : http://opensource.org/licenses/mit-license.php)
 */
 
-#define _DEBUG true
+#define _DEBUG false
 
 // Arduinoライブラリ
 #include "Arduino.h"
@@ -41,8 +41,8 @@ PLEN2::Soul::Soul(AccelerationGyroSensor& sensor, MotionController& motion_ctrl)
 	m_sensor_ptr      = &sensor;
 	m_motion_ctrl_ptr = &motion_ctrl;
 
-	m_before_user_action_msec = millis();
-	m_next_sampling_msec      = millis() + SAMPLING_INTERVAL_MSEC();
+	m_before_user_action_msec = 0;
+	m_next_sampling_msec      = SAMPLING_INTERVAL_MSEC();
 
 	m_action_interval = BASE_INTERVAL_MSEC() + random(RANDOM_INTERVAL_MSEC());
 
@@ -100,7 +100,8 @@ void PLEN2::Soul::logging()
 		acc_backup[Z_AXIS] /= (GETUP_WAIT_MSEC() / SAMPLING_INTERVAL_MSEC());
 
 		if (   (abs(acc_backup[Y_AXIS]) > abs(acc_backup[X_AXIS]))
-			&& (abs(acc_backup[Y_AXIS]) > abs(acc_backup[Z_AXIS])) )
+			&& (abs(acc_backup[Y_AXIS]) > abs(acc_backup[Z_AXIS]))
+			&& (abs(acc_backup[Y_AXIS]) > GRAVITY_AXIS_THRESHOLD()) )
 		{
 			m_lying = true;
 		}

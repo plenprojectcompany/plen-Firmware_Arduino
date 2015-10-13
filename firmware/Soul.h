@@ -41,13 +41,13 @@ private:
 	inline static const int RANDOM_INTERVAL_MSEC()   { return 10000; }
 
 	//! 自動で起き上がるまでの待機時間
-	inline static const int GETUP_WAIT_MSEC()        { return 3000;  }
+	inline static const int GETUP_WAIT_MSEC()        { return 6000;  }
 
 	//! サンプリング間隔
-	inline static const int SAMPLING_INTERVAL_MSEC() { return 100;   }
+	inline static const int SAMPLING_INTERVAL_MSEC() { return 500;   }
 
 	//! 重力軸と判定するための閾値
-	inline static const int GRAVITY_AXIS_THRESHOLD() { return 10000; }
+	inline static const int GRAVITY_AXIS_THRESHOLD() { return 13000; }
 
 	unsigned long m_before_user_action_msec;
 	unsigned long m_next_sampling_msec;
