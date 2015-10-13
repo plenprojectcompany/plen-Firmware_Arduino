@@ -9,7 +9,7 @@ namespace
 
 void setup()
 {
-	// noop.
+	while (!Serial);
 }
 
 void loop()

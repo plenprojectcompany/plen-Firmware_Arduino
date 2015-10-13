@@ -21,34 +21,40 @@ namespace PLEN2
 */
 class PLEN2::Soul
 {
-// macro:
-	#define _PLEN2__SOUL__MOTION_BUFFER_LENGTH 5
-
 private:
-	//! ランダムに切り替える挙動の数
-	inline static const int MOTION_SUM()
-	{
-		return _PLEN2__SOUL__MOTION_BUFFER_LENGTH;
-	}
-
 	//! 仰向けからの起き上がりモーションの配置スロット
-	inline static const int SLOT_GETUP_FACE_UP()   { return 88; }
+	inline static const int SLOT_GETUP_FACE_UP()     { return 88;    }
 
 	//! うつ伏せからの起き上がりモーションの配置スロット
-	inline static const int SLOT_GETUP_FACE_DOWN() { return 89; }
+	inline static const int SLOT_GETUP_FACE_DOWN()   { return 89;    }
 
 	//! ランダムに切り替えるモーションの開始スロット
-	inline static const int MOTIONS_SLOT_BEGIN()   { return 83; }
+	inline static const int MOTIONS_SLOT_BEGIN()     { return 83;    }
+
+	//! ランダムに切り替えるモーションの終了スロット
+	inline static const int MOTIONS_SLOT_END()       { return 88;    }
 
 	//! 挙動をランダムに切り替える基本間隔
-	inline static const int BASE_INTERVAL_SEC()    { return 20; }
+	inline static const int BASE_INTERVAL_MSEC()     { return 15000; }
+
+	//! 挙動をランダムに切り替える基本感覚への外乱
+	inline static const int RANDOM_INTERVAL_MSEC()   { return 10000; }
 
 	//! 自動で起き上がるまでの待機時間
-	inline static const int GETUP_WAIT_SEC()       { return 5;  }
+	inline static const int GETUP_WAIT_MSEC()        { return 3000;  }
 
-	unsigned char m_motions[_PLEN2__SOUL__MOTION_BUFFER_LENGTH];
-	unsigned long m_before_call_sec;
-	unsigned long m_next_call_sec;
+	//! サンプリング間隔
+	inline static const int SAMPLING_INTERVAL_MSEC() { return 100;   }
+
+	//! 重力軸と判定するための閾値
+	inline static const int GRAVITY_AXIS_THRESHOLD() { return 10000; }
+
+	unsigned long m_before_user_action_msec;
+	unsigned long m_next_sampling_msec;
+
+	unsigned long m_action_interval;
+
+	bool m_lying;
 
 	AccelerationGyroSensor* m_sensor_ptr;
 	MotionController*       m_motion_ctrl_ptr;

@@ -41,13 +41,12 @@ PLEN2::Soul::Soul(AccelerationGyroSensor& sensor, MotionController& motion_ctrl)
 	m_sensor_ptr      = &sensor;
 	m_motion_ctrl_ptr = &motion_ctrl;
 
-	for (int index = 0; index < MOTION_SUM(); index++)
-	{
-		m_motions[index] = MOTIONS_SLOT_BEGIN() + index;
-	}
+	m_before_user_action_msec = millis();
+	m_next_sampling_msec      = millis() + SAMPLING_INTERVAL_MSEC();
 
-	m_before_call_sec = millis() / 1000;
-	m_next_call_sec   = m_before_call_sec + BASE_INTERVAL_SEC();
+	m_action_interval = BASE_INTERVAL_MSEC() + random(RANDOM_INTERVAL_MSEC());
+
+	m_lying = false;
 }
 
 
@@ -56,6 +55,22 @@ void PLEN2::Soul::logging()
 	#if _DEBUG
 		system.outputSerial().println(F("=== in fuction : Soul::logging()"));
 	#endif
+
+	static unsigned char call_count = 0;
+
+	/*!
+		@note
+
+	*/
+	if (m_lying == true)
+	{
+		return;
+	}
+
+	if (millis() < m_next_sampling_msec)
+	{
+		return;
+	}
 
 	/*!
 		@note
@@ -70,9 +85,17 @@ void PLEN2::Soul::logging()
 
 	m_sensor_ptr->sampling();
 
-	acc_backup[X_AXIS] = (char)m_sensor_ptr->getAccX();
-	acc_backup[Y_AXIS] = (char)m_sensor_ptr->getAccY();
-	acc_backup[Z_AXIS] = (char)m_sensor_ptr->getAccZ();
+	acc_backup[X_AXIS] += m_sensor_ptr->getAccX();
+	acc_backup[Y_AXIS] += m_sensor_ptr->getAccY();
+	acc_backup[Z_AXIS] += m_sensor_ptr->getAccZ();
+
+	m_next_sampling_msec += SAMPLING_INTERVAL_MSEC();
+	call_count++;
+
+	if (call_count >= (GETUP_WAIT_MSEC() / SAMPLING_INTERVAL_MSEC()))
+	{
+		m_lying = true;
+	}
 }
 
 
@@ -82,8 +105,7 @@ void PLEN2::Soul::userActionInputed()
 		system.outputSerial().println(F("=== in fuction : Soul::userActionInputed()"));
 	#endif
 
-	m_before_call_sec = millis() / 1000;
-	m_next_call_sec   = m_before_call_sec + BASE_INTERVAL_SEC() + analogRead(0);
+	m_before_user_action_msec = millis();
 }
 
 
@@ -93,5 +115,11 @@ void PLEN2::Soul::action()
 		system.outputSerial().println(F("=== in fuction : Soul::action()"));
 	#endif
 
-	m_motion_ctrl_ptr->play(m_motions[random(MOTION_SUM())]);
+	if (millis() - m_before_user_action_msec > m_action_interval)
+	{
+		m_motion_ctrl_ptr->play(random(MOTIONS_SLOT_BEGIN(), MOTIONS_SLOT_END()));
+
+		userActionInputed();
+		m_action_interval = BASE_INTERVAL_MSEC() + random(RANDOM_INTERVAL_MSEC());
+	}
 }
