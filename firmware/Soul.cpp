@@ -7,7 +7,7 @@
 	(See also : http://opensource.org/licenses/mit-license.php)
 */
 
-#define _DEBUG false
+#define _DEBUG true
 
 // Arduinoライブラリ
 #include "Arduino.h"
@@ -60,11 +60,12 @@ void PLEN2::Soul::logging()
 
 	/*!
 		@note
-
+		通常、PLENが横たわっていると判定された後、即座に復帰処理が行われるため、
+		以下のif文内部が実行されることはない。
 	*/
 	if (m_lying == true)
 	{
-		return;
+		return; // sanity check.
 	}
 
 	if (millis() < m_next_sampling_msec)
@@ -92,9 +93,25 @@ void PLEN2::Soul::logging()
 	m_next_sampling_msec += SAMPLING_INTERVAL_MSEC();
 	call_count++;
 
-	if (call_count >= (GETUP_WAIT_MSEC() / SAMPLING_INTERVAL_MSEC()))
+	if (call_count == (GETUP_WAIT_MSEC() / SAMPLING_INTERVAL_MSEC()))
 	{
-		m_lying = true;
+		acc_backup[X_AXIS] /= (GETUP_WAIT_MSEC() / SAMPLING_INTERVAL_MSEC());
+		acc_backup[Y_AXIS] /= (GETUP_WAIT_MSEC() / SAMPLING_INTERVAL_MSEC());
+		acc_backup[Z_AXIS] /= (GETUP_WAIT_MSEC() / SAMPLING_INTERVAL_MSEC());
+
+		if (   (abs(acc_backup[Y_AXIS]) > abs(acc_backup[X_AXIS]))
+			&& (abs(acc_backup[Y_AXIS]) > abs(acc_backup[Z_AXIS])) )
+		{
+			m_lying = true;
+		}
+		else
+		{
+			acc_backup[X_AXIS] = 0;
+			acc_backup[Y_AXIS] = 0;
+			acc_backup[Z_AXIS] = 0;
+		}
+
+		call_count = 0;
 	}
 }
 
@@ -115,11 +132,33 @@ void PLEN2::Soul::action()
 		system.outputSerial().println(F("=== in fuction : Soul::action()"));
 	#endif
 
+	if (m_lying == true)
+	{
+		m_motion_ctrl_ptr->stop();
+
+		if (acc_backup[Y_AXIS] < 0)
+		{
+			m_motion_ctrl_ptr->play(SLOT_GETUP_FACE_DOWN());
+		}
+		else
+		{
+			m_motion_ctrl_ptr->play(SLOT_GETUP_FACE_UP());
+		}
+
+		m_lying = false;
+
+		acc_backup[X_AXIS] = 0;
+		acc_backup[Y_AXIS] = 0;
+		acc_backup[Z_AXIS] = 0;
+
+		return;
+	}
+
 	if (millis() - m_before_user_action_msec > m_action_interval)
 	{
 		m_motion_ctrl_ptr->play(random(MOTIONS_SLOT_BEGIN(), MOTIONS_SLOT_END()));
 
-		userActionInputed();
+		m_before_user_action_msec = millis();
 		m_action_interval = BASE_INTERVAL_MSEC() + random(RANDOM_INTERVAL_MSEC());
 	}
 }
