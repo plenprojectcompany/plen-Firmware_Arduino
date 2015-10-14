@@ -166,7 +166,7 @@ void PLEN2::JointController::resetSettings()
 }
 
 
-const int& PLEN2::JointController::getMinAngle(unsigned char joint_id)
+int PLEN2::JointController::getMinAngle(unsigned char joint_id)
 {
 	#if _DEBUG
 		system.outputSerial().println(F("=== in fuction : JointController::getMinAngle()"));
@@ -186,7 +186,7 @@ const int& PLEN2::JointController::getMinAngle(unsigned char joint_id)
 }
 
 
-const int& PLEN2::JointController::getMaxAngle(unsigned char joint_id)
+int PLEN2::JointController::getMaxAngle(unsigned char joint_id)
 {
 	#if _DEBUG
 		system.outputSerial().println(F("=== in fuction : JointController::getMaxAngle()"));
@@ -206,7 +206,7 @@ const int& PLEN2::JointController::getMaxAngle(unsigned char joint_id)
 }
 
 
-const int& PLEN2::JointController::getHomeAngle(unsigned char joint_id)
+int PLEN2::JointController::getHomeAngle(unsigned char joint_id)
 {
 	#if _DEBUG
 		system.outputSerial().println(F("=== in fuction : JointController::getHomeAngle()"));
