@@ -8,7 +8,7 @@
 */
 
 #define _DEBUG false
-#define _ENSOUL_PLEN2 false
+#define _ENSOUL_PLEN2 true
 
 // 標準ライブラリ
 #include <string.h>
@@ -521,11 +521,11 @@ namespace
 				unsigned char cmd_id    = m_purser[COMMAND_INCOMING]->index();
 
 				(this->*EVENT_HANDLER[header_id][cmd_id])();
-			}
 
-			#if _ENSOUL_PLEN2
-				soul.userActionInputed();
-			#endif
+				#if _ENSOUL_PLEN2
+					soul.userActionInputed();
+				#endif
+			}
 		}
 	};
 
@@ -586,6 +586,15 @@ void setup()
 	randomSeed(analogRead(PLEN2::Pin::RANDOM_DEVCIE_IN()));
 
 	joint_ctrl.loadSettings();
+
+	#if _ENSOUL_PLEN2
+		/*!
+			@attention
+			バスを介してセンサ値を取得する場合、通信対象のファームウェアが
+			完全に立ち上がるのを待つ必要があります。
+		*/
+		delay(3000);
+	#endif
 }
 
 

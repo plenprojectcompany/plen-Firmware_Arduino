@@ -61,14 +61,10 @@ void PLEN2::Soul::logging()
 	/*!
 		@note
 		通常、PLENが横たわっていると判定された後、即座に復帰処理が行われるため、
-		以下のif文内部が実行されることはない。
+		(*)の条件により以下のif文内部が実行されることはない。
 	*/
-	if (m_lying == true)
-	{
-		return; // sanity check.
-	}
-
-	if (   (millis() < m_next_sampling_msec)
+	if (   (m_lying == true) // (*) sanity check.
+		|| (millis() < m_next_sampling_msec)
 		|| m_motion_ctrl_ptr->playing() )
 	{
 		return;
@@ -136,8 +132,6 @@ void PLEN2::Soul::action()
 
 	if (m_lying == true)
 	{
-		m_motion_ctrl_ptr->stop();
-
 		if (acc_backup[Y_AXIS] < 0)
 		{
 			m_motion_ctrl_ptr->play(SLOT_GETUP_FACE_DOWN());

@@ -31,6 +31,8 @@ void setup()
 	randomSeed(analogRead(PLEN2::Pin::RANDOM_DEVCIE_IN()));
 
 	joint_ctrl.loadSettings();
+
+	delay(3000);
 }
 
 void loop()
