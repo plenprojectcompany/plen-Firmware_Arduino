@@ -8,7 +8,14 @@
 */
 
 #define _DEBUG false
-#define _ENSOUL_PLEN2 true
+
+/*!
+	@note
+	このマクロの値をtrueにすることで、PLENに自然な動きを適用します。
+	ただし、シリアル通信の帯域を圧迫するため、ユーザからの操作を受け付けづらくなります。
+*/
+#define _ENSOUL_PLEN2 false
+
 
 // 標準ライブラリ
 #include <string.h>
@@ -76,14 +83,13 @@ namespace Utility
 
 		/*!
 			@note
-			avr-gccは算術シフトをサポートしているため(*)の行は必要ないが、
-			互換性のため以下の構成としている。
+			avr-gccは算術シフトをサポートしているため、(*)の行は必要ない。
 		*/
 		int result = temp;
-		bool negative = (result < 0); // (*)
+		// bool negative = (result < 0); // (*)
 
 		result >>= (((sizeof(int) * 2) - size) * 4);
-		if (negative) result |= (0xffff << (size * 4)); // (*)
+		// if (negative) result |= (0xffff << (size * 4)); // (*)
 
 		return result;
 	}

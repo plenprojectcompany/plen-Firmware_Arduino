@@ -196,7 +196,7 @@ public:
 		@return 関節角度最小値
 		@retval -32768 **joint_id**が不正
 	*/
-	int getMinAngle(unsigned char joint_id);
+	const int& getMinAngle(unsigned char joint_id);
 	
 	/*!
 		@brief 指定した関節の角度最大値を取得するメソッド
@@ -206,7 +206,7 @@ public:
 		@return 関節角度最大値
 		@retval -32768 **joint_id**が不正
 	*/
-	int getMaxAngle(unsigned char joint_id);
+	const int& getMaxAngle(unsigned char joint_id);
 	
 	/*!
 		@brief 指定した関節の角度初期値を取得するメソッド
@@ -216,7 +216,7 @@ public:
 		@return 関節角度初期値
 		@retval -32768 **joint_id**が不正
 	*/
-	int getHomeAngle(unsigned char joint_id);
+	const int& getHomeAngle(unsigned char joint_id);
 
 	/*!
 		@brief 指定した関節の角度最小値を、指定した値に設定するメソッド

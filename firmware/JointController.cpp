@@ -21,7 +21,11 @@
 #define _DEBUG      false
 #define _DEBUG_HARD false
 
-#define _CLOCK_WISE false
+/*!
+	@note
+	PLEN1.4に本ファームウェアを適用する場合、falseにする。
+*/
+#define _CLOCK_WISE true
 
 #define _PLEN2__JOINTCONTROLLER__PWM_OUT_00_07_REGISTER OCR1C
 #define _PLEN2__JOINTCONTROLLER__PWM_OUT_08_15_REGISTER OCR1B
@@ -162,7 +166,7 @@ void PLEN2::JointController::resetSettings()
 }
 
 
-int PLEN2::JointController::getMinAngle(unsigned char joint_id)
+const int& PLEN2::JointController::getMinAngle(unsigned char joint_id)
 {
 	#if _DEBUG
 		system.outputSerial().println(F("=== in fuction : JointController::getMinAngle()"));
@@ -182,7 +186,7 @@ int PLEN2::JointController::getMinAngle(unsigned char joint_id)
 }
 
 
-int PLEN2::JointController::getMaxAngle(unsigned char joint_id)
+const int& PLEN2::JointController::getMaxAngle(unsigned char joint_id)
 {
 	#if _DEBUG
 		system.outputSerial().println(F("=== in fuction : JointController::getMaxAngle()"));
@@ -202,7 +206,7 @@ int PLEN2::JointController::getMaxAngle(unsigned char joint_id)
 }
 
 
-int PLEN2::JointController::getHomeAngle(unsigned char joint_id)
+const int& PLEN2::JointController::getHomeAngle(unsigned char joint_id)
 {
 	#if _DEBUG
 		system.outputSerial().println(F("=== in fuction : JointController::getHomeAngle()"));
