@@ -7,6 +7,9 @@
 	(See also : http://opensource.org/licenses/mit-license.php)
 */
 
+#define _DEBUG false
+#define _ENSOUL_PLEN2 false
+
 // 標準ライブラリ
 #include <string.h>
 
@@ -15,18 +18,18 @@
 #include <Wire.h>
 
 // 独自ライブラリ
-#include "AccelerationGyroSensor.h"
 #include "Interpreter.h"
 #include "JointController.h"
 #include "MotionController.h"
 #include "Pin.h"
 #include "Purser.h"
 #include "PurserCombinator.h"
-#include "Soul.h"
 #include "System.h"
 
-// マクロ
-#define _DEBUG false
+#if _ENSOUL_PLEN2
+	#include "AccelerationGyroSensor.h"
+	#include "Soul.h"
+#endif
 
 
 namespace Utility
@@ -90,12 +93,15 @@ namespace Utility
 namespace
 {
 	// コアインスタンス
-	PLEN2::AccelerationGyroSensor sensor;
-	PLEN2::JointController        joint_ctrl;
-	PLEN2::MotionController       motion_ctrl(joint_ctrl);
-	PLEN2::Interpreter            interpreter(motion_ctrl);
-	PLEN2::System                 system;
-	PLEN2::Soul                   soul(sensor, motion_ctrl);
+	PLEN2::JointController  joint_ctrl;
+	PLEN2::MotionController motion_ctrl(joint_ctrl);
+	PLEN2::Interpreter      interpreter(motion_ctrl);
+	PLEN2::System           system;
+
+	#if _ENSOUL_PLEN2
+		PLEN2::AccelerationGyroSensor sensor;
+		PLEN2::Soul soul(sensor, motion_ctrl);
+	#endif
 
 
 	// アプリケーションインスタンス
@@ -113,10 +119,10 @@ namespace
 		PLEN2::MotionController::Frame  m_frame_tmp;
 		PLEN2::Interpreter::Code        m_code_tmp;
 
-		void angleDiff()
+		void applyDiff()
 		{
 			#if _DEBUG
-				system.outputSerial().println(F("# in event handler : Application::angleDiff()"));
+				system.outputSerial().println(F("# in event handler : Application::applyDiff()"));
 
 				system.outputSerial().print(F("> joint_id : "));
 				system.outputSerial().println(Utility::hexbytes2uint(m_buffer.data, 2));
@@ -133,10 +139,10 @@ namespace
 			#endif
 		}
 
-		void angle()
+		void apply()
 		{
 			#if _DEBUG
-				system.outputSerial().println(F("# in event handler : Application::angle()"));
+				system.outputSerial().println(F("# in event handler : Application::apply()"));
 
 				system.outputSerial().print(F("> joint_id : "));
 				system.outputSerial().println(Utility::hexbytes2uint(m_buffer.data, 2));
@@ -233,10 +239,10 @@ namespace
 			#endif
 		}
 
-		void setHomeAngle()
+		void setHome()
 		{
 			#if _DEBUG
-				system.outputSerial().println(F("# in event handler : Application::setHomeAngle()"));
+				system.outputSerial().println(F("# in event handler : Application::setHome()"));
 
 				system.outputSerial().print(F("> joint_id : "));
 				system.outputSerial().println(Utility::hexbytes2uint(m_buffer.data, 2));
@@ -264,10 +270,10 @@ namespace
 			#endif
 		}
 
-		void setMaxAngle()
+		void setMax()
 		{
 			#if _DEBUG
-				system.outputSerial().println(F("# in event handler : Application::setMaxAngle()"));
+				system.outputSerial().println(F("# in event handler : Application::setMax()"));
 
 				system.outputSerial().print(F("> joint_id : "));
 				system.outputSerial().println(Utility::hexbytes2uint(m_buffer.data, 2));
@@ -444,10 +450,10 @@ namespace
 			#endif
 		}
 
-		void setMinAngle()
+		void setMin()
 		{
 			#if _DEBUG
-				system.outputSerial().println(F("# in event handler : Application::setMinAngle()"));
+				system.outputSerial().println(F("# in event handler : Application::setMin()"));
 
 				system.outputSerial().print(F("> joint_id : "));
 				system.outputSerial().println(Utility::hexbytes2uint(m_buffer.data, 2));
@@ -517,13 +523,15 @@ namespace
 				(this->*EVENT_HANDLER[header_id][cmd_id])();
 			}
 
-			soul.userActionInputed();
+			#if _ENSOUL_PLEN2
+				soul.userActionInputed();
+			#endif
 		}
 	};
 
 	void (Application::*Application::CONTROLLER_EVENT_HANDLER[])() = {
-		&Application::angleDiff,
-		&Application::angle,
+		&Application::applyDiff,
+		&Application::apply,
 		&Application::homePosition,
 		&Application::playMotion,
 		&Application::stopMotion,
@@ -538,13 +546,13 @@ namespace
 	};
 
 	void (Application::*Application::SETTER_EVENT_HANDLER[])() = {
-		&Application::setHomeAngle,
+		&Application::setHome,
 		&Application::setMotionHeader, // sanity check.
 		&Application::setJointSettings,
-		&Application::setMaxAngle,
+		&Application::setMax,
 		&Application::setMotionFrame,
 		&Application::setMotionHeader,
-		&Application::setMinAngle
+		&Application::setMin
 	};
 
 	void (Application::*Application::GETTER_EVENT_HANDLER[])() = {
@@ -638,6 +646,8 @@ void loop()
 		}
 	}
 
-	soul.logging();
-	soul.action();
+	#if _ENSOUL_PLEN2
+		soul.logging();
+		soul.action();
+	#endif
 }

@@ -68,7 +68,8 @@ void PLEN2::Soul::logging()
 		return; // sanity check.
 	}
 
-	if (millis() < m_next_sampling_msec)
+	if (   (millis() < m_next_sampling_msec)
+		|| m_motion_ctrl_ptr->playing() )
 	{
 		return;
 	}

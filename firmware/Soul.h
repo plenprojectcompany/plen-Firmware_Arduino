@@ -37,14 +37,14 @@ private:
 	//! 挙動をランダムに切り替える基本間隔
 	inline static const int BASE_INTERVAL_MSEC()     { return 15000; }
 
-	//! 挙動をランダムに切り替える基本感覚への外乱
+	//! 挙動をランダムに切り替える基本間隔への外乱
 	inline static const int RANDOM_INTERVAL_MSEC()   { return 10000; }
 
 	//! 自動で起き上がるまでの待機時間
-	inline static const int GETUP_WAIT_MSEC()        { return 6000;  }
+	inline static const int GETUP_WAIT_MSEC()        { return 2000;  }
 
 	//! サンプリング間隔
-	inline static const int SAMPLING_INTERVAL_MSEC() { return 500;   }
+	inline static const int SAMPLING_INTERVAL_MSEC() { return 100;   }
 
 	//! 重力軸と判定するための閾値
 	inline static const int GRAVITY_AXIS_THRESHOLD() { return 13000; }
@@ -76,7 +76,7 @@ public:
 	/*!
 		@brief ユーザ操作を観測するメソッド
 
-		このメソッドをユーザ操作を観測した地点の全てで実行してください。
+		このメソッドを、ユーザ操作を観測した全ての地点で実行してください。
 	*/
 	void userActionInputed();
 
