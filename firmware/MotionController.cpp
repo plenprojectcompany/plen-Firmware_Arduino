@@ -87,7 +87,7 @@ PLEN2::MotionController::MotionController(JointController& joint_ctrl)
 bool PLEN2::MotionController::setHeader(const Header* header_ptr)
 {
 	#if _DEBUG
-		system.outputSerial().println(F("=== in fuction : MotionController::setHeader()"));
+		system.outputSerial().println(F("=== running in function : MotionController::setHeader()"));
 	#endif
 
 	if (header_ptr->slot >= Header::SLOT_END())
@@ -162,7 +162,7 @@ bool PLEN2::MotionController::setHeader(const Header* header_ptr)
 bool PLEN2::MotionController::getHeader(Header* header_ptr)
 {
 	#if _DEBUG
-		system.outputSerial().println(F("=== in fuction : MotionController::getHeader()"));
+		system.outputSerial().println(F("=== running in function : MotionController::getHeader()"));
 	#endif
 	
 	if (header_ptr->slot >= Header::SLOT_END())
@@ -226,7 +226,7 @@ bool PLEN2::MotionController::getHeader(Header* header_ptr)
 bool PLEN2::MotionController::setFrame(unsigned char slot, const Frame* frame_ptr)
 {
 	#if _DEBUG
-		system.outputSerial().println(F("=== in fuction : MotionController::setFrame()"));
+		system.outputSerial().println(F("=== running in function : MotionController::setFrame()"));
 	#endif
 	
 	if (slot >= Header::SLOT_END())
@@ -301,7 +301,7 @@ bool PLEN2::MotionController::setFrame(unsigned char slot, const Frame* frame_pt
 bool PLEN2::MotionController::getFrame(unsigned char slot, Frame* frame_ptr)
 {
 	#if _DEBUG
-		system.outputSerial().println(F("=== in fuction : MotionController::getFrame()"));
+		system.outputSerial().println(F("=== running in function : MotionController::getFrame()"));
 	#endif
 	
 	if (slot >= Header::SLOT_END())
@@ -376,7 +376,7 @@ bool PLEN2::MotionController::getFrame(unsigned char slot, Frame* frame_ptr)
 bool PLEN2::MotionController::playing()
 {
 	#if _DEBUG_HARD
-		system.outputSerial().println(F("=== in fuction : MotionController::playing()"));
+		system.outputSerial().println(F("=== running in function : MotionController::playing()"));
 	#endif
 
 	return m_playing;
@@ -386,7 +386,7 @@ bool PLEN2::MotionController::playing()
 bool PLEN2::MotionController::frameUpdatable()
 {
 	#if _DEBUG_HARD
-		system.outputSerial().println(F("=== in fuction : MotionController::frameUpdatable()"));
+		system.outputSerial().println(F("=== running in function : MotionController::frameUpdatable()"));
 	#endif
 
 	return m_joint_ctrl_ptr->m_1cycle_finished;
@@ -396,7 +396,7 @@ bool PLEN2::MotionController::frameUpdatable()
 bool PLEN2::MotionController::frameUpdateFinished()
 {
 	#if _DEBUG_HARD
-		system.outputSerial().println(F("=== in fuction : MotionController::frameUpdateFinished()"));
+		system.outputSerial().println(F("=== running in function : MotionController::frameUpdateFinished()"));
 	#endif
 
 	return (m_transition_count == 0);
@@ -406,7 +406,7 @@ bool PLEN2::MotionController::frameUpdateFinished()
 bool PLEN2::MotionController::nextFrameLoadable()
 {
 	#if _DEBUG_HARD
-		system.outputSerial().println(F("=== in fuction : MotionController::nextFrameLoadable()"));
+		system.outputSerial().println(F("=== running in function : MotionController::nextFrameLoadable()"));
 	#endif
 
 	if (   (m_header.use_loop == 1)
@@ -422,7 +422,7 @@ bool PLEN2::MotionController::nextFrameLoadable()
 void PLEN2::MotionController::play(unsigned char slot)
 {
 	#if _DEBUG
-		system.outputSerial().println(F("=== in fuction : MotionController::play()"));
+		system.outputSerial().println(F("=== running in function : MotionController::play()"));
 	#endif
 
 	if (playing())
@@ -467,7 +467,7 @@ void PLEN2::MotionController::play(unsigned char slot)
 void PLEN2::MotionController::stopping()
 {
 	#if _DEBUG
-		system.outputSerial().println(F("=== in fuction : MotionController::stopping()"));
+		system.outputSerial().println(F("=== running in function : MotionController::stopping()"));
 	#endif
 
 	m_header.use_loop = 0;
@@ -478,7 +478,7 @@ void PLEN2::MotionController::stopping()
 void PLEN2::MotionController::stop()
 {
 	#if _DEBUG
-		system.outputSerial().println(F("=== in fuction : MotionController::stop()"));
+		system.outputSerial().println(F("=== running in function : MotionController::stop()"));
 	#endif
 
 	m_playing = false;
@@ -489,7 +489,7 @@ void PLEN2::MotionController::stop()
 void PLEN2::MotionController::frameUpdate()
 {
 	#if _DEBUG
-		system.outputSerial().println(F("=== in fuction : MotionController::frameUpdate()"));
+		system.outputSerial().println(F("=== running in function : MotionController::frameUpdate()"));
 	#endif	
 
 	m_transition_count--;
@@ -507,7 +507,7 @@ void PLEN2::MotionController::frameUpdate()
 void PLEN2::MotionController::frameBuffering()
 {
 	#if _DEBUG
-		system.outputSerial().println(F("=== in fuction : MotionController::frameBuffering()"));
+		system.outputSerial().println(F("=== running in function : MotionController::frameBuffering()"));
 	#endif
 
 	Frame* frame_ptr_temp = m_frame_ptr_now;
@@ -519,7 +519,7 @@ void PLEN2::MotionController::frameBuffering()
 void PLEN2::MotionController::loadNextFrame()
 {
 	#if _DEBUG
-		system.outputSerial().println(F("=== in fuction : MotionController::loadNextFrame()"));
+		system.outputSerial().println(F("=== running in function : MotionController::loadNextFrame()"));
 	#endif
 
 	frameBuffering();
@@ -612,7 +612,7 @@ update_process:
 void PLEN2::MotionController::dump(unsigned char slot)
 {
 	#if _DEBUG
-		system.outputSerial().println(F("=== in fuction : MotionController::dump()"));
+		system.outputSerial().println(F("=== running in function : MotionController::dump()"));
 	#endif
 
 	if (slot >= Header::SLOT_END())
