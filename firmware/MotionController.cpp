@@ -18,7 +18,7 @@
 
 
 // マクロの定義
-#define _DEBUG      true
+#define _DEBUG      false
 #define _DEBUG_HARD false
 
 
@@ -525,9 +525,19 @@ void PLEN2::MotionController::loadNextFrame()
 	frameBuffering();
 	const unsigned char& index_now = m_frame_ptr_now->index;
 
+	if (index_now == (m_header.frame_length - 1))
+	{
+		m_playing = false; // sanity check.
+
+		return;
+	}
+
 	#if _DEBUG
 		system.outputSerial().print(F(">>> index_now : "));
 		system.outputSerial().println((int)index_now);
+
+		system.outputSerial().print(F(">>> m_header.frame_length : "));
+		system.outputSerial().println((int)m_header.frame_length);
 	#endif
 
 	/*!
