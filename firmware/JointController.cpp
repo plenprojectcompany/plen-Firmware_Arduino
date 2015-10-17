@@ -25,7 +25,7 @@
 	@note
 	PLEN1.4に本ファームウェアを適用する場合、falseにする。
 */
-#define _CLOCK_WISE false
+#define _CLOCK_WISE true
 
 #define _PLEN2__JOINTCONTROLLER__PWM_OUT_00_07_REGISTER OCR1C
 #define _PLEN2__JOINTCONTROLLER__PWM_OUT_08_15_REGISTER OCR1B
