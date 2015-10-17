@@ -525,13 +525,6 @@ void PLEN2::MotionController::loadNextFrame()
 	frameBuffering();
 	const unsigned char& index_now = m_frame_ptr_now->index;
 
-	if (index_now == (m_header.frame_length - 1))
-	{
-		m_playing = false; // sanity check.
-
-		return;
-	}
-
 	#if _DEBUG
 		system.outputSerial().print(F(">>> index_now : "));
 		system.outputSerial().println((int)index_now);
@@ -590,6 +583,13 @@ void PLEN2::MotionController::loadNextFrame()
 		}
 
 		goto update_process;
+	}
+
+	if (index_now == (m_header.frame_length - 1))
+	{
+		m_playing = false; // sanity check.
+
+		return;
 	}
 
 	m_frame_ptr_next->index = index_now + 1;
