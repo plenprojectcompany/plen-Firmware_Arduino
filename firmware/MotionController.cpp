@@ -18,7 +18,8 @@
 
 
 // マクロの定義
-#define _DEBUG false
+#define _DEBUG      true
+#define _DEBUG_HARD false
 
 
 // ファイル内グローバルインスタンスの定義
@@ -374,7 +375,7 @@ bool PLEN2::MotionController::getFrame(unsigned char slot, Frame* frame_ptr)
 
 bool PLEN2::MotionController::playing()
 {
-	#if _DEBUG
+	#if _DEBUG_HARD
 		system.outputSerial().println(F("=== in fuction : MotionController::playing()"));
 	#endif
 
@@ -384,7 +385,7 @@ bool PLEN2::MotionController::playing()
 
 bool PLEN2::MotionController::frameUpdatable()
 {
-	#if _DEBUG
+	#if _DEBUG_HARD
 		system.outputSerial().println(F("=== in fuction : MotionController::frameUpdatable()"));
 	#endif
 
@@ -394,7 +395,7 @@ bool PLEN2::MotionController::frameUpdatable()
 
 bool PLEN2::MotionController::frameUpdateFinished()
 {
-	#if _DEBUG
+	#if _DEBUG_HARD
 		system.outputSerial().println(F("=== in fuction : MotionController::frameUpdateFinished()"));
 	#endif
 
@@ -404,7 +405,7 @@ bool PLEN2::MotionController::frameUpdateFinished()
 
 bool PLEN2::MotionController::nextFrameLoadable()
 {
-	#if _DEBUG
+	#if _DEBUG_HARD
 		system.outputSerial().println(F("=== in fuction : MotionController::nextFrameLoadable()"));
 	#endif
 
@@ -523,6 +524,11 @@ void PLEN2::MotionController::loadNextFrame()
 
 	frameBuffering();
 	const unsigned char& index_now = m_frame_ptr_now->index;
+
+	#if _DEBUG
+		system.outputSerial().print(F(">>> index_now : "));
+		system.outputSerial().println((int)index_now);
+	#endif
 
 	/*!
 		@note
