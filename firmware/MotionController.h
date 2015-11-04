@@ -5,13 +5,16 @@
 	@copyright The MIT License - http://opensource.org/licenses/mit-license.php
 */
 
-#ifndef _PLEN2__MOTION_CONTROLLER_H_
-#define _PLEN2__MOTION_CONTROLLER_H_
+#pragma once
+
+#ifndef PLEN2_MOTION_CONTROLLER_H
+#define PLEN2_MOTION_CONTROLLER_H
+
 
 namespace PLEN2
 {
 	class JointController;
-	#ifdef _PLEN2__INTERPRETER_H_
+	#ifdef PLEN2_INTERPRETER_H
 		class Interpreter;
 	#endif
 
@@ -23,7 +26,7 @@ namespace PLEN2
 */
 class PLEN2::MotionController
 {
-#ifdef _PLEN2__INTERPRETER_H_
+#ifdef PLEN2_INTERPRETER_H
 	friend class Interpreter;
 #endif
 
@@ -44,11 +47,11 @@ public:
 
 			ただし、EOS = '\0'と見なすため、正味の長さは20文字までです。
 		*/
-		#define _PLEN2__MOTIONCONTROLLER__HEADER__NAMELENGTH 21
+		#define PLEN2_MOTIONCONTROLLER_HEADER_NAMELENGTH 21
 
 	public:
 		//! @brief モーション名の長さ
-		inline static const int NAME_LENGTH()     { return _PLEN2__MOTIONCONTROLLER__HEADER__NAMELENGTH - 1; }
+		inline static const int NAME_LENGTH()     { return PLEN2_MOTIONCONTROLLER_HEADER_NAMELENGTH - 1; }
 
 		//! @brief スロット番号の開始値
 		inline static const int SLOT_BEGIN()      { return 0;  }
@@ -80,7 +83,7 @@ public:
 		}
 
 		unsigned char slot;                                               //!< スロット番号
-		char          name[_PLEN2__MOTIONCONTROLLER__HEADER__NAMELENGTH]; //!< モーション名
+		char          name[PLEN2_MOTIONCONTROLLER_HEADER_NAMELENGTH]; //!< モーション名
 		unsigned char frame_length;                                       //!< フレーム長
 
 		unsigned char non_reserved_func_flags : 5; //!< 未定義領域 (今後のアップデートのために予約)
@@ -119,10 +122,10 @@ public:
 		*/
 		inline static const int UPDATE_INTERVAL_MS() { return 32; }
 
-		unsigned char index;                                     //!< フレーム番号
-		unsigned int  transition_time_ms;                        //!< 遷移時間
-		int           joint_angle[_PLEN2__JOINTCONTROLLER__SUM]; //!< 各関節角度
-		unsigned char device_value[8];                           //!< 各デバイスへの出力値
+		unsigned char index;                                  //!< フレーム番号
+		unsigned int  transition_time_ms;                     //!< 遷移時間
+		int           joint_angle[PLEN2_JOINTCONTROLLER_SUM]; //!< 各関節角度
+		unsigned char device_value[8];                        //!< 各デバイスへの出力値
 	};
 
 	/*!
@@ -242,13 +245,13 @@ public:
 	void dump(unsigned char slot);
 
 // macro:
-	#define _PLEN2__MOTION_CONTROLLER__FRAMEBUFFER_LENGTH 2
+	#define PLEN2_MOTION_CONTROLLER_FRAMEBUFFER_LENGTH 2
 
 private:
 	//! @brief フレームバッファ長
 	inline static const int FRAMEBUFFER_LENGTH()
 	{
-		return _PLEN2__MOTION_CONTROLLER__FRAMEBUFFER_LENGTH;
+		return PLEN2_MOTION_CONTROLLER_FRAMEBUFFER_LENGTH;
 	}
 
 	/*!
@@ -263,12 +266,12 @@ private:
 	bool          m_playing;
 
 	Header m_header;
-	Frame  m_buffer[_PLEN2__MOTION_CONTROLLER__FRAMEBUFFER_LENGTH];
+	Frame  m_buffer[PLEN2_MOTION_CONTROLLER_FRAMEBUFFER_LENGTH];
 	Frame* m_frame_ptr_now;
 	Frame* m_frame_ptr_next;
 
-	long m_now_fixed_points[_PLEN2__JOINTCONTROLLER__SUM];
-	long m_diff_fixed_points[_PLEN2__JOINTCONTROLLER__SUM];
+	long m_now_fixed_points[PLEN2_JOINTCONTROLLER_SUM];
+	long m_diff_fixed_points[PLEN2_JOINTCONTROLLER_SUM];
 };
 
-#endif // _PLEN2__MOTION_CONTROLLER_H_
+#endif // PLEN2_MOTION_CONTROLLER_H

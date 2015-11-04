@@ -5,8 +5,8 @@
 	@copyright The MIT License - http://opensource.org/licenses/mit-license.php
 */
 
-#ifndef _PLEN2__JOINT_CONTROLLER_H_
-#define _PLEN2__JOINT_CONTROLLER_H_
+#ifndef PLEN2_JOINT_CONTROLLER_H
+#define PLEN2_JOINT_CONTROLLER_H
 
 namespace PLEN2
 {
@@ -44,7 +44,7 @@ namespace PLEN2
 class PLEN2::JointController
 {
 // macro:
-	#define _PLEN2__JOINTCONTROLLER__SUM 24
+	#define PLEN2_JOINTCONTROLLER_SUM 24
 
 private:
 	//! @brief 初期化フラグの保持アドレス
@@ -93,8 +93,8 @@ private:
 		}
 	};
 
-	JointSetting m_SETTINGS_INITIAL[_PLEN2__JOINTCONTROLLER__SUM];
-	JointSetting m_SETTINGS[_PLEN2__JOINTCONTROLLER__SUM];
+	JointSetting m_SETTINGS_INITIAL[PLEN2_JOINTCONTROLLER_SUM];
+	JointSetting m_SETTINGS[PLEN2_JOINTCONTROLLER_SUM];
 
 public:
 	/*!
@@ -132,7 +132,7 @@ public:
 	inline static const int ANGLE_NEUTRAL() { return 0;    }
 
 	//! @brief 関節の実装個数
-	inline static const int SUM() { return _PLEN2__JOINTCONTROLLER__SUM; }
+	inline static const int SUM() { return PLEN2_JOINTCONTROLLER_SUM; }
 
 	/*!
 		@brief タイマ1 オーバーフロー割り込みベクタ，呼び出し回数
@@ -159,7 +159,7 @@ public:
 		本来はprivateにされるべき変数です。タイマ1 オーバーフロー割り込みベクタから
 		参照するためにpublicにされているので、基本的に外部からはこの変数を参照しないでください。
 	*/
-	static unsigned int m_pwms[_PLEN2__JOINTCONTROLLER__SUM];
+	static unsigned int m_pwms[PLEN2_JOINTCONTROLLER_SUM];
 
 	/*!
 		@brief コンストラクタ
@@ -300,4 +300,4 @@ public:
 	void dump();
 };
 
-#endif // _PLEN2__JOINT_CONTROLLER_H_
+#endif // PLEN2_JOINT_CONTROLLER_H

@@ -5,8 +5,10 @@
 	@copyright The MIT License - http://opensource.org/licenses/mit-license.php
 */
 
-#ifndef _PLEN2__SOUL_H_
-#define _PLEN2__SOUL_H_
+#pragma once
+
+#ifndef PLEN2_SOUL_H
+#define PLEN2_SOUL_H
 
 namespace PLEN2
 {
@@ -86,4 +88,4 @@ public:
 	void action();
 };
 
-#endif // _PLEN2__SOUL_H_
+#endif // PLEN2_SOUL_H

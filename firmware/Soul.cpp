@@ -7,7 +7,7 @@
 	(See also : http://opensource.org/licenses/mit-license.php)
 */
 
-#define _DEBUG false
+#define DEBUG false
 
 // Arduinoライブラリ
 #include "Arduino.h"
@@ -52,7 +52,7 @@ PLEN2::Soul::Soul(AccelerationGyroSensor& sensor, MotionController& motion_ctrl)
 
 void PLEN2::Soul::logging()
 {
-	#if _DEBUG
+	#if DEBUG
 		system.outputSerial().println(F("=== running in function : Soul::logging()"));
 	#endif
 
@@ -116,7 +116,7 @@ void PLEN2::Soul::logging()
 
 void PLEN2::Soul::userActionInputed()
 {
-	#if _DEBUG
+	#if DEBUG
 		system.outputSerial().println(F("=== running in function : Soul::userActionInputed()"));
 	#endif
 
@@ -126,7 +126,7 @@ void PLEN2::Soul::userActionInputed()
 
 void PLEN2::Soul::action()
 {
-	#if _DEBUG
+	#if DEBUG
 		system.outputSerial().println(F("=== running in function : Soul::action()"));
 	#endif
 

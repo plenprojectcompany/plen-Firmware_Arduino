@@ -5,10 +5,14 @@
 	@copyright The MIT License - http://opensource.org/licenses/mit-license.php
 */
 
-#ifndef _PLEN2__SYSTEM_H_
-#define _PLEN2__SYSTEM_H_
+#pragma once
 
-#include "Arduino.h"
+#ifndef PLEN2_SYSTEM_H
+#define PLEN2_SYSTEM_H
+
+
+class Stream;
+
 
 namespace PLEN2
 {
@@ -107,4 +111,4 @@ public:
 	void dump();
 };
 
-#endif // _PLEN2__SYSTEM_H_
+#endif // PLEN2_SYSTEM_H

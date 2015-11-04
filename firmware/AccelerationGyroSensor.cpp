@@ -15,7 +15,7 @@
 #include "System.h"
 #include "AccelerationGyroSensor.h"
 
-#define _DEBUG false
+#define DEBUG false
 
 
 namespace
@@ -48,7 +48,7 @@ namespace
 
 void PLEN2::AccelerationGyroSensor::sampling()
 {
-	#if _DEBUG
+	#if DEBUG
 		system.outputSerial().println(F("=== running in function : AccelerationGyroSensor::sampling()"));
 	#endif
 
@@ -94,7 +94,7 @@ void PLEN2::AccelerationGyroSensor::sampling()
 
 const int& PLEN2::AccelerationGyroSensor::getAccX()
 {
-	#if _DEBUG
+	#if DEBUG
 		system.outputSerial().println(F("=== running in function : AccelerationGyroSensor::getAccX()"));
 	#endif
 
@@ -103,7 +103,7 @@ const int& PLEN2::AccelerationGyroSensor::getAccX()
 
 const int& PLEN2::AccelerationGyroSensor::getAccY()
 {
-	#if _DEBUG
+	#if DEBUG
 		system.outputSerial().println(F("=== running in function : AccelerationGyroSensor::getAccY()"));
 	#endif
 
@@ -112,7 +112,7 @@ const int& PLEN2::AccelerationGyroSensor::getAccY()
 
 const int& PLEN2::AccelerationGyroSensor::getAccZ()
 {
-	#if _DEBUG
+	#if DEBUG
 		system.outputSerial().println(F("=== running in function : AccelerationGyroSensor::getAccZ()"));
 	#endif
 
@@ -121,7 +121,7 @@ const int& PLEN2::AccelerationGyroSensor::getAccZ()
 
 const int& PLEN2::AccelerationGyroSensor::getGyroRoll()
 {
-	#if _DEBUG
+	#if DEBUG
 		system.outputSerial().println(F("=== running in function : AccelerationGyroSensor::getGyroRoll()"));
 	#endif
 
@@ -130,7 +130,7 @@ const int& PLEN2::AccelerationGyroSensor::getGyroRoll()
 
 const int& PLEN2::AccelerationGyroSensor::getGyroPitch()
 {
-	#if _DEBUG
+	#if DEBUG
 		system.outputSerial().println(F("=== running in function : AccelerationGyroSensor::getGyroPitch()"));
 	#endif
 
@@ -139,7 +139,7 @@ const int& PLEN2::AccelerationGyroSensor::getGyroPitch()
 
 const int& PLEN2::AccelerationGyroSensor::getGyroYaw()
 {
-	#if _DEBUG
+	#if DEBUG
 		system.outputSerial().println(F("=== running in function : AccelerationGyroSensor::getGyroYaw()"));
 	#endif
 
@@ -148,7 +148,7 @@ const int& PLEN2::AccelerationGyroSensor::getGyroYaw()
 
 void PLEN2::AccelerationGyroSensor::dump()
 {
-	#if _DEBUG
+	#if DEBUG
 		system.outputSerial().println(F("=== running in function : AccelerationGyroSensor::dump()"));
 	#endif
 

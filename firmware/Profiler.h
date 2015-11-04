@@ -7,8 +7,8 @@
 
 #pragma once
 
-#ifndef PROFILER_H
-#define PROFILER_H
+#ifndef UTILITY_PROFILER_H
+#define UTILITY_PROFILER_H
 
 
 class __FlashStringHelper;
@@ -18,7 +18,6 @@ namespace Utility
 {
 	class Profiler;
 }
-
 
 /*!
 	@brief Tiny metrics class
@@ -30,7 +29,7 @@ namespace Utility
 		// When instantiate the class, it outputs message given.
 		volatile Utility::Profiler p(F("anyFunction()"));
 
-		any code here...
+		Any code here...
 
 		// Outputting metrics about this function when profiler instance has destroyed.
 	}
@@ -68,4 +67,4 @@ public:
 	~Profiler();
 };
 
-#endif // PROFILER_H
+#endif // UTILITY_PROFILER_H

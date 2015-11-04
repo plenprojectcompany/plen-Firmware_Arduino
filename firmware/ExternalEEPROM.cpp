@@ -7,21 +7,21 @@
 	(See also : http://opensource.org/licenses/mit-license.php)
 */
 
-#define _DEBUG false
+#define DEBUG false
 
 // Arduinoライブラリ
 #include "Arduino.h"
 #include <Wire.h>
 
 // 独自ライブラリ
-#if _DEBUG
+#if DEBUG
 	#include "System.h"
 #endif
 #include "ExternalEEPROM.h"
 
 
 namespace {
-	#if _DEBUG
+	#if DEBUG
 		PLEN2::System system;
 	#endif
 }
@@ -40,7 +40,7 @@ int PLEN2::ExternalEEPROM::readSlot(
 	unsigned int read_size
 )
 {
-	#if _DEBUG
+	#if DEBUG
 		system.outputSerial().println(F("=== running in function : ExternalEEPROM::readSlot()"));
 	#endif
 
@@ -48,7 +48,7 @@ int PLEN2::ExternalEEPROM::readSlot(
 		|| (read_size > SLOT_SIZE())
 	)
 	{
-		#if _DEBUG
+		#if DEBUG
 			system.outputSerial().print(F(">>> bad argument! : slot = "));
 			system.outputSerial().print(slot);
 			system.outputSerial().print(F(", or read_size = "));
@@ -67,7 +67,7 @@ int PLEN2::ExternalEEPROM::readSlot(
 		data_address  -= (SIZE() / 2);
 	}
 
-	#if _DEBUG
+	#if DEBUG
 		system.outputSerial().print(F(">>> slave_address = "));
 		system.outputSerial().println(slave_address, HEX);
 		system.outputSerial().print(F(">>> data_address = "));
@@ -109,7 +109,7 @@ int PLEN2::ExternalEEPROM::writeSlot(
 	unsigned int write_size
 )
 {
-	#if _DEBUG
+	#if DEBUG
 		system.outputSerial().println(F("=== running in function : ExternalEEPROM::writeSlot()"));
 	#endif
 
@@ -117,7 +117,7 @@ int PLEN2::ExternalEEPROM::writeSlot(
 		|| (write_size > SLOT_SIZE())
 	)
 	{
-		#if _DEBUG
+		#if DEBUG
 			system.outputSerial().print(F(">>> bad argument! : slot = "));
 			system.outputSerial().print(slot);
 			system.outputSerial().print(F(", or write_size = "));
@@ -136,7 +136,7 @@ int PLEN2::ExternalEEPROM::writeSlot(
 		data_address  -= (SIZE() / 2);
 	}
 
-	#if _DEBUG
+	#if DEBUG
 		system.outputSerial().print(F(">>> slave_address : "));
 		system.outputSerial().println(slave_address, HEX);
 		system.outputSerial().print(F(">>> data_address : "));

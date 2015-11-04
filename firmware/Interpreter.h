@@ -5,9 +5,10 @@
 	@copyright The MIT License - http://opensource.org/licenses/mit-license.php
 */
 
-#ifndef _PLEN2__INTERPRETER_H_
-#define _PLEN2__INTERPRETER_H_
+#pragma once
 
+#ifndef PLEN2_INTERPRETER_H
+#define PLEN2_INTERPRETER_H
 
 namespace PLEN2
 {
@@ -31,7 +32,7 @@ class PLEN2::Interpreter
 		@attention
 		高速に処理をするために、値として2^Nが定義される必要があります。
 	*/
-	#define _PLEN2__INTERPRETER__QUEUE_SIZE 32
+	#define PLEN2_INTERPRETER_QUEUE_SIZE 32
 
 public:
 	/*!
@@ -45,7 +46,7 @@ public:
 	};
 
 	//! @brief キューサイズ
-	inline static const int QUEUE_SIZE() { return _PLEN2__INTERPRETER__QUEUE_SIZE; }
+	inline static const int QUEUE_SIZE() { return PLEN2_INTERPRETER_QUEUE_SIZE; }
 
 
 	/*!
@@ -93,10 +94,10 @@ public:
 
 
 private:
-	Code m_code_queue[_PLEN2__INTERPRETER__QUEUE_SIZE];
+	Code m_code_queue[PLEN2_INTERPRETER_QUEUE_SIZE];
 	unsigned char m_queue_begin;
 	unsigned char m_queue_end;
 	MotionController* m_motion_ctrl_ptr;
 };
 
-#endif // _PLEN2__INTERPRETER_H_
+#endif // PLEN2_INTERPRETER_H

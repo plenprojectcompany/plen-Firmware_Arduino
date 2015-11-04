@@ -7,10 +7,10 @@
 	(See also : http://opensource.org/licenses/mit-license.php)
 */
 
-#define _DEBUG false
+#define DEBUG false
 
 // 独自ライブラリ
-#if _DEBUG
+#if DEBUG
 	#include "System.h"
 #endif
 #include "Purser.h"
@@ -127,7 +127,7 @@ namespace
 	Utility::NilPurser nil_purser;
 
 
-	#if _DEBUG
+	#if DEBUG
 		PLEN2::System system;
 	#endif
 }
@@ -135,7 +135,7 @@ namespace
 
 void PLEN2::PurserCombinator::m_abort()
 {
-	#if _DEBUG
+	#if DEBUG
 		system.outputSerial().println(F("=== running in function : PurserCombinator::m_abort()"));
 	#endif
 
@@ -159,7 +159,7 @@ PLEN2::PurserCombinator::PurserCombinator()
 
 void PLEN2::PurserCombinator::readByte(char byte)
 {
-	#if _DEBUG
+	#if DEBUG
 		system.outputSerial().println(F("=== running in function : PurserCombinator::readByte()"));
 	#endif
 
@@ -172,7 +172,7 @@ void PLEN2::PurserCombinator::readByte(char byte)
 
 bool PLEN2::PurserCombinator::accept()
 {
-	#if _DEBUG
+	#if DEBUG
 		system.outputSerial().println(F("=== running in function : PurserCombinator::accept()"));
 	#endif
 
@@ -196,7 +196,7 @@ void PLEN2::PurserCombinator::transition()
 {
 	beforeFook();
 
-	#if _DEBUG
+	#if DEBUG
 		system.outputSerial().println(F("=== running in function : PurserCombinator::transition()"));
 	#endif
 
@@ -258,7 +258,7 @@ void PLEN2::PurserCombinator::transition()
 
 		default:
 		{
-			#if _DEBUG
+			#if DEBUG
 				system.outputSerial().println(">>> error : Undefined state was inputed.");
 			#endif
 
@@ -274,7 +274,7 @@ void PLEN2::PurserCombinator::transition()
 
 void PLEN2::PurserCombinator::beforeFook()
 {
-	#if _DEBUG
+	#if DEBUG
 		system.outputSerial().println(F("=== running in function : PurserCombinator::beforeFook()"));
 	#endif
 }
@@ -282,7 +282,7 @@ void PLEN2::PurserCombinator::beforeFook()
 
 void PLEN2::PurserCombinator::afterFook()
 {
-	#if _DEBUG
+	#if DEBUG
 		system.outputSerial().println(F("=== running in function : PurserCombinator::afterFook()"));
 	#endif
 }

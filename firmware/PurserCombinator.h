@@ -5,8 +5,10 @@
 	@copyright The MIT License - http://opensource.org/licenses/mit-license.php
 */
 
-#ifndef _PLEN2__PURSER_COMBINATOR_H_
-#define _PLEN2__PURSER_COMBINATOR_H_
+#pragma once
+
+#ifndef PLEN2_PURSER_COMBINATOR_H
+#define PLEN2_PURSER_COMBINATOR_H
 
 namespace PLEN2
 {
@@ -47,16 +49,16 @@ protected:
 			バッファサイズは最低限、BLEのペイロード長(20byte)以上必要です。
 			また、高速に処理を行うため2^Nを要求します。
 		*/
-		#define _PLEN2__PURSER_COMBINATOR__BUFFER__LENGTH 128
+		#define PLEN2_PURSER_COMBINATOR_BUFFER_LENGTH 128
 
 	public:
 		//! @brief バッファ長
 		inline static const int LENGTH()
 		{
-			return _PLEN2__PURSER_COMBINATOR__BUFFER__LENGTH;
+			return PLEN2_PURSER_COMBINATOR_BUFFER_LENGTH;
 		}
 
-		char data[_PLEN2__PURSER_COMBINATOR__BUFFER__LENGTH];
+		char data[PLEN2_PURSER_COMBINATOR_BUFFER_LENGTH];
 		unsigned char position;
 
 		Buffer()
@@ -113,4 +115,4 @@ public:
 	virtual void afterFook();
 };
 
-#endif // _PLEN2__PURSER_COMBINATOR_H_
+#endif // PLEN2_PURSER_COMBINATOR_H

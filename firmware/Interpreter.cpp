@@ -7,13 +7,13 @@
 	(See also : http://opensource.org/licenses/mit-license.php)
 */
 
-#define _DEBUG false
+#define DEBUG false
 
 // Arduinoライブラリ
 #include "Arduino.h"
 
 // 独自ライブラリ
-#if _DEBUG
+#if DEBUG
 	#include "System.h"
 #endif
 #include "Interpreter.h"
@@ -23,7 +23,7 @@
 
 namespace
 {
-	#if _DEBUG
+	#if DEBUG
 		PLEN2::System system;
 	#endif
 
@@ -44,13 +44,13 @@ PLEN2::Interpreter::Interpreter(MotionController& motion_crtl)
 
 bool PLEN2::Interpreter::pushCode(const Code& code)
 {
-	#if _DEBUG
+	#if DEBUG
 		system.outputSerial().println(F("=== running in function : Interpreter::pushCode()"));
 	#endif
 
 	if (getIndex(m_queue_end + 1) == m_queue_begin)
 	{
-		#if _DEBUG
+		#if DEBUG
 			system.outputSerial().println(F(">>> error : Queue overflow!"));
 		#endif
 
@@ -65,13 +65,13 @@ bool PLEN2::Interpreter::pushCode(const Code& code)
 
 bool PLEN2::Interpreter::popCode()
 {
-	#if _DEBUG
+	#if DEBUG
 		system.outputSerial().println(F("=== running in function : Interpreter::popCode()"));
 	#endif
 
 	if (!ready())
 	{
-		#if _DEBUG
+		#if DEBUG
 			system.outputSerial().println(F(">>> error : This is not ready!"));
 		#endif
 
@@ -106,7 +106,7 @@ bool PLEN2::Interpreter::popCode()
 
 bool PLEN2::Interpreter::ready()
 {
-	#if _DEBUG
+	#if DEBUG
 		system.outputSerial().println(F("=== running in function : Interpreter::ready()"));
 	#endif
 
@@ -115,7 +115,7 @@ bool PLEN2::Interpreter::ready()
 
 void PLEN2::Interpreter::reset()
 {
-	#if _DEBUG
+	#if DEBUG
 		system.outputSerial().println(F("=== running in function : Interpreter::reset()"));
 	#endif
 

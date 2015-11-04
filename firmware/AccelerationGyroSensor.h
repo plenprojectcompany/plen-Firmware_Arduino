@@ -5,8 +5,10 @@
 	@copyright The MIT License - http://opensource.org/licenses/mit-license.php
 */
 
-#ifndef _PLEN2__ACCELERATION_GYRO_SENSOR_H_
-#define _PLEN2__ACCELERATION_GYRO_SENSOR_H_
+#pragma once
+
+#ifndef PLEN2_ACCELERATION_GYRO_SENSOR_H
+#define PLEN2_ACCELERATION_GYRO_SENSOR_H
 
 namespace PLEN2
 {
@@ -22,16 +24,16 @@ namespace PLEN2
 class PLEN2::AccelerationGyroSensor
 {
 // macro:
-	#define _PLEN2__ACCELERATION_GYRO_SENSOR__SUM 6
+	#define PLEN2_ACCELERATION_GYRO_SENSOR_SUM 6
 
 private:
 	//! @brief センサの総数
 	inline static const int SUM()
 	{
-		return _PLEN2__ACCELERATION_GYRO_SENSOR__SUM;
+		return PLEN2_ACCELERATION_GYRO_SENSOR_SUM;
 	}
 
-	int m_values[_PLEN2__ACCELERATION_GYRO_SENSOR__SUM];
+	int m_values[PLEN2_ACCELERATION_GYRO_SENSOR_SUM];
 
 public:
 	/*!
@@ -129,4 +131,4 @@ public:
 	void dump();
 };
 
-#endif // _PLEN2__ACCELERATION_GYRO_SENSOR_H_
+#endif // PLEN2_ACCELERATION_GYRO_SENSOR_H

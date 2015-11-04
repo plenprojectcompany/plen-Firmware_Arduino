@@ -7,14 +7,14 @@
 	(See also : http://opensource.org/licenses/mit-license.php)
 */
 
-#define _DEBUG false
+#define DEBUG false
 
 /*!
 	@note
 	このマクロの値をtrueにすることで、PLENに自然な動きを適用します。
 	ただし、シリアル通信の帯域を圧迫するため、ユーザからの操作を受け付けづらくなります。
 */
-#define _ENSOUL_PLEN2 false
+#define ENSOUL_PLEN2 false
 
 
 // 標準ライブラリ
@@ -33,7 +33,7 @@
 #include "PurserCombinator.h"
 #include "System.h"
 
-#if _ENSOUL_PLEN2
+#if ENSOUL_PLEN2
 	#include "AccelerationGyroSensor.h"
 	#include "Soul.h"
 #endif
@@ -104,7 +104,7 @@ namespace
 	PLEN2::Interpreter      interpreter(motion_ctrl);
 	PLEN2::System           system;
 
-	#if _ENSOUL_PLEN2
+	#if ENSOUL_PLEN2
 		PLEN2::AccelerationGyroSensor sensor;
 		PLEN2::Soul soul(sensor, motion_ctrl);
 	#endif
@@ -127,7 +127,7 @@ namespace
 
 		void applyDiff()
 		{
-			#if _DEBUG
+			#if DEBUG
 				system.outputSerial().println(F("# in event handler : Application::applyDiff()"));
 
 				system.outputSerial().print(F("> joint_id : "));
@@ -137,7 +137,7 @@ namespace
 				system.outputSerial().println(Utility::hexbytes2int(m_buffer.data + 2, 3));
 			#endif
 
-			#if !_DEBUG
+			#if !DEBUG
 				joint_ctrl.setAngleDiff(
 					Utility::hexbytes2uint(m_buffer.data, 2),
 					Utility::hexbytes2int(m_buffer.data + 2, 3)
@@ -147,7 +147,7 @@ namespace
 
 		void apply()
 		{
-			#if _DEBUG
+			#if DEBUG
 				system.outputSerial().println(F("# in event handler : Application::apply()"));
 
 				system.outputSerial().print(F("> joint_id : "));
@@ -157,7 +157,7 @@ namespace
 				system.outputSerial().println(Utility::hexbytes2int(m_buffer.data + 2, 3));
 			#endif
 
-			#if !_DEBUG
+			#if !DEBUG
 				joint_ctrl.setAngle(
 					Utility::hexbytes2uint(m_buffer.data, 2),
 					Utility::hexbytes2int(m_buffer.data + 2, 3)
@@ -167,25 +167,25 @@ namespace
 
 		void homePosition()
 		{
-			#if _DEBUG
+			#if DEBUG
 				system.outputSerial().println(F("# in event handler : Application::homePosition()"));
 			#endif
 
-			#if !_DEBUG
+			#if !DEBUG
 				joint_ctrl.loadSettings();
 			#endif
 		}
 
 		void playMotion()
 		{
-			#if _DEBUG
+			#if DEBUG
 				system.outputSerial().println(F("# in event handler : Application::playMotion()"));
 
 				system.outputSerial().print(F("> slot : "));
 				system.outputSerial().println(Utility::hexbytes2uint(m_buffer.data, 2));
 			#endif
 
-			#if !_DEBUG
+			#if !DEBUG
 				motion_ctrl.play(
 					Utility::hexbytes2uint(m_buffer.data, 2)
 				);
@@ -194,29 +194,29 @@ namespace
 
 		void stopMotion()
 		{
-			#if _DEBUG
+			#if DEBUG
 				system.outputSerial().println(F("# in event handler : Application::stopMotion()"));
 			#endif
 
-			#if !_DEBUG
+			#if !DEBUG
 				motion_ctrl.stopping();
 			#endif
 		}
 
 		void popCode()
 		{
-			#if _DEBUG
+			#if DEBUG
 				system.outputSerial().println(F("# in event handler : Application::popCode()"));
 			#endif
 
-			#if !_DEBUG
+			#if !DEBUG
 				interpreter.popCode();
 			#endif
 		}
 
 		void pushCode()
 		{
-			#if _DEBUG
+			#if DEBUG
 				system.outputSerial().println(F("# in event handler : Application::pushCode()"));
 
 				system.outputSerial().print(F("> slot : "));
@@ -226,7 +226,7 @@ namespace
 				system.outputSerial().println(Utility::hexbytes2uint(m_buffer.data + 2, 2));
 			#endif
 
-			#if !_DEBUG
+			#if !DEBUG
 				m_code_tmp.slot       = Utility::hexbytes2uint(m_buffer.data, 2);
 				m_code_tmp.loop_count = Utility::hexbytes2uint(m_buffer.data + 2, 2);
 
@@ -236,18 +236,18 @@ namespace
 
 		void resetInterpreter()
 		{
-			#if _DEBUG
+			#if DEBUG
 				system.outputSerial().println(F("# in event handler : Application::resetInterpreter()"));
 			#endif
 
-			#if !_DEBUG
+			#if !DEBUG
 				interpreter.reset();
 			#endif
 		}
 
 		void setHome()
 		{
-			#if _DEBUG
+			#if DEBUG
 				system.outputSerial().println(F("# in event handler : Application::setHome()"));
 
 				system.outputSerial().print(F("> joint_id : "));
@@ -257,7 +257,7 @@ namespace
 				system.outputSerial().println(Utility::hexbytes2int(m_buffer.data + 2, 3));
 			#endif
 
-			#if !_DEBUG
+			#if !DEBUG
 				joint_ctrl.setHomeAngle(
 					Utility::hexbytes2uint(m_buffer.data, 2),
 					Utility::hexbytes2int(m_buffer.data + 2, 3)
@@ -267,18 +267,18 @@ namespace
 
 		void setJointSettings()
 		{
-			#if _DEBUG
+			#if DEBUG
 				system.outputSerial().println(F("# in event handler : Application::setJointSettings()"));
 			#endif
 
-			#if !_DEBUG
+			#if !DEBUG
 				joint_ctrl.resetSettings();
 			#endif
 		}
 
 		void setMax()
 		{
-			#if _DEBUG
+			#if DEBUG
 				system.outputSerial().println(F("# in event handler : Application::setMax()"));
 
 				system.outputSerial().print(F("> joint_id : "));
@@ -288,7 +288,7 @@ namespace
 				system.outputSerial().println(Utility::hexbytes2int(m_buffer.data + 2, 3));
 			#endif
 
-			#if !_DEBUG
+			#if !DEBUG
 				joint_ctrl.setMaxAngle(
 					Utility::hexbytes2uint(m_buffer.data, 2),
 					Utility::hexbytes2int(m_buffer.data + 2, 3)
@@ -298,7 +298,7 @@ namespace
 
 		void setMotionFrame()
 		{
-			#if _DEBUG
+			#if DEBUG
 				system.outputSerial().println(F("# in event handler : Application::setMotionFrame()"));
 
 				system.outputSerial().print(F("> slot : "));
@@ -319,7 +319,7 @@ namespace
 				}
 			#endif
 
-			#if !_DEBUG
+			#if !DEBUG
 				m_frame_tmp.transition_time_ms = Utility::hexbytes2uint(m_buffer.data + 4, 4);
 
 				for (int device_id = 0; device_id < joint_ctrl.SUM(); device_id++)
@@ -377,7 +377,7 @@ namespace
 			}
 
 
-			#if _DEBUG
+			#if DEBUG
 				system.outputSerial().println(F("# in event handler : Application::setMotionHeader()"));
 
 				system.outputSerial().print(F("> slot : "));
@@ -399,7 +399,7 @@ namespace
 				system.outputSerial().println(Utility::hexbytes2uint(m_buffer.data + 28, 2));
 			#endif
 
-			#if !_DEBUG
+			#if !DEBUG
 				m_header_tmp.slot = Utility::hexbytes2uint(m_buffer.data, 2);
 				m_header_tmp.frame_length = Utility::hexbytes2uint(m_buffer.data + 28, 2);
 
@@ -458,7 +458,7 @@ namespace
 
 		void setMin()
 		{
-			#if _DEBUG
+			#if DEBUG
 				system.outputSerial().println(F("# in event handler : Application::setMin()"));
 
 				system.outputSerial().print(F("> joint_id : "));
@@ -468,7 +468,7 @@ namespace
 				system.outputSerial().println(Utility::hexbytes2int(m_buffer.data + 2, 3));
 			#endif
 
-			#if !_DEBUG
+			#if !DEBUG
 				joint_ctrl.setMinAngle(
 					Utility::hexbytes2uint(m_buffer.data, 2),
 					Utility::hexbytes2int(m_buffer.data + 2, 3)
@@ -478,25 +478,25 @@ namespace
 
 		void getJointSettings()
 		{
-			#if _DEBUG
+			#if DEBUG
 				system.outputSerial().println(F("# in event handler : Application::getJointSettings()"));
 			#endif
 
-			#if !_DEBUG
+			#if !DEBUG
 				joint_ctrl.dump();
 			#endif
 		}
 
 		void getMotion()
 		{
-			#if _DEBUG
+			#if DEBUG
 				system.outputSerial().println(F("# in event handler : Application::getMotion()"));
 
 				system.outputSerial().print(F("> slot : "));
 				system.outputSerial().println(Utility::hexbytes2uint(m_buffer.data, 2));
 			#endif
 
-			#if !_DEBUG
+			#if !DEBUG
 				motion_ctrl.dump(
 					Utility::hexbytes2uint(m_buffer.data, 2)
 				);
@@ -505,11 +505,11 @@ namespace
 
 		void getVersionInformation()
 		{
-			#if _DEBUG
+			#if DEBUG
 				system.outputSerial().println(F("# in event handler : Application::getVersionInformation()"));
 			#endif
 
-			#if !_DEBUG
+			#if !DEBUG
 				system.dump();
 			#endif
 		}
@@ -517,7 +517,7 @@ namespace
 	public:
 		virtual void afterFook()
 		{
-			#if _DEBUG
+			#if DEBUG
 				system.outputSerial().println(F("# in function : Application::afterFook()"));
 			#endif
 
@@ -528,7 +528,7 @@ namespace
 
 				(this->*EVENT_HANDLER[header_id][cmd_id])();
 
-				#if _ENSOUL_PLEN2
+				#if ENSOUL_PLEN2
 					soul.userActionInputed();
 				#endif
 			}
@@ -593,7 +593,7 @@ void setup()
 
 	joint_ctrl.loadSettings();
 
-	#if _ENSOUL_PLEN2
+	#if ENSOUL_PLEN2
 		/*!
 			@attention
 			バスを介してセンサ値を取得する場合、通信対象のファームウェアが
@@ -672,7 +672,7 @@ void loop()
 		}
 	}
 
-	#if _ENSOUL_PLEN2
+	#if ENSOUL_PLEN2
 		soul.logging();
 		soul.action();
 	#endif

@@ -18,18 +18,18 @@
 
 
 // マクロの定義
-#define _DEBUG      false
-#define _DEBUG_HARD false
+#define DEBUG      false
+#define DEBUG_HARD false
 
 /*!
 	@note
 	PLEN1.4に本ファームウェアを適用する場合、falseにする。
 */
-#define _CLOCK_WISE true
+#define CLOCK_WISE true
 
-#define _PLEN2__JOINTCONTROLLER__PWM_OUT_00_07_REGISTER OCR1C
-#define _PLEN2__JOINTCONTROLLER__PWM_OUT_08_15_REGISTER OCR1B
-#define _PLEN2__JOINTCONTROLLER__PWM_OUT_16_23_REGISTER OCR1A
+#define PLEN2_JOINTCONTROLLER_PWM_OUT_00_07_REGISTER OCR1C
+#define PLEN2_JOINTCONTROLLER_PWM_OUT_08_15_REGISTER OCR1B
+#define PLEN2_JOINTCONTROLLER_PWM_OUT_16_23_REGISTER OCR1A
 
 
 // ファイル内グローバルインスタンスの定義
@@ -42,7 +42,7 @@ namespace
 // staticインスタンスの実態定義
 volatile unsigned char PLEN2::JointController::m_overflow_count;
 volatile bool PLEN2::JointController::m_1cycle_finished = false;
-unsigned int PLEN2::JointController::m_pwms[_PLEN2__JOINTCONTROLLER__SUM];
+unsigned int PLEN2::JointController::m_pwms[PLEN2_JOINTCONTROLLER_SUM];
 
 
 PLEN2::JointController::JointController()
@@ -83,7 +83,7 @@ PLEN2::JointController::JointController()
 
 void PLEN2::JointController::loadSettings()
 {
-	#if _DEBUG
+	#if DEBUG
 		system.outputSerial().println(F("=== running in function : JointController::loadSettings()"));
 	#endif
 
@@ -143,7 +143,7 @@ void PLEN2::JointController::loadSettings()
 
 void PLEN2::JointController::resetSettings()
 {
-	#if _DEBUG
+	#if DEBUG
 		system.outputSerial().println(F("=== running in function : JointController::resetSettings()"));
 	#endif
 
@@ -168,13 +168,13 @@ void PLEN2::JointController::resetSettings()
 
 int PLEN2::JointController::getMinAngle(unsigned char joint_id)
 {
-	#if _DEBUG
+	#if DEBUG
 		system.outputSerial().println(F("=== running in function : JointController::getMinAngle()"));
 	#endif
 
 	if (joint_id >= SUM())
 	{
-		#if _DEBUG
+		#if DEBUG
 			system.outputSerial().print(F(">>> bad argment! : joint_id = "));
 			system.outputSerial().println((int)joint_id);
 		#endif
@@ -188,13 +188,13 @@ int PLEN2::JointController::getMinAngle(unsigned char joint_id)
 
 int PLEN2::JointController::getMaxAngle(unsigned char joint_id)
 {
-	#if _DEBUG
+	#if DEBUG
 		system.outputSerial().println(F("=== running in function : JointController::getMaxAngle()"));
 	#endif
 
 	if (joint_id >= SUM())
 	{
-		#if _DEBUG
+		#if DEBUG
 			system.outputSerial().print(F(">>> bad argment! : joint_id = "));
 			system.outputSerial().println((int)joint_id);
 		#endif
@@ -208,13 +208,13 @@ int PLEN2::JointController::getMaxAngle(unsigned char joint_id)
 
 int PLEN2::JointController::getHomeAngle(unsigned char joint_id)
 {
-	#if _DEBUG
+	#if DEBUG
 		system.outputSerial().println(F("=== running in function : JointController::getHomeAngle()"));
 	#endif
 
 	if (joint_id >= SUM())
 	{
-		#if _DEBUG
+		#if DEBUG
 			system.outputSerial().print(F(">>> bad argment! : joint_id = "));
 			system.outputSerial().println((int)joint_id);
 		#endif
@@ -228,13 +228,13 @@ int PLEN2::JointController::getHomeAngle(unsigned char joint_id)
 
 bool PLEN2::JointController::setMinAngle(unsigned char joint_id, int angle)
 {
-	#if _DEBUG
+	#if DEBUG
 		system.outputSerial().println(F("=== running in function : JointController::setMinAngle()"));
 	#endif
 
 	if (joint_id >= SUM())
 	{
-		#if _DEBUG
+		#if DEBUG
 			system.outputSerial().print(F(">>> bad argment! : joint_id = "));
 			system.outputSerial().println((int)joint_id);
 		#endif
@@ -245,7 +245,7 @@ bool PLEN2::JointController::setMinAngle(unsigned char joint_id, int angle)
 	if (   (angle >= m_SETTINGS[joint_id].MAX)
 		|| (angle < ANGLE_MIN()) )
 	{
-		#if _DEBUG
+		#if DEBUG
 			system.outputSerial().print(F(">>> bad argment! : angle = "));
 			system.outputSerial().println(angle);
 		#endif
@@ -264,7 +264,7 @@ bool PLEN2::JointController::setMinAngle(unsigned char joint_id, int angle)
 		delay(5);
 	}
 
-	#if _DEBUG
+	#if DEBUG
 		system.outputSerial().print(F(">>> address_offset : "));
 		system.outputSerial().println(address_offset);
 	#endif
@@ -275,13 +275,13 @@ bool PLEN2::JointController::setMinAngle(unsigned char joint_id, int angle)
 
 bool PLEN2::JointController::setMaxAngle(unsigned char joint_id, int angle)
 {
-	#if _DEBUG
+	#if DEBUG
 		system.outputSerial().println(F("=== running in function : JointController::setMaxAngle()"));
 	#endif
 
 	if (joint_id >= SUM())
 	{
-		#if _DEBUG
+		#if DEBUG
 			system.outputSerial().print(F(">>> bad argment! : joint_id = "));
 			system.outputSerial().println((int)joint_id);
 		#endif
@@ -292,7 +292,7 @@ bool PLEN2::JointController::setMaxAngle(unsigned char joint_id, int angle)
 	if (   (angle <= m_SETTINGS[joint_id].MIN)
 		|| (angle > ANGLE_MAX()) )
 	{
-		#if _DEBUG
+		#if DEBUG
 			system.outputSerial().print(F(">>> bad argment! : angle = "));
 			system.outputSerial().println(angle);
 		#endif
@@ -311,7 +311,7 @@ bool PLEN2::JointController::setMaxAngle(unsigned char joint_id, int angle)
 		delay(5);
 	}
 
-	#if _DEBUG
+	#if DEBUG
 		system.outputSerial().print(F(">>> address_offset : "));
 		system.outputSerial().println(address_offset);
 	#endif
@@ -322,13 +322,13 @@ bool PLEN2::JointController::setMaxAngle(unsigned char joint_id, int angle)
 
 bool PLEN2::JointController::setHomeAngle(unsigned char joint_id, int angle)
 {
-	#if _DEBUG
+	#if DEBUG
 		system.outputSerial().println(F("=== running in function : JointController::setHomeAngle()"));
 	#endif
 
 	if (joint_id >= SUM())
 	{
-		#if _DEBUG
+		#if DEBUG
 			system.outputSerial().print(F(">>> bad argment! : joint_id = "));
 			system.outputSerial().println((int)joint_id);
 		#endif
@@ -339,7 +339,7 @@ bool PLEN2::JointController::setHomeAngle(unsigned char joint_id, int angle)
 	if (   (angle < m_SETTINGS[joint_id].MIN)
 		|| (angle > m_SETTINGS[joint_id].MAX) )
 	{
-		#if _DEBUG
+		#if DEBUG
 			system.outputSerial().print(F(">>> bad argment! : angle = "));
 			system.outputSerial().println(angle);
 		#endif
@@ -358,7 +358,7 @@ bool PLEN2::JointController::setHomeAngle(unsigned char joint_id, int angle)
 		delay(5);
 	}
 
-	#if _DEBUG
+	#if DEBUG
 		system.outputSerial().print(F(">>> address_offset : "));
 		system.outputSerial().println(address_offset);
 	#endif
@@ -369,13 +369,13 @@ bool PLEN2::JointController::setHomeAngle(unsigned char joint_id, int angle)
 
 bool PLEN2::JointController::setAngle(unsigned char joint_id, int angle)
 {
-	#if _DEBUG_HARD
+	#if DEBUG_HARD
 		system.outputSerial().println(F("=== running in function : JointController::setAngle()"));
 	#endif
 
 	if (joint_id >= SUM())
 	{
-		#if _DEBUG_HARD
+		#if DEBUG_HARD
 			system.outputSerial().print(F(">>> bad argment! : joint_id = "));
 			system.outputSerial().println((int)joint_id);
 		#endif
@@ -389,7 +389,7 @@ bool PLEN2::JointController::setAngle(unsigned char joint_id, int angle)
 		angle,
 		PLEN2::JointController::ANGLE_MIN(), PLEN2::JointController::ANGLE_MAX(),
 
-		#if _CLOCK_WISE
+		#if CLOCK_WISE
 			PLEN2::JointController::PWM_MIN(), PLEN2::JointController::PWM_MAX()
 		#else
 			PLEN2::JointController::PWM_MAX(), PLEN2::JointController::PWM_MIN()
@@ -402,13 +402,13 @@ bool PLEN2::JointController::setAngle(unsigned char joint_id, int angle)
 
 bool PLEN2::JointController::setAngleDiff(unsigned char joint_id, int angle_diff)
 {
-	#if _DEBUG_HARD
+	#if DEBUG_HARD
 		system.outputSerial().println(F("=== running in function : JointController::setAngleDiff()"));
 	#endif
 
 	if (joint_id >= SUM())
 	{
-		#if _DEBUG_HARD
+		#if DEBUG_HARD
 			system.outputSerial().print(F(">>> bad argment! : joint_id = "));
 			system.outputSerial().println((int)joint_id);
 		#endif
@@ -425,7 +425,7 @@ bool PLEN2::JointController::setAngleDiff(unsigned char joint_id, int angle_diff
 		angle,
 		PLEN2::JointController::ANGLE_MIN(), PLEN2::JointController::ANGLE_MAX(),
 
-		#if _CLOCK_WISE
+		#if CLOCK_WISE
 			PLEN2::JointController::PWM_MIN(), PLEN2::JointController::PWM_MAX()
 		#else
 			PLEN2::JointController::PWM_MAX(), PLEN2::JointController::PWM_MIN()
@@ -438,7 +438,7 @@ bool PLEN2::JointController::setAngleDiff(unsigned char joint_id, int angle_diff
 
 void PLEN2::JointController::dump()
 {
-	#if _DEBUG
+	#if DEBUG
 		system.outputSerial().println(F("=== running in function : JointController::dump()"));
 	#endif
 
@@ -510,15 +510,15 @@ ISR(TIMER1_OVF_vect)
 	digitalWrite(PLEN2::Pin::MULTIPLEXER_SELECT1(), bitRead(output_select, 1));
 	digitalWrite(PLEN2::Pin::MULTIPLEXER_SELECT2(), bitRead(output_select, 2));
 
-	_PLEN2__JOINTCONTROLLER__PWM_OUT_00_07_REGISTER = PLEN2::JointController::m_pwms[
+	PLEN2_JOINTCONTROLLER_PWM_OUT_00_07_REGISTER = PLEN2::JointController::m_pwms[
 		joint_select + 0 * PLEN2::JointController::Multiplexer::SELECTABLE_NUM()
 	];
 	
-	_PLEN2__JOINTCONTROLLER__PWM_OUT_08_15_REGISTER = PLEN2::JointController::m_pwms[
+	PLEN2_JOINTCONTROLLER_PWM_OUT_08_15_REGISTER = PLEN2::JointController::m_pwms[
 		joint_select + 1 * PLEN2::JointController::Multiplexer::SELECTABLE_NUM()
 	];
 	
-	_PLEN2__JOINTCONTROLLER__PWM_OUT_16_23_REGISTER = PLEN2::JointController::m_pwms[
+	PLEN2_JOINTCONTROLLER_PWM_OUT_16_23_REGISTER = PLEN2::JointController::m_pwms[
 		joint_select + 2 * PLEN2::JointController::Multiplexer::SELECTABLE_NUM()
 	];
 

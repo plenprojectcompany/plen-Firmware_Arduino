@@ -18,8 +18,8 @@
 
 
 // マクロの定義
-#define _DEBUG      false
-#define _DEBUG_HARD false
+#define DEBUG      false
+#define DEBUG_HARD false
 
 
 // ファイル内グローバルインスタンスの定義
@@ -86,13 +86,13 @@ PLEN2::MotionController::MotionController(JointController& joint_ctrl)
 
 bool PLEN2::MotionController::setHeader(const Header* header_ptr)
 {
-	#if _DEBUG
+	#if DEBUG
 		system.outputSerial().println(F("=== running in function : MotionController::setHeader()"));
 	#endif
 
 	if (header_ptr->slot >= Header::SLOT_END())
 	{
-		#if _DEBUG
+		#if DEBUG
 			system.outputSerial().print(F(">>> bad argment : header_ptr->slot = "));
 			system.outputSerial().println((int)header_ptr->slot);
 		#endif
@@ -103,7 +103,7 @@ bool PLEN2::MotionController::setHeader(const Header* header_ptr)
 	if (   (header_ptr->frame_length > Header::FRAMELENGTH_MAX())
 		|| (header_ptr->frame_length < Header::FRAMELENGTH_MIN()) )
 	{
-		#if _DEBUG
+		#if DEBUG
 			system.outputSerial().print(F(">>> bad argment : header_ptr->frame_length = "));
 			system.outputSerial().println((int)header_ptr->frame_length);
 		#endif
@@ -126,7 +126,7 @@ bool PLEN2::MotionController::setHeader(const Header* header_ptr)
 
 		if (ret != 0)
 		{
-			#if _DEBUG
+			#if DEBUG
 				system.outputSerial().print(F(">>> failed : ret["));
 				system.outputSerial().print(count);
 				system.outputSerial().print(F("] = "));
@@ -145,7 +145,7 @@ bool PLEN2::MotionController::setHeader(const Header* header_ptr)
 
 	if (ret != 0)
 	{
-		#if _DEBUG
+		#if DEBUG
 			system.outputSerial().print(F(">>> failed : ret["));
 			system.outputSerial().print(write_count - 1);
 			system.outputSerial().print(F("] = "));
@@ -161,13 +161,13 @@ bool PLEN2::MotionController::setHeader(const Header* header_ptr)
 
 bool PLEN2::MotionController::getHeader(Header* header_ptr)
 {
-	#if _DEBUG
+	#if DEBUG
 		system.outputSerial().println(F("=== running in function : MotionController::getHeader()"));
 	#endif
 	
 	if (header_ptr->slot >= Header::SLOT_END())
 	{
-		#if _DEBUG
+		#if DEBUG
 			system.outputSerial().print(F(">>> bad argment : header_ptr->slot = "));
 			system.outputSerial().println((int)header_ptr->slot);
 		#endif
@@ -190,7 +190,7 @@ bool PLEN2::MotionController::getHeader(Header* header_ptr)
 
 		if (ret != ExternalEEPROM::SLOT_SIZE())
 		{
-			#if _DEBUG
+			#if DEBUG
 				system.outputSerial().print(F(">>> failed : ret["));
 				system.outputSerial().print(count);
 				system.outputSerial().print(F("] = "));
@@ -209,7 +209,7 @@ bool PLEN2::MotionController::getHeader(Header* header_ptr)
 
 	if (ret != read_size_sup)
 	{
-		#if _DEBUG
+		#if DEBUG
 			system.outputSerial().print(F(">>> failed : ret["));
 			system.outputSerial().print(read_count - 1);
 			system.outputSerial().print(F("] = "));
@@ -225,13 +225,13 @@ bool PLEN2::MotionController::getHeader(Header* header_ptr)
 
 bool PLEN2::MotionController::setFrame(unsigned char slot, const Frame* frame_ptr)
 {
-	#if _DEBUG
+	#if DEBUG
 		system.outputSerial().println(F("=== running in function : MotionController::setFrame()"));
 	#endif
 	
 	if (slot >= Header::SLOT_END())
 	{
-		#if _DEBUG
+		#if DEBUG
 			system.outputSerial().print(F(">>> bad argment : slot = "));
 			system.outputSerial().println((int)slot);
 		#endif
@@ -241,7 +241,7 @@ bool PLEN2::MotionController::setFrame(unsigned char slot, const Frame* frame_pt
 
 	if (frame_ptr->index >= Frame::FRAME_END())
 	{
-		#if _DEBUG
+		#if DEBUG
 			system.outputSerial().print(F(">>> bad argment : frame_ptr->index = "));
 			system.outputSerial().println((int)frame_ptr->index);
 		#endif
@@ -265,7 +265,7 @@ bool PLEN2::MotionController::setFrame(unsigned char slot, const Frame* frame_pt
 
 		if (ret != 0)
 		{
-			#if _DEBUG
+			#if DEBUG
 				system.outputSerial().print(F(">>> failed : ret["));
 				system.outputSerial().print(count);
 				system.outputSerial().print(F("] = "));
@@ -284,7 +284,7 @@ bool PLEN2::MotionController::setFrame(unsigned char slot, const Frame* frame_pt
 
 	if (ret != 0)
 	{
-		#if _DEBUG
+		#if DEBUG
 			system.outputSerial().print(F(">>> failed : ret["));
 			system.outputSerial().print(write_count - 1);
 			system.outputSerial().print(F("] = "));
@@ -300,13 +300,13 @@ bool PLEN2::MotionController::setFrame(unsigned char slot, const Frame* frame_pt
 
 bool PLEN2::MotionController::getFrame(unsigned char slot, Frame* frame_ptr)
 {
-	#if _DEBUG
+	#if DEBUG
 		system.outputSerial().println(F("=== running in function : MotionController::getFrame()"));
 	#endif
 	
 	if (slot >= Header::SLOT_END())
 	{
-		#if _DEBUG
+		#if DEBUG
 			system.outputSerial().print(F(">>> bad argment : slot = "));
 			system.outputSerial().println((int)slot);
 		#endif
@@ -316,7 +316,7 @@ bool PLEN2::MotionController::getFrame(unsigned char slot, Frame* frame_ptr)
 
 	if (frame_ptr->index >= Frame::FRAME_END())
 	{
-		#if _DEBUG
+		#if DEBUG
 			system.outputSerial().print(F(">>> bad argment : frame_ptr->index = "));
 			system.outputSerial().println((int)frame_ptr->index);
 		#endif
@@ -340,7 +340,7 @@ bool PLEN2::MotionController::getFrame(unsigned char slot, Frame* frame_ptr)
 
 		if (ret != ExternalEEPROM::SLOT_SIZE())
 		{
-			#if _DEBUG
+			#if DEBUG
 				system.outputSerial().print(F(">>> failed : ret["));
 				system.outputSerial().print(count);
 				system.outputSerial().print(F("] = "));
@@ -359,7 +359,7 @@ bool PLEN2::MotionController::getFrame(unsigned char slot, Frame* frame_ptr)
 
 	if (ret != read_size_sup)
 	{
-		#if _DEBUG
+		#if DEBUG
 			system.outputSerial().print(F(">>> failed : ret["));
 			system.outputSerial().print(read_count - 1);
 			system.outputSerial().print(F("] = "));
@@ -375,7 +375,7 @@ bool PLEN2::MotionController::getFrame(unsigned char slot, Frame* frame_ptr)
 
 bool PLEN2::MotionController::playing()
 {
-	#if _DEBUG_HARD
+	#if DEBUG_HARD
 		system.outputSerial().println(F("=== running in function : MotionController::playing()"));
 	#endif
 
@@ -385,7 +385,7 @@ bool PLEN2::MotionController::playing()
 
 bool PLEN2::MotionController::frameUpdatable()
 {
-	#if _DEBUG_HARD
+	#if DEBUG_HARD
 		system.outputSerial().println(F("=== running in function : MotionController::frameUpdatable()"));
 	#endif
 
@@ -395,7 +395,7 @@ bool PLEN2::MotionController::frameUpdatable()
 
 bool PLEN2::MotionController::frameUpdateFinished()
 {
-	#if _DEBUG_HARD
+	#if DEBUG_HARD
 		system.outputSerial().println(F("=== running in function : MotionController::frameUpdateFinished()"));
 	#endif
 
@@ -405,7 +405,7 @@ bool PLEN2::MotionController::frameUpdateFinished()
 
 bool PLEN2::MotionController::nextFrameLoadable()
 {
-	#if _DEBUG_HARD
+	#if DEBUG_HARD
 		system.outputSerial().println(F("=== running in function : MotionController::nextFrameLoadable()"));
 	#endif
 
@@ -421,13 +421,13 @@ bool PLEN2::MotionController::nextFrameLoadable()
 
 void PLEN2::MotionController::play(unsigned char slot)
 {
-	#if _DEBUG
+	#if DEBUG
 		system.outputSerial().println(F("=== running in function : MotionController::play()"));
 	#endif
 
 	if (playing())
 	{
-		#if _DEBUG
+		#if DEBUG
 			system.outputSerial().println(F(">>> error! : A motion has been playing."));
 		#endif
 
@@ -436,7 +436,7 @@ void PLEN2::MotionController::play(unsigned char slot)
 
 	if (slot >= Header::SLOT_END())
 	{
-		#if _DEBUG
+		#if DEBUG
 			system.outputSerial().print(F(">>> bad argment : slot = "));
 			system.outputSerial().println((int)slot);
 		#endif
@@ -466,7 +466,7 @@ void PLEN2::MotionController::play(unsigned char slot)
 
 void PLEN2::MotionController::stopping()
 {
-	#if _DEBUG
+	#if DEBUG
 		system.outputSerial().println(F("=== running in function : MotionController::stopping()"));
 	#endif
 
@@ -477,7 +477,7 @@ void PLEN2::MotionController::stopping()
 
 void PLEN2::MotionController::stop()
 {
-	#if _DEBUG
+	#if DEBUG
 		system.outputSerial().println(F("=== running in function : MotionController::stop()"));
 	#endif
 
@@ -488,7 +488,7 @@ void PLEN2::MotionController::stop()
 
 void PLEN2::MotionController::frameUpdate()
 {
-	#if _DEBUG
+	#if DEBUG
 		system.outputSerial().println(F("=== running in function : MotionController::frameUpdate()"));
 	#endif	
 
@@ -506,7 +506,7 @@ void PLEN2::MotionController::frameUpdate()
 
 void PLEN2::MotionController::frameBuffering()
 {
-	#if _DEBUG
+	#if DEBUG
 		system.outputSerial().println(F("=== running in function : MotionController::frameBuffering()"));
 	#endif
 
@@ -518,14 +518,14 @@ void PLEN2::MotionController::frameBuffering()
 
 void PLEN2::MotionController::loadNextFrame()
 {
-	#if _DEBUG
+	#if DEBUG
 		system.outputSerial().println(F("=== running in function : MotionController::loadNextFrame()"));
 	#endif
 
 	frameBuffering();
 	const unsigned char& index_now = m_frame_ptr_now->index;
 
-	#if _DEBUG
+	#if DEBUG
 		system.outputSerial().print(F(">>> index_now : "));
 		system.outputSerial().println((int)index_now);
 
@@ -611,13 +611,13 @@ update_process:
 
 void PLEN2::MotionController::dump(unsigned char slot)
 {
-	#if _DEBUG
+	#if DEBUG
 		system.outputSerial().println(F("=== running in function : MotionController::dump()"));
 	#endif
 
 	if (slot >= Header::SLOT_END())
 	{
-		#if _DEBUG
+		#if DEBUG
 			system.outputSerial().print(F(">>> bad argment : slot = "));
 			system.outputSerial().println((int)slot);
 		#endif

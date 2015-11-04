@@ -5,8 +5,10 @@
 	@copyright The MIT License - http://opensource.org/licenses/mit-license.php
 */
 
-#ifndef _PLEN2__EXTERNAL_EEPROM_H_
-#define _PLEN2__EXTERNAL_EEPROM_H_
+#pragma once
+
+#ifndef PLEN2_EXTERNAL_EEPROM_H
+#define PLEN2_EXTERNAL_EEPROM_H
 
 namespace PLEN2
 {
@@ -98,4 +100,4 @@ public:
 	int writeSlot(unsigned int slot, const char data[], unsigned int write_size);
 };
 
-#endif // _PLEN2__EXTERNAL_EEPROM_H_
+#endif // PLEN2_EXTERNAL_EEPROM_H

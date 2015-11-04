@@ -5,8 +5,10 @@
 	@copyright The MIT License - http://opensource.org/licenses/mit-license.php
 */
 
-#ifndef _UTILITY__PURSER_H_
-#define _UTILITY__PURSER_H_
+#pragma once
+
+#ifndef UTILITY_PURSER_H
+#define UTILITY_PURSER_H
 
 namespace Utility
 {
@@ -112,4 +114,4 @@ public:
 	virtual bool purse(const char* input);
 };
 
-#endif // _UTILITY__PURSER_H_
+#endif // UTILITY_PURSER_H

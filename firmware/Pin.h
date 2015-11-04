@@ -5,8 +5,10 @@
 	@copyright The MIT License - http://opensource.org/licenses/mit-license.php
 */
 
-#ifndef _PLEN2__PIN_H_
-#define _PLEN2__PIN_H_
+#pragma once
+
+#ifndef PLEN2_PIN_H
+#define PLEN2_PIN_H
 
 namespace PLEN2
 {
@@ -55,4 +57,4 @@ namespace PLEN2
 	}
 }
 
-#endif // _PLEN2__PIN_H_
+#endif // PLEN2_PIN_H
