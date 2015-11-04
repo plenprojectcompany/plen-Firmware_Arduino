@@ -589,7 +589,7 @@ namespace
 */
 void setup()
 {
-	randomSeed(analogRead(PLEN2::Pin::RANDOM_DEVCIE_IN()));
+	randomSeed(analogRead(PLEN2::Pin::RANDOM_DEVICE_IN()));
 
 	joint_ctrl.loadSettings();
 
