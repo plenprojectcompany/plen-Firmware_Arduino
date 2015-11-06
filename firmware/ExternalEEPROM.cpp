@@ -9,22 +9,15 @@
 
 #define DEBUG false
 
-// Arduinoライブラリ
 #include "Arduino.h"
 #include <Wire.h>
 
-// 独自ライブラリ
-#if DEBUG
-	#include "System.h"
-#endif
 #include "ExternalEEPROM.h"
 
-
-namespace {
-	#if DEBUG
-		PLEN2::System system;
-	#endif
-}
+#if DEBUG
+	#include "System.h"
+	#include "Profiler.h"
+#endif
 
 
 PLEN2::ExternalEEPROM::ExternalEEPROM()
@@ -34,14 +27,14 @@ PLEN2::ExternalEEPROM::ExternalEEPROM()
 }
 
 
-int PLEN2::ExternalEEPROM::readSlot(
-	unsigned int slot,
-	char         data[],
-	unsigned int read_size
+char PLEN2::ExternalEEPROM::readSlot(
+	unsigned int  slot,
+	char          data[],
+	unsigned char read_size
 )
 {
 	#if DEBUG
-		system.outputSerial().println(F("=== running in function : ExternalEEPROM::readSlot()"));
+		volatile Utility::Profiler p(F("ExternalEEPROM::readSlot()"));
 	#endif
 
 	if (   (slot >= SLOT_END())
@@ -49,68 +42,62 @@ int PLEN2::ExternalEEPROM::readSlot(
 	)
 	{
 		#if DEBUG
-			system.outputSerial().print(F(">>> bad argument! : slot = "));
-			system.outputSerial().print(slot);
-			system.outputSerial().print(F(", or read_size = "));
-			system.outputSerial().println(read_size);
+			System::debugSerial().print(F(">>> bad argument! : slot = "));
+			System::debugSerial().print(slot);
+			System::debugSerial().print(F(", or read_size = "));
+			System::debugSerial().println(read_size);
 		#endif
 
 		return -1;
 	}
 
-	int  slave_address = ADDRESS();
-	long data_address  = (long)slot * CHUNK_SIZE();
+
+	int slave_address = ADDRESS();
+	unsigned long data_address = static_cast<unsigned long>(slot) * CHUNK_SIZE();
 
 	if (data_address >= (SIZE() / 2))
 	{
-		slave_address |= _BV(SELECT_BIT()); // B0 = 1のメモリブロックを選択
+		slave_address |= _BV(SELECT_BIT()); // Select the memory block B0 = 1.
 		data_address  -= (SIZE() / 2);
 	}
 
 	#if DEBUG
-		system.outputSerial().print(F(">>> slave_address = "));
-		system.outputSerial().println(slave_address, HEX);
-		system.outputSerial().print(F(">>> data_address = "));
-		system.outputSerial().println(data_address, HEX);
+		System::debugSerial().print(F(">>> slave_address = "));
+		System::debugSerial().println(slave_address, HEX);
+
+		System::debugSerial().print(F(">>> data_address = "));
+		System::debugSerial().println(data_address, HEX);
 	#endif
 
 	Wire.beginTransmission(slave_address);
-	Wire.write((byte)(data_address >> 8));     // High側アドレスを指定
-	Wire.write((byte)(data_address & 0x00ff)); // Low側アドレスを指定
-	int ret = Wire.endTransmission();
+	Wire.write((byte)(data_address >> 8));     // Sending targeted address's high byte.
+	Wire.write((byte)(data_address & 0x00FF)); // Sending targeted address's low byte.
 
-	if (ret == 0)
+	if (Wire.endTransmission() == 0)
 	{
-		ret = Wire.requestFrom(slave_address, read_size);
-		if (ret == read_size)
+		if (Wire.requestFrom(slave_address, read_size) == read_size)
 		{
-			for (int index = 0; index < read_size; index++)
+			for (char index = 0; index < read_size; index++)
 			{
 				data[index] = Wire.read();
 			}
+
+			return read_size;
 		}
-		else
-		{
-			ret = -1;
-		}
-	}
-	else
-	{
-		ret = - 1;
 	}
 
-	return ret;
+	return -1;
 }
 
 
-int PLEN2::ExternalEEPROM::writeSlot(
-	unsigned int slot,
-	const char   data[],
-	unsigned int write_size
+char PLEN2::ExternalEEPROM::writeSlot(
+	unsigned int  slot,
+	const char    data[],
+	unsigned char write_size
 )
 {
 	#if DEBUG
-		system.outputSerial().println(F("=== running in function : ExternalEEPROM::writeSlot()"));
+		volatile Utility::Profiler p(F("ExternalEEPROM::writeSlot()"));
 	#endif
 
 	if (   (slot >= SLOT_END())
@@ -118,42 +105,45 @@ int PLEN2::ExternalEEPROM::writeSlot(
 	)
 	{
 		#if DEBUG
-			system.outputSerial().print(F(">>> bad argument! : slot = "));
-			system.outputSerial().print(slot);
-			system.outputSerial().print(F(", or write_size = "));
-			system.outputSerial().println(write_size);
+			System::debugSerial().print(F(">>> bad argument! : slot = "));
+			System::debugSerial().print(slot);
+			System::debugSerial().print(F(", or write_size = "));
+			System::debugSerial().println(write_size);
 		#endif
-		
+
 		return -1;
 	}
 
-	int  slave_address = ADDRESS();
-	long data_address  = (long)slot * CHUNK_SIZE();
+
+	int slave_address = ADDRESS();
+	unsigned long data_address = static_cast<unsigned long>(slot) * CHUNK_SIZE();
 
 	if (data_address >= (SIZE() / 2))
 	{
-		slave_address |= _BV(SELECT_BIT()); // B0 = 1のメモリブロックを選択
+		slave_address |= _BV(SELECT_BIT()); // Select the memory block B0 = 1.
 		data_address  -= (SIZE() / 2);
 	}
 
 	#if DEBUG
-		system.outputSerial().print(F(">>> slave_address : "));
-		system.outputSerial().println(slave_address, HEX);
-		system.outputSerial().print(F(">>> data_address : "));
-		system.outputSerial().println(data_address, HEX);
+		System::debugSerial().print(F(">>> slave_address : "));
+		System::debugSerial().println(slave_address, HEX);
+
+		System::debugSerial().print(F(">>> data_address : "));
+		System::debugSerial().println(data_address, HEX);
 	#endif
 
 	Wire.beginTransmission(slave_address);
-	Wire.write((byte)(data_address >> 8));     // High側アドレスを指定
-	Wire.write((byte)(data_address & 0x00ff)); // Low側アドレスを指定
+	Wire.write((byte)(data_address >> 8));     // Sending targeted address's high byte.
+	Wire.write((byte)(data_address & 0x00ff)); // Sending targeted address's low byte.
 
-	for (int index = 0; index < write_size; index++)
+	for (char index = 0; index < write_size; index++)
 	{
 		Wire.write(data[index]);
 	}
 
-	int ret = Wire.endTransmission();
-	delay(5);
+	char ret = Wire.endTransmission();
+
+	delay(5); // @attention Wait for writing EEPROM.
 
 	return ret;
 }

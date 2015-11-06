@@ -3,6 +3,7 @@
 	"import": [
 		"ExternalEEPROM",
 		"Pin",
-		"System"
+		"System",
+		"Profiler"
 	]
 }
