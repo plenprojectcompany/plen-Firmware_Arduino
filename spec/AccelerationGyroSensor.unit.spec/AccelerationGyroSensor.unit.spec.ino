@@ -1,11 +1,15 @@
-#line 2 "AccelerationGyroSensor.spec.ino"
+#line 2 "AccelerationGyroSensor.unit.spec.ino"
 
 
 #include <ArduinoUnit.h>
 #include "AccelerationGyroSensor.h"
 
 
-#define _TEST_USER true //!< ユーザテストについても実行します。
+/*!
+	@brief テストケース選択用プリプロセスマクロ
+*/
+#define TEST_USER true //!< ユーザテストについても実行します。
+
 
 namespace
 {
@@ -18,11 +22,10 @@ namespace
 */
 test(GravityAxisX)
 {
-	#if _TEST_USER
+	#if TEST_USER
 		while (true)
 		{
 			acc_gyro.sampling();
-			delay(50);
 
 			int acc_x = abs(acc_gyro.getAccX());
 			int acc_y = abs(acc_gyro.getAccY());
@@ -45,11 +48,10 @@ test(GravityAxisX)
 */
 test(GravityAxisY)
 {
-	#if _TEST_USER
+	#if TEST_USER
 		while (true)
 		{
 			acc_gyro.sampling();
-			delay(50);
 
 			int acc_x = abs(acc_gyro.getAccX());
 			int acc_y = abs(acc_gyro.getAccY());
@@ -72,11 +74,10 @@ test(GravityAxisY)
 */
 test(GravityAxisZ)
 {
-	#if _TEST_USER
+	#if TEST_USER
 		while (true)
 		{
 			acc_gyro.sampling();
-			delay(50);
 
 			int acc_x = abs(acc_gyro.getAccX());
 			int acc_y = abs(acc_gyro.getAccY());
@@ -99,11 +100,10 @@ test(GravityAxisZ)
 */
 test(GyroAxisRoll)
 {
-	#if _TEST_USER
+	#if TEST_USER
 		while (true)
 		{
 			acc_gyro.sampling();
-			delay(50);
 
 			int gyro_roll  = abs(acc_gyro.getGyroRoll());
 			int gyro_pitch = abs(acc_gyro.getGyroPitch());
@@ -126,11 +126,10 @@ test(GyroAxisRoll)
 */
 test(GyroAxisPitch)
 {
-	#if _TEST_USER
+	#if TEST_USER
 		while (true)
 		{
 			acc_gyro.sampling();
-			delay(50);
 
 			int gyro_roll  = abs(acc_gyro.getGyroRoll());
 			int gyro_pitch = abs(acc_gyro.getGyroPitch());
@@ -153,11 +152,10 @@ test(GyroAxisPitch)
 */
 test(GyroAxisYaw)
 {
-	#if _TEST_USER
+	#if TEST_USER
 		while (true)
 		{
 			acc_gyro.sampling();
-			delay(50);
 
 			int gyro_roll  = abs(acc_gyro.getGyroRoll());
 			int gyro_pitch = abs(acc_gyro.getGyroPitch());
@@ -182,7 +180,7 @@ test(GyroAxisYaw)
 */
 test(Dump)
 {
-	#if _TEST_USER
+	#if TEST_USER
 		acc_gyro.dump();
 
 		pass();
@@ -197,10 +195,12 @@ test(Dump)
 */
 void setup()
 {
+	delay(3000);
+
 	while (!Serial); // for the Arduino Leonardo/Micro only.
 
-	Serial.println("Test started.");
-	Serial.println("=============");
+	Serial.print(F("# Test : "));
+	Serial.println(__FILE__);
 }
 
 void loop()
