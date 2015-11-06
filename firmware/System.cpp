@@ -7,14 +7,16 @@
 	(See also : http://opensource.org/licenses/mit-license.php)
 */
 
+#define DEBUG false
 
 #include "Arduino.h"
 #include "Pin.h"
 #include "System.h"
 
+#if DEBUG
+	#include "Profiler.h"
+#endif
 
-// マクロ定義
-#define DEBUG false
 
 #define PLEN2_SYSTEM_USBSERIAL Serial
 #define PLEN2_SYSTEM_BLESERIAL Serial1
@@ -56,44 +58,31 @@ Stream& PLEN2::System::outputSerial()
 	return PLEN2_SYSTEM_USBSERIAL;
 }
 
-
-void PLEN2::System::timer1Attach()
+Stream& PLEN2::System::debugSerial()
 {
-	#if DEBUG
-		outputSerial().println(F("=== running in function : System::timer1Attach()"));
-	#endif
-
-	TIMSK1 = _BV(TOIE1);
-}
-
-
-void PLEN2::System::timer1Detach()
-{
-	#if DEBUG
-		outputSerial().println(F("=== running in function : System::timer1Detach()"));
-	#endif
-
-	TIMSK1 &= ~_BV(TOIE1);
+	return PLEN2_SYSTEM_USBSERIAL;
 }
 
 
 void PLEN2::System::dump()
 {
 	#if DEBUG
-		outputSerial().println(F("=== running in function : System::dump()"));
+		volatile Utility::Profiler p(F("System::dump()"));
 	#endif
 
 	outputSerial().println(F("{"));
-		outputSerial().print(F("\t\"device\": \""));
-		outputSerial().print(DEVICE());
-		outputSerial().println(F("\","));
 
-		outputSerial().print(F("\t\"codename\": \""));
-		outputSerial().print(CODENAME());
-		outputSerial().println(F("\","));
+	outputSerial().print(F("\t\"device\": \""));
+	outputSerial().print(DEVICE());
+	outputSerial().println(F("\","));
 
-		outputSerial().print(F("\t\"version\": \""));
-		outputSerial().print(VERSION());
-		outputSerial().println(F("\""));
+	outputSerial().print(F("\t\"codename\": \""));
+	outputSerial().print(CODENAME());
+	outputSerial().println(F("\","));
+
+	outputSerial().print(F("\t\"version\": \""));
+	outputSerial().print(VERSION());
+	outputSerial().println(F("\""));
+
 	outputSerial().println(F("}"));
 }
