@@ -6,7 +6,7 @@ import shutil
 import json
 
 
-fin = open('dependency.json', 'r')
+fin = open('dependencies.json', 'r')
 dependency = json.load(fin)
 
 if (len(sys.argv) == 2):

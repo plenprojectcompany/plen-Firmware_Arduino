@@ -16,7 +16,7 @@ setup(
 	},
 
 	console = [
-		{ "script" : "ArduinoDI.py" }
+		{ "script" : "CppImport.py" }
 	],
 
 	zipfile = None
