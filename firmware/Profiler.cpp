@@ -11,9 +11,12 @@
 #include "Profiler.h"
 
 
-namespace Shared
+namespace
 {
-	unsigned int m_nest = 0;
+	namespace Shared
+	{
+		unsigned int m_nest = 0;
+	}
 }
 
 
@@ -29,34 +32,32 @@ void Utility::Profiler::m_tabbing()
 Utility::Profiler::Profiler(const __FlashStringHelper* fsh_ptr)
 {
 	m_tabbing();
-	Serial.println(F(">>> pushed"));
+	Serial.print(F(">>> pushed : "));
+	Serial.println(fsh_ptr);
 
 	m_tabbing();
-	Serial.print(F("  | running   : "));
-	Serial.println(fsh_ptr);
+	Serial.print(F("+++ stack ptr : "));
+	Serial.println(reinterpret_cast<unsigned int>(this), HEX);
 
 	Shared::m_nest++;
 	m_begin = micros();
-
-	delay(DELAY_MS());
 }
 
 
 Utility::Profiler::~Profiler()
 {
-	m_end = micros() - m_begin - DELAY_MS();
+	m_end = micros();
 	Shared::m_nest--;
 
 	m_tabbing();
-	Serial.print(F("  | nest      : "));
+	Serial.print(F("+++ nest      : "));
 	Serial.println(Shared::m_nest);
 
 	m_tabbing();
-	Serial.print(F("  | exec time : "));
-	Serial.println(m_end);
+	Serial.print(F("+++ exec time : "));
+	Serial.print(m_end - m_begin);
+	Serial.println(F(" [usec]"));
 
 	m_tabbing();
 	Serial.println(F("<<< popped"));
-
-	delay(DELAY_MS());
 }

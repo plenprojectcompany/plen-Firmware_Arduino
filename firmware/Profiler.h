@@ -38,9 +38,6 @@ namespace Utility
 class Utility::Profiler
 {
 private:
-	//! @brief Serial outputting delay
-	inline static const int DELAY_MS() { return 50; }
-
 	unsigned long m_begin;
 	unsigned long m_end;
 
@@ -57,7 +54,8 @@ public:
 		@param [in] fsh_ptr Please set startup message.
 
 		@attention
-		Arduino IDE is using optimization option -Os, so you should use volatile prefix.
+		Arduino IDE is using optimization option -Os,
+		so you should use volatile prefix when instantiate the class.
 	*/
 	Profiler(const __FlashStringHelper* fsh_ptr);
 
