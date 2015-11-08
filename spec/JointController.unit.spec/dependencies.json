@@ -3,6 +3,7 @@
 	"import": [
 		"JointController",
 		"Pin",
-		"System"
+		"System",
+		"Profiler"
 	]
 }
