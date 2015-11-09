@@ -1,4 +1,5 @@
 #include "AccelerationGyroSensor.h"
+#include "Profiler.h"
 
 
 namespace
@@ -10,24 +11,17 @@ namespace
 void setup()
 {
 	while (!Serial);
+
+	delay(3000); //!< @attention BLEチップのファームウェア起動を待つ。
 }
 
 void loop()
 {
-	/*!
-		@attention
-		BLE基板に電力供給が完了するのを待つ必要があるため、
-		delay()を各種メソッドの呼び出し前に実行する必要がある。
-		(setup()でいくらかdelay()を設定するでも可。)
-	*/
-	delay(100);
+	{
+		volatile Utility::Profiler p(F("AccelerationGyroSensor::sampling()"));
 
-	unsigned long begin = micros();
-	acc_gyro.sampling();
-	unsigned long end   = micros();
-
-	Serial.print(F("# exec time : AccelerationGyroSensor::sampling() = "));
-	Serial.println(end - begin);
+		acc_gyro.sampling();
+	}
 
 	acc_gyro.dump();
 }

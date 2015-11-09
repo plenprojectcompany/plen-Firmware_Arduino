@@ -1,9 +1,12 @@
+#include "Arduino.h"
 #include <EEPROM.h>
+
 #include "System.h"
 #include "JointController.h"
 
 
-namespace {
+namespace
+{
 	PLEN2::System          system;
 	PLEN2::JointController joint_ctrl;
 

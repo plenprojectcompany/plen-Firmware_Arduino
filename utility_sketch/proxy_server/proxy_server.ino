@@ -1,3 +1,5 @@
+#include "Arduino.h"
+
 #include "Pin.h"
 #include "System.h"
 
