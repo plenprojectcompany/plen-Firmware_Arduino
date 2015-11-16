@@ -3,8 +3,12 @@
 	"import": [
 		"ExternalEEPROM",
 		"JointController",
+		"Motion",
 		"MotionController",
+		"Protocol",
+		"Parser",
 		"Pin",
-		"System"
+		"System",
+		"Profiler"
 	]
 }
