@@ -1,18 +1,17 @@
-#line 2 "Interpreter.spec.ino"
+#line 2 "Interpreter.unit.spec.ino"
 
 
-// Arduinoライブラリ関連
 #include <Wire.h>
 #include <EEPROM.h>
 
-// 独自ライブラリ関連
 #include <ArduinoUnit.h>
+#include "System.h"
 #include "JointController.h"
+#include "Motion.h"
 #include "MotionController.h"
 #include "Interpreter.h"
 
 
-// ファイル内グローバルインスタンスの定義
 namespace
 {
 	PLEN2::JointController  joint_ctrl;
@@ -26,11 +25,14 @@ namespace
 */
 test(PushPop_Equals)
 {
+	// Setup ===================================================================
 	int push_count = 0;
 	int pop_count  = 0;
 
 	PLEN2::Interpreter::Code code;
 	interpreter.reset();
+
+	// Run =====================================================================
 	while (interpreter.pushCode(code))
 	{
 		push_count++;
@@ -41,6 +43,7 @@ test(PushPop_Equals)
 		pop_count++;
 	}
 
+	// Assert ==================================================================
 	assertEqual(push_count, pop_count);
 }
 
@@ -50,17 +53,20 @@ test(PushPop_Equals)
 */
 test(PushCode_Overflow)
 {
-	bool expected = false;
-
+	// Setup ===================================================================
 	PLEN2::Interpreter::Code code;
 	interpreter.reset();
-	bool actual = true;
 
-	for (int index = 0; index < PLEN2::Interpreter::QUEUE_SIZE(); index++)
+	// Run =====================================================================
+	bool expected = false;
+	bool actual   = true;
+
+	for (int index = 0; index < PLEN2::Interpreter::QUEUE_SIZE; index++)
 	{
 		actual = interpreter.pushCode(code);
 	}
 
+	// Assert ==================================================================
 	assertEqual(expected, actual);
 }
 
@@ -70,11 +76,14 @@ test(PushCode_Overflow)
 */
 test(PopCode_Empty)
 {
-	bool expected = false;
-
+	// Setup ===================================================================
 	interpreter.reset();
-	bool actual = interpreter.popCode();
 
+	// Run =====================================================================
+	bool expected = false;
+	bool actual   = interpreter.popCode();
+
+	// Assert ==================================================================
 	assertEqual(expected, actual);
 }
 
@@ -84,13 +93,16 @@ test(PopCode_Empty)
 */
 test(Ready)
 {
-	bool expected = true;
-
+	// Setup ===================================================================
 	PLEN2::Interpreter::Code code;
 	interpreter.reset();
 	interpreter.pushCode(code);
-	bool actual = interpreter.ready();
 
+	// Run =====================================================================
+	bool expected = true;
+	bool actual   = interpreter.ready();
+
+	// Assert ==================================================================
 	assertEqual(expected, actual);
 }
 
@@ -100,10 +112,12 @@ test(Ready)
 */
 void setup()
 {
+	volatile PLEN2::System system;
+
 	while (!Serial); // for the Arduino Leonardo/Micro only.
 
-	Serial.println("Test started.");
-	Serial.println("=============");
+	PLEN2::System::outputSerial().print(F("# Test : "));
+	PLEN2::System::outputSerial().println(__FILE__);
 }
 
 void loop()

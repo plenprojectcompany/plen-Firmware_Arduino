@@ -9,27 +9,24 @@
 
 #define DEBUG false
 
-// Arduinoライブラリ
-#include "Arduino.h"
+#include <Arduino.h>
 
-// 独自ライブラリ
-#if DEBUG
-	#include "System.h"
-#endif
 #include "Interpreter.h"
 #include "JointController.h"
+#include "Motion.h"
 #include "MotionController.h"
+
+#if DEBUG
+	#include "System.h"
+	#include "Profiler.h"
+#endif
 
 
 namespace
 {
-	#if DEBUG
-		PLEN2::System system;
-	#endif
-
 	inline unsigned char getIndex(unsigned char value)
 	{
-		return (value & (PLEN2::Interpreter::QUEUE_SIZE() - 1));
+		return (value & (PLEN2::Interpreter::QUEUE_SIZE - 1));
 	}
 }
 
@@ -42,16 +39,17 @@ PLEN2::Interpreter::Interpreter(MotionController& motion_crtl)
 	// noop.
 }
 
+
 bool PLEN2::Interpreter::pushCode(const Code& code)
 {
 	#if DEBUG
-		system.outputSerial().println(F("=== running in function : Interpreter::pushCode()"));
+		volatile Utility::Profiler p(F("Interpreter::pushCode()"));
 	#endif
 
 	if (getIndex(m_queue_end + 1) == m_queue_begin)
 	{
 		#if DEBUG
-			system.outputSerial().println(F(">>> error : Queue overflow!"));
+			System::debugSerial().println(F(">>> error : Queue overflow!"));
 		#endif
 
 		return false;
@@ -63,16 +61,17 @@ bool PLEN2::Interpreter::pushCode(const Code& code)
 	return true;
 }
 
+
 bool PLEN2::Interpreter::popCode()
 {
 	#if DEBUG
-		system.outputSerial().println(F("=== running in function : Interpreter::popCode()"));
+		volatile Utility::Profiler p(F("Interpreter::popCode()"));
 	#endif
 
 	if (!ready())
 	{
 		#if DEBUG
-			system.outputSerial().println(F(">>> error : This is not ready!"));
+			System::debugSerial().println(F(">>> error : This is not ready!"));
 		#endif
 
 		return false;
@@ -85,7 +84,7 @@ bool PLEN2::Interpreter::popCode()
 
 	if (doing.loop_count != 0)
 	{
-		if (m_motion_ctrl_ptr->m_header.use_loop == 0)
+		if (!m_motion_ctrl_ptr->m_header.use_loop)
 		{
 			m_motion_ctrl_ptr->m_header.use_loop = 1;
 
@@ -104,19 +103,21 @@ bool PLEN2::Interpreter::popCode()
 	return true;
 }
 
+
 bool PLEN2::Interpreter::ready()
 {
 	#if DEBUG
-		system.outputSerial().println(F("=== running in function : Interpreter::ready()"));
+		volatile Utility::Profiler p(F("Interpreter::ready()"));
 	#endif
 
 	return (m_queue_begin != m_queue_end);
 }
 
+
 void PLEN2::Interpreter::reset()
 {
 	#if DEBUG
-		system.outputSerial().println(F("=== running in function : Interpreter::reset()"));
+		volatile Utility::Profiler p(F("Interpreter::reset()"));
 	#endif
 
 	m_queue_begin = 0;
