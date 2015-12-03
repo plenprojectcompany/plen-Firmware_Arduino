@@ -26,7 +26,7 @@ namespace Utility
 		@param [in] size  Length of hex string buffer.
 
 		@attention
-		
+		The method does not validate arguments.
 	*/
 	unsigned int hexbytes2uint(const char* bytes, unsigned char size);
 
@@ -39,7 +39,7 @@ namespace Utility
 		@param [in] size  Length of hex string buffer.
 
 		@attention
-		
+		The method does not validate arguments.
 	*/
 	int hexbytes2int(const char* bytes, unsigned char size);
 }
