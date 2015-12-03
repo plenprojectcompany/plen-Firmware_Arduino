@@ -9,6 +9,8 @@
 
 #define DEBUG false
 
+#include <Arduino.h>
+
 #include "Parser.h"
 #include "Protocol.h"
 
@@ -268,7 +270,7 @@ void PLEN2::Protocol::transitState()
 		default:
 		{
 			#if DEBUG
-				System::debugSerial.println(F(">>> error : Undefined state was inputed."));
+				System::debugSerial().println(F(">>> error : Undefined state was inputed."));
 			#endif
 
 			m_abort();
