@@ -33,7 +33,7 @@ namespace PLEN2
 
 	@attention
 	The firmware backs up memory allocation of an instance to external EEPROM,
-	so if you change the order of member instances, PLEN does not work properly
+	so if you change the order of the member instances, PLEN does not work properly
 	if you did not re-install all motions.
 */
 class PLEN2::Motion::Header
@@ -48,7 +48,7 @@ public:
 		*/
 		NAME_LENGTH     = 21,
 
-		FRAMELENGTH_MIN =  1, //!< Minimum value of frame length. 
+		FRAMELENGTH_MIN =  1, //!< Minimum value of frame length.
 		FRAMELENGTH_MAX = 20  //!< Maximum value of frame length.
 	};
 
@@ -74,15 +74,15 @@ public:
 	unsigned char frame_length;      //!< Frame length of a motion.
 
 	unsigned char NON_RESERVED : 5;  //!< Undefined area. (It is reserved for future changes.)
-	unsigned char use_extra    : 1;  //!< Selector for to enable "extra".
-	unsigned char use_jump     : 1;  //!< Selector for to enable "jump".
-	unsigned char use_loop     : 1;  //!< Selector for to enable "loop".
+	unsigned char use_extra    : 1;  //!< Selector to enable "extra".
+	unsigned char use_jump     : 1;  //!< Selector to enable "jump".
+	unsigned char use_loop     : 1;  //!< Selector to enable "loop".
 
 	unsigned char loop_begin;        //!< Frame number of loop's beginning.
 	unsigned char loop_end;          //!< Frame number of loop's ending.
 
 	unsigned char loop_count;        //!< Loop count. (Using 255 as infinity.)
-	unsigned char jump_slot;         //!< Slot number that is used for jumpping when play the motion finished.
+	unsigned char jump_slot;         //!< Slot number that is used for jumping when the motion's play is finished.
 
 	/*!
 		@brief Array of stop flags

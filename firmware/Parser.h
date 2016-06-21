@@ -26,14 +26,14 @@ namespace Utility
 		@param [in] size  Length of hex string buffer.
 
 		@attention
-		The method does not validate arguments.
+		The method does not validate its arguments.
 	*/
 	unsigned int hexbytes2uint(const char* bytes, unsigned char size);
 
 	/*!
 		@brief Convert hex string to an int
 
-		Convert to regard the highest bit as signed bit after converting hex string to bit-expression.
+		Convert with regard to the highest bit as signed bit after converting hex string to bit-expression.
 
 		@param [in] bytes Pointer of hex string buffer.
 		@param [in] size  Length of hex string buffer.
@@ -56,7 +56,7 @@ protected:
 	/*!
 		@brief Constructor
 
-		The method is protected for to disable instantiation.
+		The method is protected to disable instantiation.
 	*/
 	AbstractParser();
 
@@ -79,7 +79,7 @@ public:
 		@brief Get matched index of after parsing
 
 		@return Matched index
-		@retval !-1 Matched. (The value is the index selected from the condition given when instantiate the class.)
+		@retval !-1 Matched. (The value is the index selected from the condition given when instantiating the class.)
 		@retval -1  Parsing failed, so there is no matched index.
 	*/
 	virtual const char& index();
@@ -146,7 +146,7 @@ public:
 
 		@note
 		The class runs linear search internally,
-		so it is efficient that to put a char that has high priority in heading of the accept_chars.
+		so it is efficient to put a char that has high priority in heading of the accept_chars.
 	*/
 	CharGroupParser(const char* accept_chars);
 
@@ -158,10 +158,10 @@ public:
 	/*!
 		@brief Parse input string
 
-		In the implementation, parses heading of the input.
+		In the implementation, parses the heading of the input.
 		(i.e. Validate the input as <b>^[accept_chars]</b>.)
 
-		If you want to validate being <b>^[accept_chars]+$</b>,
+		If you want <b>^[accept_chars]+$</b> to be validated,
 		please edit the method yourself.
 
 		@param [in] input String you want to parse.
@@ -209,11 +209,11 @@ public:
 	/*!
 		@brief Constructor
 
-		@param [in] accept_strs Pointer of condition array that sorted with dictionary order.
+		@param [in] accept_strs Pointer of condition array sorted with dictionary order.
 		@param [in] size        Size of the condition array.
 
 		@attention
-		Should give the class array that sorted with dictionary order,
+		Should give the class array sorted with dictionary order,
 		because it runs binary search internally.
 	*/
 	StringGroupParser(const char* accept_strs[], const unsigned char size);

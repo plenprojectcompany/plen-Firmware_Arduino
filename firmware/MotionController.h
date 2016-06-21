@@ -46,14 +46,14 @@ public:
 	MotionController(JointController& joint_ctrl);
 
 	/*!
-		@brief Decide a motion is playing
+		@brief Decide if a motion is playing
 
 		@return Result
 	*/
 	bool playing();
 
 	/*!
-		@brief Decide a motion frame is updatable
+		@brief Decide if a motion frame is updatable
 
 		@return Result
 	*/
@@ -67,7 +67,7 @@ public:
 	bool updatingFinished();
 
 	/*!
-		@brief Decide there is a loadable frame at the next time
+		@brief Decide if there is a loadable frame at the next time
 
 		@return Result
 	*/
@@ -84,7 +84,7 @@ public:
 		@brief Will stop playing a motion
 
 		The method doesn't stop playing a motion just after running itself,
-		but will stop it when a frame that has the stop flag discovered.
+		but will stop it when a frame that has the stop flag is discovered.
 	*/
 	void willStop();
 

@@ -26,7 +26,7 @@ namespace Utility
 	@code
 	void anyFunction()
 	{
-		// When instantiate the class, it outputs message given.
+		// When instantiating the class, it outputs a given message.
 		volatile Utility::Profiler p(F("anyFunction()"));
 
 		Any code here...

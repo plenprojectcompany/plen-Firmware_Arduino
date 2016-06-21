@@ -19,12 +19,12 @@ namespace PLEN2
 	@brief Management class of external EEPROM
 
 	@note
-	24FC1025 supports to access 128 bytes at once, but Arduino's I2C library is not supported the method
+	24FC1025 supports the access to 128 bytes at once, but Arduino's I2C library doesn't support it
 	because the library's buffer size is 32 bytes.
 	<br><br>
-	Please pay attention to it is including bytes of targeted area address (= 2 bytes).
-	Accurate data size are 30 bytes that you can write.
-	(This is the reason that there are differences between CHUNK_SIZE() and SLOT_SIZE().)
+	Please pay attention to the fact that it is including bytes of targeted area address (= 2 bytes).
+	The accurate data size that you can write is 30 bytes .
+	(This is why there are differences between CHUNK_SIZE() and SLOT_SIZE().)
 */
 class PLEN2::ExternalEEPROM
 {
@@ -92,7 +92,7 @@ public:
 
 		@attention
 		Writing external EEPROM requires time. (Typically using 3[msec].)
-		In the implementation, 5[msec] delay is inserted at end of the method.
+		In the implementation, 5[msec] delay is inserted at the end of the method.
 	*/
 	static char writeSlot(unsigned int slot, const char data[], unsigned char write_size);
 };

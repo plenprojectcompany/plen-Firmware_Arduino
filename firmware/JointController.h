@@ -20,7 +20,7 @@ namespace PLEN2
 	The MCU can control 24 servos by connecting 3bit multiplexer in each signal output lines.
 
 	@note
-	There is information about PLEN1.4's configuration below.
+	There is more information about PLEN1.4's configuration below.
 	@code
 	enum {
 		SUM = 24, //!< Summation of the servos controllable.
@@ -30,13 +30,13 @@ namespace PLEN2
 		ANGLE_NEUTRAL =    0  //!< Neutral angle of the servos.
 	};
 
-	//! @brief PWM width that to make min angle
+	//! @brief PWM width to make min angle
 	inline static const int PWM_MIN()     { return 492;  }
 
-	//! @brief PWM width that to make max angle
+	//! @brief PWM width to make max angle
 	inline static const int PWM_MAX()     { return 816;  }
 
-	//! @brief PWM width that to make neutral angle
+	//! @brief PWM width to make neutral angle
 	inline static const int PWM_NEUTRAL() { return 654;  }
 	@endcode
 */
@@ -90,8 +90,8 @@ public:
 		@brief Management class (as namespace) of multiplexer
 
 		@note
-		The methods the class has are more accurate that there are in the namespace named Multiplexer,
-		but C++'s idiom doesn't accept syntax that described before.
+		The methods of the class are more accurate than those in the namespace named Multiplexer,
+		but C++'s idiom doesn't accept the syntax that was described before.
 	*/
 	class Multiplexer {
 	public:
@@ -116,7 +116,7 @@ public:
 
 		@attention
 		The instance should be a private member normally.
-		It is a public member because it is only way to access from Timer 1 overflow interruption vector,
+		It is a public member because it is the only way to access it from Timer 1 overflow interruption vector,
 		so you must not access it from other functions basically.
 	*/
 	volatile static bool m_1cycle_finished;
@@ -126,7 +126,7 @@ public:
 
 		@attention
 		The instance should be a private member normally.
-		It is a public member because it is only way to access from Timer 1 overflow interruption vector,
+		It is a public member because it is the only way to access it from Timer 1 overflow interruption vector,
 		so you must not access it from other functions basically.
 	*/
 	static unsigned int m_pwms[SUM];
@@ -146,9 +146,9 @@ public:
 		JointController.cpp::Shared::m_SETTINGS_INITIAL
 
 		@attention
-		The method should call in constructor normally,
-		but initialized timing of any interruption is indefinite, so might get deadlock.
-		(The method uses serial communication and internal EEPROM accessing, so it happens interruption.)
+		The method should be called in constructor normally,
+		but initialized timing of any interruption is indefinite, so it might get deadlocked.
+		(The method uses serial communication and internal EEPROM access, so interruption happens.)
 	*/
 	void loadSettings();
 
@@ -162,9 +162,9 @@ public:
 	/*!
 		@brief Get min angle of the joint given
 
-		@param [in] joint_id Please set joint id you want to get min angle.
+		@param [in] joint_id Please set the joint id from which you want to get min angle.
 
-		@return Reference of min angle a joint expressed by **joint_id** has.
+		@return Reference of min angle of a joint described by **joint_id**.
 		@retval -32768 Argument error. (**joint_id** is invalid.)
 	*/
 	const int& getMinAngle(unsigned char joint_id);
@@ -172,9 +172,9 @@ public:
 	/*!
 		@brief Get max angle of the joint given
 
-		@param [in] joint_id Please set joint id you want to get max angle.
+		@param [in] joint_id Please set the joint id from which you want to get max angle.
 
-		@return Reference of max angle a joint expressed by **joint_id** has.
+		@return Reference of max angle of a joint described by **joint_id**.
 		@retval -32768 Argument error. (**joint_id** is invalid.)
 	*/
 	const int& getMaxAngle(unsigned char joint_id);
@@ -182,7 +182,7 @@ public:
 	/*!
 		@brief Get home angle of the joint given
 
-		@param [in] joint_id Please set joint id you want to get home angle.
+		@param [in] joint_id Please set the joint id from which you want to get home angle.
 
 		@return Reference of home angle a joint expressed by **joint_id** has.
 		@retval -32768 Argument error. (**joint_id** is invalid.)
@@ -192,7 +192,7 @@ public:
 	/*!
 		@brief Set min angle of the joint given
 
-		@param [in] joint_id Please set joint id you want to define min angle.
+		@param [in] joint_id Please set the joint id from which you want to define the min angle.
 		@param [in] angle    Please set angle that has steps of degree 1/10.
 
 		@return Result
@@ -202,7 +202,7 @@ public:
 	/*!
 		@brief Set max angle of the joint given
 
-		@param [in] joint_id Please set joint id you want to define max angle.
+		@param [in] joint_id Please set the joint id from which you want to define the max angle.
 		@param [in] angle    Please set angle that has steps of degree 1/10.
 
 		@return Result
@@ -212,7 +212,7 @@ public:
 	/*!
 		@brief Set home angle of the joint given
 
-		@param [in] joint_id Please set joint id you want to define home angle.
+		@param [in] joint_id Please set the joint id from which you want to define the home angle.
 		@param [in] angle    Please set angle that has steps of degree 1/10.
 
 		@return Result
@@ -222,14 +222,14 @@ public:
 	/*!
 		@brief Set angle of the joint given
 
-		@param [in] joint_id Please set joint id you want to set angle.
+		@param [in] joint_id Please set the joint id from which you want to set the angle.
 		@param [in] angle    Please set angle that has steps of degree 1/10.
 
 		@return Result
 
 		@attention
-		<b>angle</b> might not be setting actually.
-		It is setting after trimming by user defined min-max value or servo's range,
+		<b>angle</b> might not be set actually.
+		It is set after trimming by user defined min-max value or servo's range,
 		so please consider it when writing a unit test.
 	*/
 	bool setAngle(unsigned char joint_id, int angle);
@@ -237,14 +237,14 @@ public:
 	/*!
 		@brief Set angle to "angle-diff + home-angle" of the joint given
 
-		@param [in] joint_id   Please set joint id you want to set angle-diff.
+		@param [in] joint_id   Please set the joint id from which you want to set the angle-diff.
 		@param [in] angle_diff Please set angle-diff that has steps of degree 1/10.
 
 		@return Result
 
 		@attention
-		<b>angle_diff</b> might not be setting actually.
-		It is setting after trimming by user defined min-max value or servo's range,
+		<b>angle_diff</b> might not be set actually.
+		It is set after trimming by user defined min-max value or servo's range,
 		so please consider it when writing a unit test.
 	*/
 	bool setAngleDiff(unsigned char joint_id, int angle_diff);
@@ -252,7 +252,7 @@ public:
 	/*!
 		@brief Dump the joint settings
 
-		Output result like JSON format below.
+		Output result in JSON format as below.
 		@code
 		[
 			{
