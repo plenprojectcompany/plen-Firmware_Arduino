@@ -10,16 +10,18 @@
 #ifndef PLEN2_PIN_H
 #define PLEN2_PIN_H
 
+degitalWrite(LEFT_SHOULDER_PIN, HIGH)
+
 namespace PLEN2
 {
 	/*!
 		@brief Management namespace of pin mapping
 
-		Please give the standard Arduino libraries the methods returning values.
+		Please give to the standard Arduino libraries methods the values defined in this namespace.
 		The methods are evaluated at compile time, so there is no overhead at runtime.
 
 		@note
-		It helps your understanding that to refer the PLEN2's circuit and schematic.
+		It helps your understanding to refer the PLEN2's circuit and schematic.
 		-> https://github.com/plenproject/plen__baseboard
 
 		@sa

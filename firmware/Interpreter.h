@@ -41,7 +41,7 @@ public:
 			@brief Size of code queue
 
 			@attention
-			It should be defined 2^N length for processing the class with high speed.
+			It should be defined as 2^N length for processing the class with high speed.
 		*/
 		QUEUE_SIZE = 32
 	};
@@ -79,7 +79,7 @@ public:
 	bool popCode();
 
 	/*!
-		@brief Decide there are codes which are reserved to run
+		@brief Decide if there are codes which are reserved to run
 
 		@return Result
 	*/

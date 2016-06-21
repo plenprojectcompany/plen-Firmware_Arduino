@@ -37,7 +37,7 @@ private:
 
 	//! @brief Communication speed of USB serial
 	inline static const long USBSERIAL_BAUDRATE() { return 2000000L; }
-	
+
 	//! @brief Communication speed of BLE serial
 	inline static const long BLESERIAL_BAUDRATE() { return 2000000L; }
 
@@ -73,14 +73,14 @@ public:
 
 	/*!
 		@brief Get output-serial instance
-		
+
 		@return Reference of output-serial instance
 	*/
 	static Stream& outputSerial();
 
 	/*!
 		@brief Get debug-serial instance
-		
+
 		@return Reference of debug-serial instance
 	*/
 	static Stream& debugSerial();
@@ -88,7 +88,7 @@ public:
 	/*!
 		@brief Dump information of the system
 
-		Outputs result like JSON format below.
+		Outputs result in JSON format as below.
 		@code
 		{
 			"device": <string>,

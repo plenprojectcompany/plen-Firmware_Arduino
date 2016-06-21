@@ -25,7 +25,7 @@ namespace Utility
 	@brief Analysis class of the PLEN2's protocol
 
 	The class only analyses the command line given,
-	so should override the event handler(s) with inheriting the class yourself.
+	so you should override the event handler(s) by inheriting the class yourself.
 
 	Please see the virtual methods to get more details.
 */
@@ -55,7 +55,7 @@ protected:
 				@brief Buffer length
 
 				@attention
-				The value is required at least more than BLE payload length (= 20 bytes),
+				The value is required to be at least more than BLE payload length (= 20 bytes),
 				and it should be defined 2^N length for processing the class with high speed.
 			*/
 			LENGTH = 128
