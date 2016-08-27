@@ -1,8 +1,8 @@
 /*!
-	@file      System.h
-	@brief     Management class of basis about AVR MCU.
-	@author    Kazuyuki TAKASE
-	@copyright The MIT License - http://opensource.org/licenses/mit-license.php
+    @file      System.h
+    @brief     Management class of basis about AVR MCU.
+    @author    Kazuyuki TAKASE
+    @copyright The MIT License - http://opensource.org/licenses/mit-license.php
 */
 
 #pragma once
@@ -17,87 +17,92 @@ class __FlashStringHelper;
 
 namespace PLEN2
 {
-	class System;
+    class System;
 }
 
 /*!
-	@brief Management class of basis about AVR MCU
+    @brief Management class of basis about AVR MCU
 */
 class PLEN2::System
 {
 private:
-	//! @brief Device name
-	inline static const __FlashStringHelper* DEVICE()   { return F("PLEN2");   }
+    //! @brief Device name
+    inline static const __FlashStringHelper* DEVICE()   { return F("PLEN2");   }
 
-	//! @brief Code name of the firmware
-	inline static const __FlashStringHelper* CODENAME() { return F("Cytisus"); }
+    //! @brief Code name of the firmware
+    inline static const __FlashStringHelper* CODENAME() { return F("Cytisus"); }
 
-	//! @brief Version number of the firmware
-	inline static const __FlashStringHelper* VERSION()  { return F("1.3.1");   }
+    //! @brief Version number of the firmware
+    inline static const __FlashStringHelper* VERSION()  { return F("1.3.1");   }
 
-	//! @brief Communication speed of USB serial
-	inline static const long USBSERIAL_BAUDRATE() { return 2000000L; }
+    //! @brief Communication speed of USB serial
+    enum { USBSERIAL_BAUDRATE = 2000000L };
 
-	//! @brief Communication speed of BLE serial
-	inline static const long BLESERIAL_BAUDRATE() { return 2000000L; }
+    //! @brief Communication speed of BLE serial
+    enum { BLESERIAL_BAUDRATE = 2000000L };
 
 public:
-	//! @brief Size of internal eeprom
-	inline static const int INTERNAL_EEPROMSIZE() { return 1024; }
+    //! @brief Size of internal eeprom
+    enum { INTERNAL_EEPROMSIZE = 1024 };
 
-	/*!
-		@brief Constructor
-	*/
-	System();
+    /*!
+        @brief Constructor
+    */
+    System() { begin(); }
 
-	/*!
-		@brief Get USB-serial instance
+    /*!
+        @brief Static constructor
+    */
+    static void begin();
 
-		@return Reference of USB-serial instance
-	*/
-	static Stream& USBSerial();
+    /*!
+        @brief Get USB-serial instance
 
-	/*!
-		@brief Get BLE-serial instance
+        @return Reference of USB-serial instance
+    */
+    static Stream& USBSerial();
 
-		@return Reference of BLE-serial instance
-	*/
-	static Stream& BLESerial();
+    /*!
+        @brief Get BLE-serial instance
 
-	/*!
-		@brief Get input-serial instance
+        @return Reference of BLE-serial instance
+    */
+    static Stream& BLESerial();
 
-		@return Reference of input-serial instance
-	*/
-	static Stream& inputSerial();
+    /*!
+        @brief Get input-serial instance
 
-	/*!
-		@brief Get output-serial instance
+        @return Reference of input-serial instance
+    */
+    static Stream& inputSerial();
 
-		@return Reference of output-serial instance
-	*/
-	static Stream& outputSerial();
+    /*!
+        @brief Get output-serial instance
 
-	/*!
-		@brief Get debug-serial instance
+        @return Reference of output-serial instance
+    */
+    static Stream& outputSerial();
 
-		@return Reference of debug-serial instance
-	*/
-	static Stream& debugSerial();
+    /*!
+        @brief Get debug-serial instance
 
-	/*!
-		@brief Dump information of the system
+        @return Reference of debug-serial instance
+    */
+    static Stream& debugSerial();
 
-		Outputs result in JSON format as below.
-		@code
-		{
-			"device": <string>,
-			"codename": <string>,
-			"version": <string>
-		}
-		@endcode
-	*/
-	static void dump();
+    /*!
+        @brief Dump information of the system
+
+        Outputs result in JSON format as below.
+        @code
+        {
+            "device": <string>,
+            "codename": <string>,
+            "version": <string>
+        }
+        @endcode
+    */
+    static void dump();
 };
 
 #endif // PLEN2_SYSTEM_H
