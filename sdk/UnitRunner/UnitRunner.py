@@ -66,15 +66,18 @@ def test():
             result += usb_serial.read(usb_serial.in_waiting)
 
             if ('Test summary:' in result):
+                while (result[-1] != '\n'):
+                    result += usb_serial.read(usb_serial.in_waiting)
+
+                    time.sleep(0.01)
+
                 break
 
         time.sleep(0.01)
 
-    test_summary = result.split('\r\n')[-1]
-
     print result
 
-    return ('0 failed' not in test_summary)
+    return ('0 failed' in result)
 
 
 # Application entry point.
