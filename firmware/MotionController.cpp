@@ -60,6 +60,7 @@ bool PLEN2::MotionController::playing()
         PROFILING("MotionController::playing()");
     #endif
 
+
     return m_playing;
 }
 
@@ -69,6 +70,7 @@ bool PLEN2::MotionController::frameUpdatable()
     #if DEBUG_HARD
         PROFILING("MotionController::frameUpdatable()");
     #endif
+
 
     return m_joint_ctrl_ptr->m_1cycle_finished;
 }
@@ -80,6 +82,7 @@ bool PLEN2::MotionController::updatingFinished()
         PROFILING("MotionController::updatingFinished()");
     #endif
 
+
     return (m_transition_count == 0);
 }
 
@@ -89,6 +92,7 @@ bool PLEN2::MotionController::nextFrameLoadable()
     #if DEBUG_HARD
         PROFILING("MotionController::nextFrameLoadable()");
     #endif
+
 
     if (   (m_header.use_loop)
         || (m_header.use_jump) )
@@ -105,6 +109,7 @@ void PLEN2::MotionController::play(uint8_t slot)
     #if DEBUG
         PROFILING("MotionController::play()");
     #endif
+
 
     if (playing())
     {
@@ -139,6 +144,7 @@ void PLEN2::MotionController::playFrameDirectly(const Motion::Frame& frame)
     #if DEBUG
         PROFILING("MotionController::playDirectly()");
     #endif
+
 
     if (playing())
     {
@@ -179,6 +185,7 @@ void PLEN2::MotionController::willStop()
         PROFILING("MotionController::willStop()");
     #endif
 
+
     m_header.use_loop = 0;
     m_header.use_jump = 0;
 }
@@ -190,6 +197,7 @@ void PLEN2::MotionController::stop()
         PROFILING("MotionController::stop()");
     #endif
 
+
     m_playing = false;
     m_bufferingFrame(); // @attension It is necessary for a valid sequence!
 }
@@ -200,6 +208,7 @@ void PLEN2::MotionController::updateFrame()
     #if DEBUG
         PROFILING("MotionController::updateFrame()");
     #endif
+
 
     m_transition_count--;
 
@@ -237,6 +246,7 @@ void PLEN2::MotionController::m_bufferingFrame()
         PROFILING("MotionController::m_bufferingFrame()");
     #endif
 
+
     Motion::Frame* frame_ptr_temp = m_frame_current_ptr;
 
     m_frame_current_ptr = m_frame_next_ptr;
@@ -249,6 +259,7 @@ void PLEN2::MotionController::loadNextFrame()
     #if DEBUG
         PROFILING("MotionController::loadNextFrame()");
     #endif
+
 
     m_bufferingFrame();
     const uint8_t index_current = m_frame_current_ptr->index;
@@ -305,6 +316,7 @@ void PLEN2::MotionController::dump(uint8_t slot)
     #if DEBUG
         PROFILING("MotionController::dump()");
     #endif
+
 
     if (slot >= Motion::SLOT_END)
     {

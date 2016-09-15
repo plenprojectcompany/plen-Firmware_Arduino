@@ -30,8 +30,9 @@ void PLEN2::ExternalEEPROM::begin()
 int8_t PLEN2::ExternalEEPROM::readSlot(uint16_t slot, uint8_t data[], uint8_t read_size)
 {
     #if DEBUG
-        volatile Utility::Profiler p(F("ExternalEEPROM::readSlot()"));
+        PROFILING("ExternalEEPROM::readSlot()");
     #endif
+
 
     if (   (slot >= SLOT_END)
         || (read_size > SLOT_SIZE)
@@ -89,8 +90,9 @@ int8_t PLEN2::ExternalEEPROM::readSlot(uint16_t slot, uint8_t data[], uint8_t re
 int8_t PLEN2::ExternalEEPROM::writeSlot(uint16_t  slot, const uint8_t data[], uint8_t write_size)
 {
     #if DEBUG
-        volatile Utility::Profiler p(F("ExternalEEPROM::writeSlot()"));
+        PROFILING("ExternalEEPROM::writeSlot()");
     #endif
+
 
     if (   (slot >= SLOT_END)
         || (write_size > SLOT_SIZE)

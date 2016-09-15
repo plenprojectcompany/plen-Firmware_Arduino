@@ -52,16 +52,14 @@ protected:
     class Buffer
     {
     public:
-        enum {
-            /*!
-                @brief Buffer length
+        /*!
+            @brief Buffer length
 
-                @attention
-                The value is required to be at least more than BLE payload length (= 20 bytes),
-                and it should be defined 2^N length for processing the class with high speed.
-            */
-            LENGTH = 128
-        };
+            @attention
+            The value is required to be at least more than BLE payload length (= 20 bytes),
+            and it should be defined 2^N length for processing the class with high speed.
+        */
+        enum { LENGTH = 128 };
 
         char    data[LENGTH]; //!< Actual buffer instance.
         uint8_t position;     //!< Current iterator's position.

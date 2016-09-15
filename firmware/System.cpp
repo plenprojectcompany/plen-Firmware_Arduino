@@ -33,6 +33,8 @@ void PLEN2::System::begin()
 
     digitalWrite(Pin::RS485_TXD, LOW);
     digitalWrite(Pin::LED_OUT,   LOW);
+
+    randomSeed( analogRead(Pin::RANDOM_DEVICE_IN) );
 }
 
 
@@ -68,8 +70,9 @@ Stream& PLEN2::System::debugSerial()
 void PLEN2::System::dump()
 {
     #if DEBUG
-        volatile Utility::Profiler p(F("System::dump()"));
+        PROFILING("System::dump()");
     #endif
+
 
     outputSerial().println(F("{"));
 

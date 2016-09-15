@@ -127,9 +127,7 @@ public:
     void dump(uint8_t slot);
 
 private:
-    enum {
-        FRAMEBUFFER_LENGTH = 2
-    };
+    enum { FRAMEBUFFER_LENGTH = 2 };
 
     void m_setupFrame(uint8_t index);
     void m_bufferingFrame();

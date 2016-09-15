@@ -105,8 +105,9 @@ PLEN2::JointController::JointController()
 void PLEN2::JointController::loadSettings()
 {
     #if DEBUG
-        volatile Utility::Profiler p(F("JointController::loadSettings()"));
+        PROFILING("JointController::loadSettings()");
     #endif
+
 
     uint8_t* filler = reinterpret_cast<uint8_t*>(m_SETTINGS);
     
@@ -165,8 +166,9 @@ void PLEN2::JointController::loadSettings()
 void PLEN2::JointController::resetSettings()
 {
     #if DEBUG
-        volatile Utility::Profiler p(F("JointController::resetSettings()"));
+        PROFILING("JointController::resetSettings()");
     #endif
+
 
     EEPROM[INIT_FLAG_ADDRESS] = INIT_FLAG_VALUE;
     eeprom_busy_wait();
@@ -193,8 +195,9 @@ void PLEN2::JointController::resetSettings()
 const int16_t& PLEN2::JointController::getMinAngle(uint8_t joint_id)
 {
     #if DEBUG
-        volatile Utility::Profiler p(F("JointController::getMinAngle()"));
+        PROFILING("JointController::getMinAngle()");
     #endif
+
 
     if (joint_id >= JOINTS_SUM)
     {
@@ -213,8 +216,9 @@ const int16_t& PLEN2::JointController::getMinAngle(uint8_t joint_id)
 const int16_t& PLEN2::JointController::getMaxAngle(uint8_t joint_id)
 {
     #if DEBUG
-        volatile Utility::Profiler p(F("JointController::getMaxAngle()"));
+        PROFILING("JointController::getMaxAngle()");
     #endif
+
 
     if (joint_id >= JOINTS_SUM)
     {
@@ -233,8 +237,9 @@ const int16_t& PLEN2::JointController::getMaxAngle(uint8_t joint_id)
 const int16_t& PLEN2::JointController::getHomeAngle(uint8_t joint_id)
 {
     #if DEBUG
-        volatile Utility::Profiler p(F("JointController::getHomeAngle()"));
+        PROFILING("JointController::getHomeAngle()");
     #endif
+
 
     if (joint_id >= JOINTS_SUM)
     {
@@ -253,8 +258,9 @@ const int16_t& PLEN2::JointController::getHomeAngle(uint8_t joint_id)
 bool PLEN2::JointController::setMinAngle(uint8_t joint_id, int16_t angle)
 {
     #if DEBUG
-        volatile Utility::Profiler p(F("JointController::setMinAngle()"));
+        PROFILING("JointController::setMinAngle()");
     #endif
+
 
     if (joint_id >= JOINTS_SUM)
     {
@@ -301,8 +307,9 @@ bool PLEN2::JointController::setMinAngle(uint8_t joint_id, int16_t angle)
 bool PLEN2::JointController::setMaxAngle(uint8_t joint_id, int16_t angle)
 {
     #if DEBUG
-        volatile Utility::Profiler p(F("JointController::setMaxAngle()"));
+        PROFILING("JointController::setMaxAngle()");
     #endif
+
 
     if (joint_id >= JOINTS_SUM)
     {
@@ -349,8 +356,9 @@ bool PLEN2::JointController::setMaxAngle(uint8_t joint_id, int16_t angle)
 bool PLEN2::JointController::setHomeAngle(uint8_t joint_id, int16_t angle)
 {
     #if DEBUG
-        volatile Utility::Profiler p(F("JointController::setHomeAngle()"));
+        PROFILING("JointController::setHomeAngle()");
     #endif
+
 
     if (joint_id >= JOINTS_SUM)
     {
@@ -397,8 +405,9 @@ bool PLEN2::JointController::setHomeAngle(uint8_t joint_id, int16_t angle)
 bool PLEN2::JointController::setAngle(uint8_t joint_id, int16_t angle)
 {
     #if DEBUG_HARD
-        volatile Utility::Profiler p(F("JointController::setAngle()"));
+        PROFILING("JointController::setAngle()");
     #endif
+
 
     if (joint_id >= JOINTS_SUM)
     {
@@ -428,8 +437,9 @@ bool PLEN2::JointController::setAngle(uint8_t joint_id, int16_t angle)
 bool PLEN2::JointController::setAngleDiff(uint8_t joint_id, int16_t angle_diff)
 {
     #if DEBUG_HARD
-        volatile Utility::Profiler p(F("JointController::setAngleDiff()"));
+        PROFILING("JointController::setAngleDiff()");
     #endif
+
 
     if (joint_id >= JOINTS_SUM)
     {
@@ -462,8 +472,9 @@ bool PLEN2::JointController::setAngleDiff(uint8_t joint_id, int16_t angle_diff)
 void PLEN2::JointController::dump()
 {
     #if DEBUG
-        volatile Utility::Profiler p(F("JointController::dump()"));
+        PROFILING("JointController::dump()");
     #endif
+
 
     System::outputSerial().println(F("["));
 

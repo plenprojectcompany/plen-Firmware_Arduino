@@ -48,12 +48,14 @@ namespace
     template<typename T>
     struct SLOT_COUNT
     {
-        enum {
+        enum
+        {
             VALUE = sizeof(T) / ExternalEEPROM::SLOT_SIZE + IF<SIZE_SUP<T>::VALUE>::VALUE
         };
     };
 
-    enum {
+    enum
+    {
         SLOT_COUNT_HEADER = SLOT_COUNT<Header>::VALUE,
         SLOT_COUNT_FRAME  = SLOT_COUNT<Frame>::VALUE,
         SLOT_COUNT_MOTION = SLOT_COUNT_HEADER + SLOT_COUNT_FRAME * Header::FRAMELENGTH_MAX
@@ -71,6 +73,7 @@ void Header::init(Header& header)
     #if DEBUG
         PROFILING("Header::init()");
     #endif
+
 
     header.slot              = 0;
     header.name[0]           = '\0';
@@ -91,6 +94,7 @@ bool Header::set(uint8_t slot, const Header& header)
     #if DEBUG
         PROFILING("Header::set()");
     #endif
+
 
     if (slot >= SLOT_END)
     {
@@ -159,6 +163,7 @@ bool Header::get(uint8_t slot, Header& header)
         PROFILING("Header::get()");
     #endif
 
+
     if (slot >= SLOT_END)
     {
         #if DEBUG
@@ -214,6 +219,7 @@ void Frame::init(Frame& frame)
         PROFILING("Frame::init()");
     #endif
 
+
     frame.index              = 0;
     frame.transition_time_ms = 32;
 
@@ -229,7 +235,8 @@ bool Frame::set(uint8_t slot, uint8_t index, const Frame& frame)
     #if DEBUG
         PROFILING("Frame::set()");
     #endif
-    
+
+
     if (slot >= SLOT_END)
     {
         #if DEBUG
@@ -297,7 +304,8 @@ bool Frame::get(uint8_t slot, uint8_t index, Frame& frame)
     #if DEBUG
         PROFILING("Frame::get()");
     #endif
-    
+
+
     if (slot >= SLOT_END)
     {
         #if DEBUG

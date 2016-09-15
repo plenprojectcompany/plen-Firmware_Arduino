@@ -47,8 +47,9 @@ namespace
 bool PLEN2::AccelerationGyroSensor::sampling()
 {
     #if DEBUG
-        volatile Utility::Profiler p(F("AccelerationGyroSensor::sampling()"));
+        PROFILING("AccelerationGyroSensor::sampling()");
     #endif
+
 
     /*!
         @note
@@ -58,10 +59,10 @@ bool PLEN2::AccelerationGyroSensor::sampling()
         Just after sending any data, must give up the right of sending data (data flow is "head-board -> base-board")
         by substituting LOW for Pin::RS485_TXD(), for receiving the values.
     */
-    digitalWrite(Pin::RS485_TXD(), HIGH);
+    digitalWrite(Pin::RS485_TXD, HIGH);
     System::BLESerial().write('<');
 
-    digitalWrite(Pin::RS485_TXD(), LOW);
+    digitalWrite(Pin::RS485_TXD, LOW);
 
     uint8_t  read_count;
     uint8_t* filler = reinterpret_cast<uint8_t*>(m_values);
@@ -81,65 +82,79 @@ bool PLEN2::AccelerationGyroSensor::sampling()
     return false;
 }
 
+
 const int16_t& PLEN2::AccelerationGyroSensor::getAccX()
 {
     #if DEBUG
-        volatile Utility::Profiler p(F("AccelerationGyroSensor::getAccX()"));
+        PROFILING("AccelerationGyroSensor::getAccX()");
     #endif
+
 
     return m_values[ACC_X];
 }
 
+
 const int16_t& PLEN2::AccelerationGyroSensor::getAccY()
 {
     #if DEBUG
-        volatile Utility::Profiler p(F("AccelerationGyroSensor::getAccY()"));
+        PROFILING("AccelerationGyroSensor::getAccY()");
     #endif
+
 
     return m_values[ACC_Y];
 }
 
+
 const int16_t& PLEN2::AccelerationGyroSensor::getAccZ()
 {
     #if DEBUG
-        volatile Utility::Profiler p(F("AccelerationGyroSensor::getAccZ()"));
+        PROFILING("AccelerationGyroSensor::getAccZ()");
     #endif
+
 
     return m_values[ACC_Z];
 }
 
+
 const int16_t& PLEN2::AccelerationGyroSensor::getGyroRoll()
 {
     #if DEBUG
-        volatile Utility::Profiler p(F("AccelerationGyroSensor::getGyroRoll()"));
+        PROFILING("AccelerationGyroSensor::getGyroRoll()");
     #endif
+
 
     return m_values[GYRO_ROLL];
 }
 
+
 const int16_t& PLEN2::AccelerationGyroSensor::getGyroPitch()
 {
     #if DEBUG
-        volatile Utility::Profiler p(F("AccelerationGyroSensor::getGyroPitch()"));
+        PROFILING("AccelerationGyroSensor::getGyroPitch()");
     #endif
+
 
     return m_values[GYRO_PITCH];
 }
 
+
 const int16_t& PLEN2::AccelerationGyroSensor::getGyroYaw()
 {
     #if DEBUG
-        volatile Utility::Profiler p(F("AccelerationGyroSensor::getGyroYaw()"));
+        PROFILING("AccelerationGyroSensor::getGyroYaw()");
     #endif
+
 
     return m_values[GYRO_YAW];
 }
 
+
 void PLEN2::AccelerationGyroSensor::dump()
 {
     #if DEBUG
-        volatile Utility::Profiler p(F("AccelerationGyroSensor::dump()"));
+        PROFILING("AccelerationGyroSensor::dump()");
     #endif
+
 
     System::outputSerial().println(F("{"));
 

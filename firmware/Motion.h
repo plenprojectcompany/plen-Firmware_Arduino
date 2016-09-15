@@ -19,7 +19,8 @@ namespace PLEN2
 {
     namespace Motion
     {
-        enum {
+        enum
+        {
             SLOT_BEGIN =  0, //!< Beginning value of slots.
             SLOT_END   = 90  //!< Ending value of slots.
         };
@@ -41,7 +42,8 @@ namespace PLEN2
 class PLEN2::Motion::Header
 {
 public:
-    enum {
+    enum
+    {
         /*!
             @brief Length of a motion name.
 
@@ -65,7 +67,7 @@ public:
         @brief Write the header to external EEPROM
 
         @param [in] slot Number of a header.
-        @parse [in] header An instance of header.
+        @param [in] header An instance of header.
 
         @return Result
     */
@@ -121,7 +123,8 @@ public:
 class PLEN2::Motion::Frame
 {
 public:
-    enum {
+    enum
+    {
         /*!
             @brief Update interval between frames
 

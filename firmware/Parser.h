@@ -13,7 +13,6 @@
 
 #include <stdint.h>
 
-
 namespace Utility
 {
     class AbstractParser;
@@ -34,6 +33,12 @@ namespace Utility
     */
     uint16_t hexbytes2uint16_impl(const char* bytes, uint8_t size);
 
+    /*!
+        @brief hexbytes2uint16_impl with compile time assertion
+
+        @tparam     SIZE  Length of hex string buffer.
+        @param [in] bytes Pointer of hex string buffer.
+    */
     template<const int SIZE>
     uint16_t hexbytes2uint16(const char* bytes)
     {
@@ -56,6 +61,12 @@ namespace Utility
     */
     int16_t hexbytes2int16_impl(const char* bytes, uint8_t size);
 
+    /*!
+        @brief hexbytes2int16_impl with compile time assertion.
+
+        @tparam     SIZE  Length of hex string buffer.
+        @param [in] bytes Pointer of hex string buffer.
+    */
     template<const int SIZE>
     int16_t hexbytes2int16(const char* bytes)
     {
