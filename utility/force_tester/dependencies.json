@@ -1,9 +1,9 @@
 {
     "root": "../../firmware/",
     "import": [
+        "BuildConfig",
         "JointController",
         "Pin",
-        "System",
-        "BuildConfig"
+        "System"
     ]
 }

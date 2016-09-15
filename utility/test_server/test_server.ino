@@ -6,7 +6,7 @@
 
 void setup()
 {
-    volatile PLEN2::System s;
+    PLEN2::System::begin();
 }
 
 void loop()
@@ -15,16 +15,16 @@ void loop()
 
     if (System::USBSerial().available())
     {
-        digitalWrite(Pin::RS485_TXD(), HIGH);
+        digitalWrite(Pin::RS485_TXD, HIGH);
 
-        System::BLESerial().write(System::USBSerial().read());
+        System::BLESerial().write( System::USBSerial().read() );
         System::BLESerial().flush();
 
-        digitalWrite(Pin::RS485_TXD(), LOW);
+        digitalWrite(Pin::RS485_TXD, LOW);
     }
 
     if (System::BLESerial().available())
     {
-        System::USBSerial().write(System::BLESerial().read());
+        System::USBSerial().write( System::BLESerial().read() );
     }
 }

@@ -8,13 +8,13 @@ namespace
 {
     PLEN2::AccelerationGyroSensor acc_gyro;
 
-    unsigned long call_count = 1;
+    uint32_t call_count = 1;
 }
 
 
 void setup()
 {
-    volatile PLEN2::System s;
+    PLEN2::System::begin();
 
     while (!Serial);
 
@@ -23,10 +23,10 @@ void setup()
 
 void loop()
 {
-    PLEN2::System::debugSerial().print(acc_gyro.sampling() ? F("OK : ") : F("NG : "));
-    PLEN2::System::debugSerial().println(call_count++);
+    PLEN2::System::outputSerial().print(acc_gyro.sampling() ? F("OK : ") : F("NG : "));
+    PLEN2::System::outputSerial().println(call_count++);
 
     acc_gyro.dump();
 
-    delay(1000);
+    delay(100);
 }
