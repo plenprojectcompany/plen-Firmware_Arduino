@@ -90,3 +90,16 @@ void PLEN2::System::dump()
 
     outputSerial().println(F("}"));
 }
+
+
+void PLEN2::System::welcome()
+{
+    #if DEBUG
+        PROFILING("System::welcome()");
+    #endif
+
+
+    outputSerial().println(
+        F("Hello, I am PLEN! My system is up and running ver." FIRMWARE_VERSION ", Let me walk :)")
+    );
+}

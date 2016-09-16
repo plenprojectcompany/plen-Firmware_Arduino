@@ -20,8 +20,8 @@ class __FlashStringHelper;
     @brief Sugar syntax for the profiler
 
     @attention
-    You shouldn't use the macro with '__func__' macro,
-    because '__func__' macro is expanded as static const char pointer.
+    You shouldn't use the macro with `__func__` macro,
+    because `__func__` macro is expanded as static const char pointer.
 */
 #define PROFILING(FUNC_NAME) volatile Utility::Profiler p(F(FUNC_NAME))
 

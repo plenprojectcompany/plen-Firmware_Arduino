@@ -343,6 +343,10 @@ void PLEN2::MotionController::dump(uint8_t slot)
     System::outputSerial().print(header.name);
     System::outputSerial().println(F("\","));
 
+    System::outputSerial().print(F("\t\"@frame_length\": "));
+    System::outputSerial().print(static_cast<int>(header.frame_length));
+    System::outputSerial().println(F(","));
+
     System::outputSerial().println(F("\t\"codes\": ["));
 
     if (header.use_loop)
@@ -394,11 +398,15 @@ void PLEN2::MotionController::dump(uint8_t slot)
 
     Motion::Frame frame;
 
-    for (char frame_index = 0; frame_index < header.frame_length; frame_index++)
+    for (uint16_t frame_index = 0; frame_index < header.frame_length; frame_index++)
     {
         Motion::Frame::get(slot, frame_index, frame);
 
         System::outputSerial().println(F("\t\t{"));
+
+        System::outputSerial().print(F("\t\t\t\"@index\": "));
+        System::outputSerial().print(frame_index);
+        System::outputSerial().println(F(","));
 
         System::outputSerial().print(F("\t\t\t\"transition_time_ms\": "));
         System::outputSerial().print(frame.transition_time_ms);
@@ -406,7 +414,7 @@ void PLEN2::MotionController::dump(uint8_t slot)
 
         System::outputSerial().println(F("\t\t\t\"outputs\": ["));
 
-        for (int device_index = 0; device_index < JointController::JOINTS_SUM; device_index++)
+        for (uint16_t device_index = 0; device_index < JointController::JOINTS_SUM; device_index++)
         {
             System::outputSerial().println(F("\t\t\t\t{"));
 

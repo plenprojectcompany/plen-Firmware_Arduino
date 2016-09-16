@@ -596,6 +596,10 @@ namespace
     @attention
     Digital pin's output is an indefinite if you don't give an initialize value.
     Please ensure that setup the pins which are configurable.
+
+    @note
+    The default baudrate of the firmware is defined at System.h.
+    If you would like to change the value, please write down `Serial.begin()` in the function.
 */
 void setup()
 {
@@ -617,9 +621,7 @@ void setup()
     #if DEBUG
         while (!Serial);
 
-        PLEN2::System::outputSerial().println(
-            F("Hello, I am PLEN2! My system is up and running ver.1.3.1, Let me walk :)")
-        );
+        PLEN2::System::welcome();
     #endif
 }
 
