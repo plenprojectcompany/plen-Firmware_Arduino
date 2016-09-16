@@ -772,7 +772,7 @@ test(Args_ValidInputs)
     {
         setup(">MH");
 
-        n_input('8', 30);
+        n_input('8', 35);
 
         bool expected = true;
         bool actual   = protocol.accept();

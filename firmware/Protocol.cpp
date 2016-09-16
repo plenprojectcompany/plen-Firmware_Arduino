@@ -75,7 +75,7 @@ namespace
             0,    // RESET JOINT SETTINGS
             5,    // MAX
             104,  // MOTION FRAME
-            30,   // MOTION HEADER
+            35,   // MOTION HEADER
             5     // MIN
         };
 
@@ -234,7 +234,7 @@ void PLEN2::Protocol::transitState()
                 }
             }
 
-            uint8_t header_id = m_parser[HEADER_INCOMING]->index();
+            uint8_t header_id = m_parser[HEADER_INCOMING ]->index();
             uint8_t cmd_id    = m_parser[COMMAND_INCOMING]->index();
 
             m_store_length = Shared::ARGS_STORE_LENGTH[header_id][cmd_id];
