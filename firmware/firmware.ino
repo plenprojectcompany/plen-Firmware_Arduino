@@ -343,6 +343,7 @@ namespace
                 }
             #endif
 
+            m_frame_tmp.index              = args::frame_id(m_buffer.data);
             m_frame_tmp.transition_time_ms = args::transition_time_ms(m_buffer.data);
 
             for (uint8_t device_id = 0; device_id < JointController::JOINTS_SUM; device_id++)
