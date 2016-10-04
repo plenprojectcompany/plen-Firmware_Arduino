@@ -125,7 +125,7 @@ bool Header::set(uint8_t slot, const Header& header)
     {
         int8_t result = ExternalEEPROM::writeSlot(
             (
-                static_cast<const uint16_t>(slot) * SLOT_COUNT_MOTION + count
+                static_cast<uint16_t>(slot) * SLOT_COUNT_MOTION + count
             ),
             (
                 filler + count * ExternalEEPROM::SLOT_SIZE
@@ -264,9 +264,9 @@ bool Frame::set(uint8_t slot, uint8_t index, const Frame& frame)
     {
         int8_t result = ExternalEEPROM::writeSlot(
             (
-                  static_cast<int>(slot) * SLOT_COUNT_MOTION
+                  static_cast<uint16_t>(slot) * SLOT_COUNT_MOTION
                 + SLOT_COUNT_HEADER
-                + index * SLOT_COUNT_FRAME
+                + static_cast<uint16_t>(index) * SLOT_COUNT_FRAME
                 + count
             ),
             (
@@ -335,7 +335,7 @@ bool Frame::get(uint8_t slot, uint8_t index, Frame& frame)
             (
                   static_cast<uint16_t>(slot) * SLOT_COUNT_MOTION
                 + SLOT_COUNT_HEADER
-                + index * SLOT_COUNT_FRAME
+                + static_cast<uint16_t>(index) * SLOT_COUNT_FRAME
                 + count
             ),
             (
