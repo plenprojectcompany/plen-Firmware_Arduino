@@ -16,7 +16,7 @@
 /*!
     @brief Definition of the firmware vesion
 */
-#define FIRMWARE_VERSION "1.4.0"
+#define FIRMWARE_VERSION "1.4.1"
 
 class Stream;
 class __FlashStringHelper;
@@ -68,7 +68,7 @@ private:
     }
 
     //! @brief Version number of the firmware
-    inline static const __FlashStringHelper* VERSION()  { return F(FIRMWARE_VERSION); }
+    inline static const __FlashStringHelper* VERSION() { return F(FIRMWARE_VERSION); }
 
     //! @brief Communication speed of USB serial
     enum { USBSERIAL_BAUDRATE = 2000000L };
