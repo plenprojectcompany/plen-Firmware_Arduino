@@ -2,6 +2,7 @@
     "root": "../../firmware/",
     "import": [
         "Pin",
-        "System"
+        "System",
+        "BuildConfig"
     ]
 }
