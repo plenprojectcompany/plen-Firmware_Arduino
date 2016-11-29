@@ -16,7 +16,7 @@
 /*!
     @brief Definition of the firmware vesion
 */
-#define FIRMWARE_VERSION "1.4.1"
+#define FIRMWARE_VERSION "1.4.2"
 
 class Stream;
 class __FlashStringHelper;
