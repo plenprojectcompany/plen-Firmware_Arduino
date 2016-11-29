@@ -430,8 +430,6 @@ void setup()
 {
     PLEN2::System::begin();
 
-    randomSeed( analogRead(PLEN2::Pin::RANDOM_DEVICE_IN) );
-
     joint_ctrl.loadSettings();
     joint_ctrl.resetSettings();
 

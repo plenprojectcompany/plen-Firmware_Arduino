@@ -62,8 +62,8 @@ public:
         #endif
 
         #if TARGET_PLEN20
-            ANGLE_MIN     = -700, //!< Min angle of the servos.
-            ANGLE_MAX     =  700, //!< Max angle of the servos.
+            ANGLE_MIN     = -900, //!< Min angle of the servos.
+            ANGLE_MAX     =  900, //!< Max angle of the servos.
             ANGLE_NEUTRAL =    0  //!< Neutral angle of the servos.
         #endif
     };
@@ -73,7 +73,7 @@ private:
     enum { INIT_FLAG_ADDRESS = 0 };
 
     //! @brief Initialized flag's value
-    enum { INIT_FLAG_VALUE = 2 };
+    enum { INIT_FLAG_VALUE = 3 };
 
     //! @brief Head-address of joint settings on internal EEPROM
     enum { SETTINGS_HEAD_ADDRESS = 1 };
@@ -133,13 +133,13 @@ public:
 
     #if TARGET_PLEN20
         //! @brief PWM width that to make min angle
-        enum { PWM_MIN = 480 };
+        enum { PWM_MIN = 410 };
 
         //! @brief PWM width that to make max angle
-        enum { PWM_MAX = 820 };
+        enum { PWM_MAX = 884 };
 
         //! @brief PWM width that to make neutral angle
-        enum { PWM_NEUTRAL = 650 };
+        enum { PWM_NEUTRAL = 647 };
     #endif
 
     /*!

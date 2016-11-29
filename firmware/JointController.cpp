@@ -51,27 +51,27 @@ namespace
 
         PROGMEM const int16_t m_SETTINGS_INITIAL[] =
         {
-            JointController::ANGLE_MIN, JointController::ANGLE_MAX,  -40, // [00] Left : Shoulder Pitch
-            JointController::ANGLE_MIN, JointController::ANGLE_MAX,  245, // [01] Left : Thigh Yaw
-            JointController::ANGLE_MIN, JointController::ANGLE_MAX,  470, // [02] Left : Shoulder Roll
-            JointController::ANGLE_MIN, JointController::ANGLE_MAX, -100, // [03] Left : Elbow Roll
-            JointController::ANGLE_MIN, JointController::ANGLE_MAX, -205, // [04] Left : Thigh Roll
-            JointController::ANGLE_MIN, JointController::ANGLE_MAX,   50, // [05] Left : Thigh Pitch
-            JointController::ANGLE_MIN, JointController::ANGLE_MAX,  445, // [06] Left : Knee Pitch
-            JointController::ANGLE_MIN, JointController::ANGLE_MAX,  245, // [07] Left : Foot Pitch
-            JointController::ANGLE_MIN, JointController::ANGLE_MAX,  -75, // [08] Left : Foot Roll
+            JointController::ANGLE_MIN, JointController::ANGLE_MAX, -200, // [00] Left : Shoulder Pitch
+            JointController::ANGLE_MIN, JointController::ANGLE_MAX,   50, // [01] Left : Thigh Yaw
+            JointController::ANGLE_MIN, JointController::ANGLE_MAX,  375, // [02] Left : Shoulder Roll
+            JointController::ANGLE_MIN, JointController::ANGLE_MAX,  250, // [03] Left : Elbow Roll
+            JointController::ANGLE_MIN, JointController::ANGLE_MAX, -470, // [04] Left : Thigh Roll
+            JointController::ANGLE_MIN, JointController::ANGLE_MAX, -220, // [05] Left : Thigh Pitch
+            JointController::ANGLE_MIN, JointController::ANGLE_MAX,  500, // [06] Left : Knee Pitch
+            JointController::ANGLE_MIN, JointController::ANGLE_MAX,  200, // [07] Left : Foot Pitch
+            JointController::ANGLE_MIN, JointController::ANGLE_MAX,  220, // [08] Left : Foot Roll
             JointController::ANGLE_MIN, JointController::ANGLE_MAX, JointController::ANGLE_NEUTRAL,
             JointController::ANGLE_MIN, JointController::ANGLE_MAX, JointController::ANGLE_NEUTRAL,
             JointController::ANGLE_MIN, JointController::ANGLE_MAX, JointController::ANGLE_NEUTRAL,
-            JointController::ANGLE_MIN, JointController::ANGLE_MAX,   15, // [12] Right : Shoulder Pitch
-            JointController::ANGLE_MIN, JointController::ANGLE_MAX,  -70, // [13] Right : Thigh Yaw
-            JointController::ANGLE_MIN, JointController::ANGLE_MAX, -390, // [14] Right : Shoulder Roll
-            JointController::ANGLE_MIN, JointController::ANGLE_MAX,  250, // [15] Right : Elbow Roll
-            JointController::ANGLE_MIN, JointController::ANGLE_MAX,  195, // [16] Right : Thigh Roll
-            JointController::ANGLE_MIN, JointController::ANGLE_MAX, -105, // [17] Right : Thigh Pitch
-            JointController::ANGLE_MIN, JointController::ANGLE_MAX, -510, // [18] Right : Knee Pitch
-            JointController::ANGLE_MIN, JointController::ANGLE_MAX, -305, // [19] Right : Foot Pitch
-            JointController::ANGLE_MIN, JointController::ANGLE_MAX,   60, // [20] Right : Foot Roll
+            JointController::ANGLE_MIN, JointController::ANGLE_MAX,  200, // [12] Right : Shoulder Pitch
+            JointController::ANGLE_MIN, JointController::ANGLE_MAX,  -50, // [13] Right : Thigh Yaw
+            JointController::ANGLE_MIN, JointController::ANGLE_MAX, -375, // [14] Right : Shoulder Roll
+            JointController::ANGLE_MIN, JointController::ANGLE_MAX, -250, // [15] Right : Elbow Roll
+            JointController::ANGLE_MIN, JointController::ANGLE_MAX,  470, // [16] Right : Thigh Roll
+            JointController::ANGLE_MIN, JointController::ANGLE_MAX,  220, // [17] Right : Thigh Pitch
+            JointController::ANGLE_MIN, JointController::ANGLE_MAX, -500, // [18] Right : Knee Pitch
+            JointController::ANGLE_MIN, JointController::ANGLE_MAX, -200, // [19] Right : Foot Pitch
+            JointController::ANGLE_MIN, JointController::ANGLE_MAX, -220, // [20] Right : Foot Roll
             JointController::ANGLE_MIN, JointController::ANGLE_MAX, JointController::ANGLE_NEUTRAL,
             JointController::ANGLE_MIN, JointController::ANGLE_MAX, JointController::ANGLE_NEUTRAL,
             JointController::ANGLE_MIN, JointController::ANGLE_MAX, JointController::ANGLE_NEUTRAL
