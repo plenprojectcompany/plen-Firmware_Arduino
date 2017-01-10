@@ -62,8 +62,8 @@ public:
         #endif
 
         #if TARGET_PLEN20
-            ANGLE_MIN     = -900, //!< Min angle of the servos.
-            ANGLE_MAX     =  900, //!< Max angle of the servos.
+            ANGLE_MIN     = -600, //!< Min angle of the servos.
+            ANGLE_MAX     =  600, //!< Max angle of the servos.
             ANGLE_NEUTRAL =    0  //!< Neutral angle of the servos.
         #endif
     };
@@ -133,13 +133,13 @@ public:
 
     #if TARGET_PLEN20
         //! @brief PWM width that to make min angle
-        enum { PWM_MIN = 410 };
+        enum { PWM_MIN = 529 };
 
         //! @brief PWM width that to make max angle
-        enum { PWM_MAX = 884 };
+        enum { PWM_MAX = 863 };
 
         //! @brief PWM width that to make neutral angle
-        enum { PWM_NEUTRAL = 647 };
+        enum { PWM_NEUTRAL = 696 };
     #endif
 
     /*!
