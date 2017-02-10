@@ -1,0 +1,36 @@
+# Test : MotionController.speed.spec.ino
+>>> pushed : MotionController::play()
++++ stack ptr : AED
++++ nest      : 0
++++ exec time : 4012 [usec]
+<<< popped
+
+>>> pushed : MotionController::updateFrame()
++++ stack ptr : AE9
++++ nest      : 0
++++ exec time : 1524 [usec]
+<<< popped
+
+>>> pushed : MotionController::loadNextFrame()
++++ stack ptr : AE9
+	>>> pushed : MotionController::m_bufferingFrame()
+	+++ stack ptr : ADB
+	+++ nest      : 1
+	+++ exec time : 4 [usec]
+	<<< popped
+>>> index_current : 0
+>>> m_header.frame_length : 1
++++ nest      : 0
++++ exec time : 7064 [usec]
+<<< popped
+
+>>> pushed : MotionController::stop()
++++ stack ptr : AEE
+	>>> pushed : MotionController::m_bufferingFrame()
+	+++ stack ptr : AE0
+	+++ nest      : 1
+	+++ exec time : 4 [usec]
+	<<< popped
++++ nest      : 0
++++ exec time : 2892 [usec]
+<<< popped
