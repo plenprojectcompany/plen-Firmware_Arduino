@@ -1,0 +1,11 @@
+# Test : Profiler.speed.spec
+>>> pushed : Loop::outerProfiler()
++++ stack ptr : AF2
+	>>> pushed : Loop::innerProfiler()
+	+++ stack ptr : AEA
+	+++ nest      : 1
+	+++ exec time : 8 [usec]
+	<<< popped
++++ nest      : 0
++++ exec time : 2580 [usec]
+<<< popped

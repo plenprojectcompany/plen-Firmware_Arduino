@@ -1,0 +1,9 @@
+{
+    "root": "../../firmware/",
+    "import": [
+        "Profiler",
+        "System",
+        "Pin",
+        "BuildConfig"
+    ]
+}
