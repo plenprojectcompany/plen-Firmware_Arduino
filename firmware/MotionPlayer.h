@@ -1,5 +1,5 @@
 ﻿/*!
-    @file      MotionController.h
+    @file      MotionPlayer.h
     @brief     Management class of a motion.
     @author    Kazuyuki TAKASE
     @copyright The MIT License - http://opensource.org/licenses/mit-license.php
@@ -7,8 +7,8 @@
 
 #pragma once
 
-#ifndef PLEN2_MOTION_CONTROLLER_H
-#define PLEN2_MOTION_CONTROLLER_H
+#ifndef PLEN2_MOTION_PLAYER_H
+#define PLEN2_MOTION_PLAYER_H
 
 
 #include <stdint.h>
@@ -23,29 +23,34 @@ namespace PLEN2
         class Frame;
     }
 
-    #ifdef PLEN2_INTERPRETER_H
-        class Interpreter;
-    #endif
-
-    class MotionController;
+    class MotionInterpreter;
+    class MotionPlayer;
 }
 
 /*!
     @brief Management class of a motion
 */
-class PLEN2::MotionController
+class PLEN2::MotionPlayer
 {
-#ifdef PLEN2_INTERPRETER_H
-    friend class Interpreter;
-#endif
+friend class MotionInterpreter;
 
 public:
+    /*!
+        @brief Function pointer of motion playing thread handler
+
+        @attention
+        The instance should be a private member normally.
+        It is a public member because it is the only way to access it from watchdog timeout interruption vector,
+        so you must not access it from other functions basically.
+    */
+    static void (*m_thread_handler)();
+
     /*!
         @brief Constructor
 
         @param [in] joint_ctrl An instance of joint controller.
     */
-    MotionController(JointController& joint_ctrl);
+    explicit MotionPlayer(JointController& joint_ctrl);
 
     /*!
         @brief Decide if a motion is playing
@@ -74,6 +79,13 @@ public:
         @return Result
     */
     bool nextFrameLoadable();
+
+    /*
+        @brief Set user defined function as the thread handler
+
+        @param [in] handler Function pointer of user defined thread handler
+    */
+    void setThreadHandler(void (*handler)());
 
     /*!
         @brief Play a motion
@@ -147,4 +159,32 @@ private:
     int32_t m_diff_fixed_points[JointController::JOINTS_SUM];
 };
 
-#endif // PLEN2_MOTION_CONTROLLER_H
+#define PLEN2_MOTION_PLAYER_CREATE_DEFAULT_THREAD_HANDLER(instance) \
+    struct DefaultThreadHandler \
+    { \
+        static void core() \
+        { \
+            if (instance.playing()) \
+            { \
+                if (instance.frameUpdatable()) \
+                { \
+                    instance.updateFrame(); \
+                } \
+                if (instance.updatingFinished()) \
+                { \
+                    if (instance.nextFrameLoadable()) \
+                    { \
+                        instance.loadNextFrame(); \
+                    } \
+                    else \
+                    { \
+                        instance.stop(); \
+                    } \
+                } \
+            } \
+        } \
+    }
+
+#define PLEN2_MOTION_PLAYER_DEFAULT_THREAD_HANDLER DefaultThreadHandler::core
+
+#endif // PLEN2_MOTION_PLAYER_H

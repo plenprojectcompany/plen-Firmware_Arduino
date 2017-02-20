@@ -1,5 +1,7 @@
-#line 2 "MotionController.operation.spec.ino"
+#line 2 "MotionPlayer.operation.spec.ino"
 
+
+#include <avr/wdt.h>
 
 #include <Wire.h>
 #include <EEPROM.h>
@@ -10,33 +12,34 @@
 #include "Protocol.h"
 #include "JointController.h"
 #include "Motion.h"
-#include "MotionController.h"
+#include "MotionPlayer.h"
 
 
 namespace
 {
-    PLEN2::JointController  joint_ctrl;
-    PLEN2::MotionController motion_ctrl(joint_ctrl);
+    PLEN2::JointController joint_ctrl;
+    PLEN2::MotionPlayer    motion_player(joint_ctrl);
 
+    PLEN2_MOTION_PLAYER_CREATE_DEFAULT_THREAD_HANDLER(motion_player);
 
     class OperationTest: public PLEN2::Protocol
     {
     private:
         void playMotion()
         {
-            motion_ctrl.play(
+            motion_player.play(
                 Utility::hexbytes2uint16<2>(m_buffer.data)
             );
         }
 
         void stopMotion()
         {
-            motion_ctrl.willStop();
+            motion_player.willStop();
         }
 
         void getMotion()
         {
-            motion_ctrl.dump(
+            motion_player.dump(
                 Utility::hexbytes2uint16<2>(m_buffer.data)
             );
         }
@@ -72,7 +75,7 @@ namespace
 
 
 /*!
-    @brief アプリケーション・エントリポイント
+    @brief The application entry point
 */
 void setup()
 {
@@ -80,39 +83,25 @@ void setup()
     PLEN2::ExternalEEPROM::begin();
 
     joint_ctrl.loadSettings();
+    motion_player.setThreadHandler(PLEN2_MOTION_PLAYER_DEFAULT_THREAD_HANDLER);
 
-
-    while (!Serial); // for the Arduino Leonardo/Micro only.
+    while (!Serial);
 
     PLEN2::System::outputSerial().print(F("# Test : "));
-    PLEN2::System::outputSerial().println(__FILE__);
+    PLEN2::System::outputSerial().println(F(__FILE__));
 }
 
+
+/*!
+    @brief Main polling loop
+*/
 void loop()
 {
-    if (motion_ctrl.playing())
-    {
-        if (motion_ctrl.frameUpdatable())
-        {
-            motion_ctrl.updateFrame();
-        }
+    using namespace PLEN2;
 
-        if (motion_ctrl.updatingFinished())
-        {
-            if (motion_ctrl.nextFrameLoadable())
-            {
-                motion_ctrl.loadNextFrame();
-            }
-            else
-            {
-                motion_ctrl.stop();
-            }
-        }
-    }
-
-    if (PLEN2::System::USBSerial().available())
+    if (System::USBSerial().available())
     {
-        test_core.readByte(PLEN2::System::USBSerial().read());
+        test_core.readByte(System::USBSerial().read());
 
         if (test_core.accept())
         {
@@ -120,9 +109,9 @@ void loop()
         }
     }
 
-    if (PLEN2::System::BLESerial().available())
+    if (System::BLESerial().available())
     {
-        test_core.readByte(PLEN2::System::BLESerial().read());
+        test_core.readByte(System::BLESerial().read());
 
         if (test_core.accept())
         {

@@ -10,17 +10,39 @@
 #define DEBUG      false
 #define DEBUG_HARD false
 
+#include <avr/interrupt.h>
+#include <avr/wdt.h>
+
 #include <Arduino.h>
 
 #include "System.h"
 #include "ExternalEEPROM.h"
 #include "JointController.h"
 #include "Motion.h"
-#include "MotionController.h"
+#include "MotionPlayer.h"
 
 #if DEBUG || DEBUG_HARD
     #include "Profiler.h"
 #endif
+
+
+namespace WDT_DisablingProcess
+{
+    void getMCUSR() __attribute__((naked)) __attribute__((section(".init3")));
+    void getMCUSR()
+    {
+        MCUSR = 0;
+        wdt_disable();
+    }
+}
+
+
+namespace
+{
+    void nullThreadHandler() {}
+}
+
+void (*PLEN2::MotionPlayer::m_thread_handler)() = nullThreadHandler;
 
 
 namespace
@@ -39,7 +61,7 @@ namespace
 }
 
 
-PLEN2::MotionController::MotionController(JointController& joint_ctrl)
+PLEN2::MotionPlayer::MotionPlayer(JointController& joint_ctrl)
 {
     m_joint_ctrl_ptr = &joint_ctrl;
 
@@ -54,10 +76,10 @@ PLEN2::MotionController::MotionController(JointController& joint_ctrl)
 }
 
 
-bool PLEN2::MotionController::playing()
+bool PLEN2::MotionPlayer::playing()
 {
     #if DEBUG_HARD
-        PROFILING("MotionController::playing()");
+        PROFILING("MotionPlayer::playing()");
     #endif
 
 
@@ -65,10 +87,10 @@ bool PLEN2::MotionController::playing()
 }
 
 
-bool PLEN2::MotionController::frameUpdatable()
+bool PLEN2::MotionPlayer::frameUpdatable()
 {
     #if DEBUG_HARD
-        PROFILING("MotionController::frameUpdatable()");
+        PROFILING("MotionPlayer::frameUpdatable()");
     #endif
 
 
@@ -76,10 +98,10 @@ bool PLEN2::MotionController::frameUpdatable()
 }
 
 
-bool PLEN2::MotionController::updatingFinished()
+bool PLEN2::MotionPlayer::updatingFinished()
 {
     #if DEBUG_HARD
-        PROFILING("MotionController::updatingFinished()");
+        PROFILING("MotionPlayer::updatingFinished()");
     #endif
 
 
@@ -87,10 +109,10 @@ bool PLEN2::MotionController::updatingFinished()
 }
 
 
-bool PLEN2::MotionController::nextFrameLoadable()
+bool PLEN2::MotionPlayer::nextFrameLoadable()
 {
     #if DEBUG_HARD
-        PROFILING("MotionController::nextFrameLoadable()");
+        PROFILING("MotionPlayer::nextFrameLoadable()");
     #endif
 
 
@@ -104,10 +126,29 @@ bool PLEN2::MotionController::nextFrameLoadable()
 }
 
 
-void PLEN2::MotionController::play(uint8_t slot)
+void PLEN2::MotionPlayer::setThreadHandler(void (*handler)())
+{
+    m_thread_handler = handler;
+
+    wdt_disable();
+    // delay(5000); // @attension It is necessary for a valid threading!
+
+    cli();
+
+    wdt_reset();
+
+    MCUSR   = 0;
+    WDTCSR |= _BV(WDCE) | _BV(WDE);
+    WDTCSR  = _BV(WDIE);
+
+    sei();
+}
+
+
+void PLEN2::MotionPlayer::play(uint8_t slot)
 {
     #if DEBUG
-        PROFILING("MotionController::play()");
+        PROFILING("MotionPlayer::play()");
     #endif
 
 
@@ -139,10 +180,10 @@ void PLEN2::MotionController::play(uint8_t slot)
 }
 
 
-void PLEN2::MotionController::playFrameDirectly(const Motion::Frame& frame)
+void PLEN2::MotionPlayer::playFrameDirectly(const Motion::Frame& frame)
 {
     #if DEBUG
-        PROFILING("MotionController::playDirectly()");
+        PROFILING("MotionPlayer::playDirectly()");
     #endif
 
 
@@ -179,10 +220,10 @@ void PLEN2::MotionController::playFrameDirectly(const Motion::Frame& frame)
 }
 
 
-void PLEN2::MotionController::willStop()
+void PLEN2::MotionPlayer::willStop()
 {
     #if DEBUG
-        PROFILING("MotionController::willStop()");
+        PROFILING("MotionPlayer::willStop()");
     #endif
 
 
@@ -191,10 +232,10 @@ void PLEN2::MotionController::willStop()
 }
 
 
-void PLEN2::MotionController::stop()
+void PLEN2::MotionPlayer::stop()
 {
     #if DEBUG
-        PROFILING("MotionController::stop()");
+        PROFILING("MotionPlayer::stop()");
     #endif
 
 
@@ -203,10 +244,10 @@ void PLEN2::MotionController::stop()
 }
 
 
-void PLEN2::MotionController::updateFrame()
+void PLEN2::MotionPlayer::updateFrame()
 {
     #if DEBUG
-        PROFILING("MotionController::updateFrame()");
+        PROFILING("MotionPlayer::updateFrame()");
     #endif
 
 
@@ -222,7 +263,7 @@ void PLEN2::MotionController::updateFrame()
 }
 
 
-void PLEN2::MotionController::m_setupFrame(uint8_t index)
+void PLEN2::MotionPlayer::m_setupFrame(uint8_t index)
 {
     Motion::Frame::get(m_header.slot, index, *m_frame_next_ptr);
 
@@ -240,10 +281,10 @@ void PLEN2::MotionController::m_setupFrame(uint8_t index)
 }
 
 
-void PLEN2::MotionController::m_bufferingFrame()
+void PLEN2::MotionPlayer::m_bufferingFrame()
 {
     #if DEBUG
-        PROFILING("MotionController::m_bufferingFrame()");
+        PROFILING("MotionPlayer::m_bufferingFrame()");
     #endif
 
 
@@ -254,10 +295,10 @@ void PLEN2::MotionController::m_bufferingFrame()
 }
 
 
-void PLEN2::MotionController::loadNextFrame()
+void PLEN2::MotionPlayer::loadNextFrame()
 {
     #if DEBUG
-        PROFILING("MotionController::loadNextFrame()");
+        PROFILING("MotionPlayer::loadNextFrame()");
     #endif
 
 
@@ -311,10 +352,10 @@ void PLEN2::MotionController::loadNextFrame()
 }
 
 
-void PLEN2::MotionController::dump(uint8_t slot)
+void PLEN2::MotionPlayer::dump(uint8_t slot)
 {
     #if DEBUG
-        PROFILING("MotionController::dump()");
+        PROFILING("MotionPlayer::dump()");
     #endif
 
 
@@ -452,4 +493,12 @@ void PLEN2::MotionController::dump(uint8_t slot)
     System::outputSerial().println(F("\t]"));
 
     System::outputSerial().println(F("}"));
+}
+
+
+ISR(WDT_vect, ISR_NOBLOCK)
+{
+    PLEN2::MotionPlayer::m_thread_handler();
+
+    wdt_reset();
 }
