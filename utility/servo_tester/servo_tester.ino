@@ -13,6 +13,8 @@ namespace
     PLEN2::JointController joint_ctrl;
 
 
+    enum { DEVICE_ID = 0 };
+
     enum { PWM_TRIM_BEGIN  = 550 };
     enum { PWM_TRIM_END    = 850 };
 
@@ -59,6 +61,9 @@ void loop()
 
     #if PRINTOUT_CSV
         #if USE_RAWDATA
+            System::USBSerial().print(F("DEVICE ID: "));
+            System::USBSerial().println(DEVICE_ID);
+
             System::USBSerial().println(F("PWM1,Analog1,PWM2,Analog2"));
         #else
             System::USBSerial().println(F("PWM1 [us],Angle1 [deg x10],PWM2 [us],Angle2 [deg x10]"));
